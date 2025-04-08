@@ -1,0 +1,2 @@
+# LoRa_2Nodes_Demo
+该项目是基于STM32F103C8T6最小系统板和正点原子ATK-LORA-01模块的智能环境监测与控制系统，可实现2个LoRa节点采集温湿度等传感器数据，通过定点模式与LoRa网关进行组网通信，LoRa网关通过ESP8266-01s Wi-Fi模块将数据上传到基于MQTT协议的EMQX Broker服务器中。同时搭建一个Android App，实现远程实时查看数据、远程控制模块、安全监控、报警等功能。
