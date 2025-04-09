@@ -2,7 +2,7 @@
 #define __DHT11_H
 
 #include "stm32f10x.h"                  // Device header
-#include "SysTick.h"
+#include "Delay.h"
 
 /*****************辰哥单片机设计******************
 											STM32

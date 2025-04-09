@@ -29,4 +29,4 @@
 .\objects\dht11.o: .\Libraries\inc\stm32f10x_usart.h
 .\objects\dht11.o: .\Libraries\inc\stm32f10x_wwdg.h
 .\objects\dht11.o: .\Libraries\inc\misc.h
-.\objects\dht11.o: .\System\SysTick.h
+.\objects\dht11.o: .\System\Delay.h

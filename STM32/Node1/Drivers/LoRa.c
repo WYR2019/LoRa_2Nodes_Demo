@@ -196,24 +196,42 @@ void LoRa_USART3_Printf(char *format, ...)
   * @brief  获取标志位					
   * @note   根据LoRa收到的数据包接收
   * @param  None
-  * @retval 1、2、99
+  * @retval 0、1、2
   */
 uint8_t LoRa_USART3_GetRxFlag(void)
 {
-//	if(LoRa_USART3_RXFlag == 1)
+//	if( == 1)
 //	{
 //		LoRa_USART3_RXFlag = 0;
 //		return 1;
 //	}
-	if(LoRa_USART3_RXFlag == 2)
+//	if(LoRa_USART3_RXFlag == 31)
+//	{
+//		LoRa_USART3_RXFlag = 0;
+//		return 31;
+//	}
+//	else if(LoRa_USART3_RXFlag == 30)
+//	{
+//		LoRa_USART3_RXFlag = 0;
+//		return 30;
+//	}
+	switch (LoRa_USART3_RXFlag)
 	{
-		LoRa_USART3_RXFlag = 0;
-		return 1;
-	}
-	else if(LoRa_USART3_RXFlag == 3)
-	{
-		LoRa_USART3_RXFlag = 0;
-		return 2;
+		case 1:
+		{
+			LoRa_USART3_RXFlag = 0;
+			return 1;
+		}
+		case 30:
+		{
+			LoRa_USART3_RXFlag = 0;
+			return 30;
+		}
+		case 31:
+		{
+			LoRa_USART3_RXFlag = 0;
+			return 31;
+		}
 	}
 	return 0;
 }
@@ -269,11 +287,11 @@ void USART3_IRQHandler(void)
 				{
 					if(LoRa_USART3_Executor_Flag == 3 && LoRa_USART3_RxPacket[1] == 0x01)
 					{
-						LoRa_USART3_RXFlag = 2;
+						LoRa_USART3_RXFlag = 31;
 					}
-					else if(LoRa_USART3_Executor_Flag == 3 && LoRa_USART3_RxPacket[1] == 0x05)
+					else if(LoRa_USART3_Executor_Flag == 3 && LoRa_USART3_RxPacket[1] == 0x02)
 					{
-						LoRa_USART3_RXFlag = 3;
+						LoRa_USART3_RXFlag = 30;
 					}
 				}
 				else if(pRxPacket > 2)
