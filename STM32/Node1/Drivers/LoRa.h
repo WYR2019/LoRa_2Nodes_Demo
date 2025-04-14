@@ -15,18 +15,18 @@
 #define LORA_NODE_IDENTIFIER																	0xD1
 
 /* LoRa发送数据数组 */
-extern uint8_t LoRa_USART3_RxPacket[];
-extern uint8_t LoRa_Sensor_DHT11_Identifier[];
-extern uint8_t LoRa_Executor_LED[];
-extern uint8_t LoRa_LED_Status_On[];
-extern uint8_t LoRa_LED_Status_Off[];
-extern uint8_t LoRa_USART3_RXFlag;
+extern uint8_t loraSensorDHT11Identifier[];
+extern uint8_t loraExecutorLED[];
+extern uint8_t loraLEDStatusOn[];
+extern uint8_t loraLEDStatusOff[];
+extern uint8_t loraUsart3RxPacket[];
+extern uint8_t loraUsart3RxFlag;
 
-void LoRa_USART3_Trans_Mode_Init(uint32_t Md_Trans_BaudRate);
-void LoRa_USART3_Set_Mode_Init(uint32_t Md_Set_BaudRate);
-void LoRa_USART3_SendByte(uint8_t Byte);
-void LoRa_USART3_SendArray(uint8_t *Array,uint16_t Length);
-void LoRa_USART3_SendString(char *String);
+void LoRa_USART3_Trans_Mode_Init(uint32_t mdTransBaudrate);
+void LoRa_USART3_Set_Mode_Init(uint32_t mdSetBaudrate);
+void LoRa_USART3_SendByte(uint8_t byte);
+void LoRa_USART3_SendArray(uint8_t *array,uint16_t length);
+void LoRa_USART3_SendString(char *string);
 void LoRa_USART3_Printf(char *format, ...);
 void LoRa_USART3_IdentifierPkt(void);
 void LoRa_USART3_Md_Trans_Msg(void);

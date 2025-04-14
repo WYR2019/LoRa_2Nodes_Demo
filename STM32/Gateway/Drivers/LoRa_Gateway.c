@@ -1,72 +1,92 @@
 #include "LoRa_Gateway.h"
 
-typedef struct
-{
-	uint8_t	LoRa_Node1_Addr_High[1];
-	uint8_t	LoRa_Node1_Addr_Low[1];
-	uint8_t	LoRa_Node1_Channel[1];
-	uint8_t	LoRa_Node1_Identifier[1];
-}LoRa_Node1_Identifiers;
+//typedef struct
+//{
+//	uint8_t	LoRa_Node1_Addr_High[1];
+//	uint8_t	LoRa_Node1_Addr_Low[1];
+//	uint8_t	LoRa_Node1_Channel[1];
+//	uint8_t	LoRa_Node1_Identifier[1];
+//}LoRa_Node1_Identifiers;
 
-typedef struct
-{
-	uint8_t	LoRa_Node2_Addr_High[1];
-	uint8_t	LoRa_Node2_Addr_Low[1];
-	uint8_t	LoRa_Node2_Channel[1];
-	uint8_t	LoRa_Node2_Identifier[1];
-}LoRa_Node2_Identifiers;
+//typedef struct
+//{
+//	uint8_t	LoRa_Node2_Addr_High[1];
+//	uint8_t	LoRa_Node2_Addr_Low[1];
+//	uint8_t	LoRa_Node2_Channel[1];
+//	uint8_t	LoRa_Node2_Identifier[1];
+//}LoRa_Node2_Identifiers;
 
-typedef struct
+//typedef struct
+//{
+//	uint8_t LoRa_Sensor_DHT11_Identifier[1];
+//	uint8_t LoRa_Sensor_MQ2_Identifier[1];
+//	uint8_t LoRa_Sensor_Light_Identifier[1];
+//	uint8_t LoRa_Sensor_RS485_Identifier[1];
+//}LoRa_Sensor_Identifiers;
+
+//typedef struct
+//{
+//	uint8_t LoRa_Executor_Humidifier[1];
+//	uint8_t LoRa_Executor_Fan[1];
+//	uint8_t LoRa_Executor_Buzzer[1];
+//	uint8_t LoRa_Executor_LED[1]; 
+//	uint8_t LoRa_Executor_Servo[1];
+//	uint8_t LoRa_Executor_Stepmotor[1];
+//}LoRa_Executor_Identifiers;
+
+//LoRa_Node1_Identifiers Node1IDs = 
+//{
+//	.LoRa_Node1_Addr_High 																	= {0x03},
+//	.LoRa_Node1_Addr_Low 																		= {0xEA},
+//	.LoRa_Node1_Channel																			= {0x17},
+//	.LoRa_Node1_Identifier																	= {0xD1}
+//};
+
+//LoRa_Node2_Identifiers Node2IDs = 
+//{
+//	.LoRa_Node2_Addr_High																		= {0x03},
+//	.LoRa_Node2_Addr_Low																		= {0xEB},
+//	.LoRa_Node2_Channel																			= {0x17},
+//	.LoRa_Node2_Identifier																	= {0xD2}
+//};
+
+//LoRa_Sensor_Identifiers SensorIDs = 
+//{
+//	.LoRa_Sensor_DHT11_Identifier 	 												= {0xEA},
+//	.LoRa_Sensor_MQ2_Identifier 														=	{0xEB},
+//	.LoRa_Sensor_Light_Identifier														=	{0xEC},
+//	.LoRa_Sensor_RS485_Identifier														= {0xED}
+//};
+
+//LoRa_Executor_Identifiers ExecutorsIDs = 
+//{
+//	.LoRa_Executor_Humidifier																= {0xFA},
+//	.LoRa_Executor_Fan																			=	{0xFB},
+//	.LoRa_Executor_Buzzer																		=	{0xFC},
+//	.LoRa_Executor_LED																			=	{0xFD},
+//	.LoRa_Executor_Servo																		=	{0xFE},
+//	.LoRa_Executor_Stepmotor																=	{0xFF}
+//};
+
+
+
+typedef enum
 {
-	uint8_t LoRa_Sensor_DHT11_Identifier[1];
-	uint8_t LoRa_Sensor_MQ2_Identifier[1];
-	uint8_t LoRa_Sensor_Light_Identifier[1];
-	uint8_t LoRa_Sensor_RS485_Identifier[1];
+	LoRa_Sensor_DHT11_Identifier
+	LoRa_Sensor_MQ2_Identifier
+	LoRa_Sensor_Light_Identifier
+	LoRa_Sensor_RS485_Identifier
 }LoRa_Sensor_Identifiers;
 
-typedef struct
+typedef enum
 {
-	uint8_t LoRa_Executor_Humidifier[1];
-	uint8_t LoRa_Executor_Fan[1];
-	uint8_t LoRa_Executor_Buzzer[1];
-	uint8_t LoRa_Executor_LED[1]; 
-	uint8_t LoRa_Executor_Servo[1];
-	uint8_t LoRa_Executor_Stepmotor[1];
+	LoRa_Executor_Humidifier																	= 0xFA,
+	LoRa_Executor_Fan																					= 0xFB,
+	LoRa_Executor_Buzzer																			= 0xFC,
+	LoRa_Executor_LED																					= 0xFD,
+	LoRa_Executor_Servo																				= 0xFE,
+	LoRa_Executor_Stepmotor																		= 0xFF
 }LoRa_Executor_Identifiers;
-
-LoRa_Node1_Identifiers Node1IDs = 
-{
-	.LoRa_Node1_Addr_High 																	= {0x03},
-	.LoRa_Node1_Addr_Low 																		= {0xEA},
-	.LoRa_Node1_Channel																			= {0x17},
-	.LoRa_Node1_Identifier																	= {0xD1}
-};
-
-LoRa_Node2_Identifiers Node2IDs = 
-{
-	.LoRa_Node2_Addr_High																		= {0x03},
-	.LoRa_Node2_Addr_Low																		= {0xEB},
-	.LoRa_Node2_Channel																			= {0x17},
-	.LoRa_Node2_Identifier																	= {0xD2}
-};
-
-LoRa_Sensor_Identifiers SensorIDs = 
-{
-	.LoRa_Sensor_DHT11_Identifier 	 												= {0xEA},
-	.LoRa_Sensor_MQ2_Identifier 														=	{0xEB},
-	.LoRa_Sensor_Light_Identifier														=	{0xEC},
-	.LoRa_Sensor_RS485_Identifier														= {0xED}
-};
-
-LoRa_Executor_Identifiers ExecutorsIDs = 
-{
-	.LoRa_Executor_Humidifier																= {0xFA},
-	.LoRa_Executor_Fan																			=	{0xFB},
-	.LoRa_Executor_Buzzer																		=	{0xFC},
-	.LoRa_Executor_LED																			=	{0xFD},
-	.LoRa_Executor_Servo																		=	{0xFE},
-	.LoRa_Executor_Stepmotor																=	{0xFF}
-};
 
 /**
   * @brief  LoRa在传输模式下的初始化函数         

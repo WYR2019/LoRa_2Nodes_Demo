@@ -711,16 +711,6 @@
               <FilePath>.\Drivers\OLED_Font.h</FilePath>
             </File>
             <File>
-              <FileName>LED.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Drivers\LED.c</FilePath>
-            </File>
-            <File>
-              <FileName>LED.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Drivers\LED.h</FilePath>
-            </File>
-            <File>
               <FileName>LoRa.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Drivers\LoRa.c</FilePath>

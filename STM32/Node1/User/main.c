@@ -20,14 +20,14 @@ int main(void){
 		if(LoRa_USART3_GetRxFlag() == 31)
 		{
 			LED_PC13_ON();
-			LoRa_USART3_SendArray(LoRa_Executor_LED,1);
-			LoRa_USART3_SendArray(LoRa_LED_Status_On,1);
+			LoRa_USART3_SendArray(loraExecutorLED,1);
+			LoRa_USART3_SendArray(loraLEDStatusOn,1);
 		}
 		else if(LoRa_USART3_GetRxFlag() == 30)
 		{
 			LED_PC13_OFF();
-			LoRa_USART3_SendArray(LoRa_Executor_LED,1);
-			LoRa_USART3_SendArray(LoRa_LED_Status_Off,1);
+			LoRa_USART3_SendArray(loraExecutorLED,1);
+			LoRa_USART3_SendArray(loraLEDStatusOff,1);
 		}
 	}
 }
@@ -35,7 +35,7 @@ int main(void){
 void LoRa_USART3_Md_Trans_Msg(void)
 {
 	LoRa_USART3_IdentifierPkt();
-	LoRa_USART3_SendArray(LoRa_Sensor_DHT11_Identifier,1);
+	LoRa_USART3_SendArray(loraSensorDHT11Identifier,1);
 	LoRa_USART3_SendArray(&temp,1);
 	LoRa_USART3_SendArray(&humi,1);
 }
