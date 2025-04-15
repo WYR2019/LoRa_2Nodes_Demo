@@ -1,5 +1,5 @@
 .\objects\delay.o: System\Delay.c
-.\objects\delay.o: System\delay.h
+.\objects\delay.o: System\Delay.h
 .\objects\delay.o: .\SystemFiles\stm32f10x.h
 .\objects\delay.o: .\SystemFiles\core_cm3.h
 .\objects\delay.o: D:\Program Files\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdint.h

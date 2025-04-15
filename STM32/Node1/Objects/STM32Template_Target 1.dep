@@ -794,7 +794,7 @@ F (.\Libraries\inc\stm32f10x_spi.h)(0x67F4E257)()
 F (.\Libraries\inc\stm32f10x_tim.h)(0x67F4E257)()
 F (.\Libraries\inc\stm32f10x_usart.h)(0x67F4E257)()
 F (.\Libraries\inc\stm32f10x_wwdg.h)(0x67F4E257)()
-F (.\System\Delay.c)(0x67F3FC16)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\System -I .\Drivers --no-multibyte-chars-I"D:\Program Files\Arm\Keil_v5\ARM\Packs\Keil\2.4.1\Device\Include"-D__UVISION_VERSION="539" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\delay.o --omf_browse .\objects\delay.crf --depend .\objects\delay.d)
+F (.\System\Delay.c)(0x67FE3335)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\System -I .\Drivers --no-multibyte-chars-I"D:\Program Files\Arm\Keil_v5\ARM\Packs\Keil\2.4.1\Device\Include"-D__UVISION_VERSION="539" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\delay.o --omf_browse .\objects\delay.crf --depend .\objects\delay.d)
 I (System\delay.h)(0x67F3FC16)
 I (.\SystemFiles\stm32f10x.h)(0x67F4E257)
 I (.\SystemFiles\core_cm3.h)(0x67F4E257)
@@ -857,7 +857,7 @@ I (.\Libraries\inc\misc.h)(0x67F4E257)
 I (Drivers\OLED_Font.h)(0x67F4E257)
 F (.\Drivers\OLED.h)(0x67F4E257)()
 F (.\Drivers\OLED_Font.h)(0x67F4E257)()
-F (.\Drivers\LoRa.c)(0x67FD1AA8)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\System -I .\Drivers --no-multibyte-chars-I"D:\Program Files\Arm\Keil_v5\ARM\Packs\Keil\2.4.1\Device\Include"-D__UVISION_VERSION="539" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\lora.o --omf_browse .\objects\lora.crf --depend .\objects\lora.d)
+F (.\Drivers\LoRa.c)(0x67FE53B0)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\System -I .\Drivers --no-multibyte-chars-I"D:\Program Files\Arm\Keil_v5\ARM\Packs\Keil\2.4.1\Device\Include"-D__UVISION_VERSION="539" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\lora.o --omf_browse .\objects\lora.crf --depend .\objects\lora.d)
 I (Drivers\LoRa.h)(0x67FD1AA8)
 I (.\SystemFiles\stm32f10x.h)(0x67F4E257)
 I (.\SystemFiles\core_cm3.h)(0x67F4E257)

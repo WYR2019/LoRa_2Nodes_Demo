@@ -916,13 +916,13 @@ Image Symbol Table
     .data                                    0x20000016   Section        4  delay.o(.data)
     fac_us                                   0x20000016   Data           1  delay.o(.data)
     fac_ms                                   0x20000018   Data           2  delay.o(.data)
-    .data                                    0x2000001a   Section       11  lora.o(.data)
+    .data                                    0x2000001a   Section       14  lora.o(.data)
     rxState                                  0x2000001d   Data           1  lora.o(.data)
     pRxPacket                                0x2000001e   Data           1  lora.o(.data)
-    .data                                    0x20000025   Section        1  lora.o(.data)
-    .data                                    0x20000026   Section        1  lora.o(.data)
-    .data                                    0x20000027   Section        1  lora.o(.data)
     .data                                    0x20000028   Section        1  lora.o(.data)
+    .data                                    0x20000029   Section        1  lora.o(.data)
+    .data                                    0x2000002a   Section        1  lora.o(.data)
+    .data                                    0x2000002b   Section        1  lora.o(.data)
     STACK                                    0x20000030   Section     1024  startup_stm32f10x_md.o(STACK)
 
     Global Symbols
@@ -1055,11 +1055,11 @@ Image Symbol Table
     loraUsart3ExecutorFlag                   0x2000001c   Data           1  lora.o(.data)
     loraUsart3RxFlag                         0x2000001f   Data           1  lora.o(.data)
     loraGateAddr                             0x20000020   Data           2  lora.o(.data)
-    loraUsart3RxPacket                       0x20000022   Data           3  lora.o(.data)
-    loraSensorDHT11Identifier                0x20000025   Data           1  lora.o(.data)
-    loraExecutorLED                          0x20000026   Data           1  lora.o(.data)
-    loraLEDStatusOn                          0x20000027   Data           1  lora.o(.data)
-    loraLEDStatusOff                         0x20000028   Data           1  lora.o(.data)
+    loraUsart3RxPacket                       0x20000022   Data           6  lora.o(.data)
+    loraSensorDHT11Identifier                0x20000028   Data           1  lora.o(.data)
+    loraExecutorLED                          0x20000029   Data           1  lora.o(.data)
+    loraLEDStatusOn                          0x2000002a   Data           1  lora.o(.data)
+    loraLEDStatusOff                         0x2000002b   Data           1  lora.o(.data)
     __initial_sp                             0x20000430   Data           0  startup_stm32f10x_md.o(STACK)
 
 
@@ -1158,12 +1158,12 @@ Memory Map of the image
     0x20000000   0x08000b3c   0x00000002   Data   RW          139    .data               main.o
     0x20000002   0x08000b3e   0x00000014   Data   RW         1864    .data               stm32f10x_rcc.o
     0x20000016   0x08000b52   0x00000004   Data   RW         3237    .data               delay.o
-    0x2000001a   0x08000b56   0x0000000b   Data   RW         3381    .data               lora.o
-    0x20000025   0x08000b61   0x00000001   Data   RW         3382    .data               lora.o
-    0x20000026   0x08000b62   0x00000001   Data   RW         3389    .data               lora.o
-    0x20000027   0x08000b63   0x00000001   Data   RW         3392    .data               lora.o
-    0x20000028   0x08000b64   0x00000001   Data   RW         3393    .data               lora.o
-    0x20000029   0x08000b65   0x00000007   PAD
+    0x2000001a   0x08000b56   0x0000000e   Data   RW         3381    .data               lora.o
+    0x20000028   0x08000b64   0x00000001   Data   RW         3382    .data               lora.o
+    0x20000029   0x08000b65   0x00000001   Data   RW         3389    .data               lora.o
+    0x2000002a   0x08000b66   0x00000001   Data   RW         3392    .data               lora.o
+    0x2000002b   0x08000b67   0x00000001   Data   RW         3393    .data               lora.o
+    0x2000002c   0x08000b68   0x00000004   PAD
     0x20000030        -       0x00000400   Zero   RW           17    STACK               startup_stm32f10x_md.o
 
 
@@ -1178,7 +1178,7 @@ Image component sizes
        124         14          0          4          0       1663   delay.o
        386         22          0          0          0       3880   dht11.o
         84         16          0          0          0       1293   led_pc13.o
-       494         36          0         15          0       5364   lora.o
+       494         36          0         18          0       5364   lora.o
        164         24          0          2          0     205262   main.o
        148         14          0          0          0       2145   misc.o
         36          8        236          0       1024        796   startup_stm32f10x_md.o
@@ -1191,7 +1191,7 @@ Image component sizes
     ----------------------------------------------------------------------
       2518        196        268         44       1028     269167   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-        12          0          0          3          4          0   (incl. Padding)
+        12          0          0          0          4          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 

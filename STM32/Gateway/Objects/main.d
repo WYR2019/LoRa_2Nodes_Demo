@@ -31,3 +31,4 @@
 .\objects\main.o: .\Drivers\LoRa_Gateway.h
 .\objects\main.o: D:\Program Files\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdio.h
 .\objects\main.o: D:\Program Files\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdarg.h
+.\objects\main.o: .\System\Delay.h

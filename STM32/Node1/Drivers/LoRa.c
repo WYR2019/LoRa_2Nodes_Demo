@@ -25,7 +25,7 @@ uint8_t	loraExecutorStepmotor[1]																							=	{0xFF};
 uint8_t loraLEDStatusOn[1]																										=	{0x01};
 uint8_t loraLEDStatusOff[1]																										=	{0x00};
 
-uint8_t loraUsart3RxPacket[3];
+uint8_t loraUsart3RxPacket[6];
 uint8_t loraUsart3RxData;
 uint8_t loraUsart3ExecutorFlag = 0;
 uint8_t loraUsart3RxFlag;

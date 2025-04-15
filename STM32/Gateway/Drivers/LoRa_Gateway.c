@@ -1,92 +1,31 @@
 #include "LoRa_Gateway.h"
 
-//typedef struct
-//{
-//	uint8_t	LoRa_Node1_Addr_High[1];
-//	uint8_t	LoRa_Node1_Addr_Low[1];
-//	uint8_t	LoRa_Node1_Channel[1];
-//	uint8_t	LoRa_Node1_Identifier[1];
-//}LoRa_Node1_Identifiers;
+uint8_t loRaNode1Addr[2]																									=	{LORA_NODE1_ADDR_HIGH,LORA_NODE1_ADDR_LOW};
+uint8_t loRaNode1Channel[1]																								=	{LORA_NODE1_CHANNEL};
+uint8_t loRaNode1Id[1]																										=	{LORA_NODE1_IDENTIFIER};
 
-//typedef struct
-//{
-//	uint8_t	LoRa_Node2_Addr_High[1];
-//	uint8_t	LoRa_Node2_Addr_Low[1];
-//	uint8_t	LoRa_Node2_Channel[1];
-//	uint8_t	LoRa_Node2_Identifier[1];
-//}LoRa_Node2_Identifiers;
+uint8_t loRaNode2Addr[2]																									=	{LORA_NODE2_ADDR_HIGH,LORA_NODE2_ADDR_LOW};
+uint8_t loRaNode2Channel[1]																								=	{LORA_NODE2_CHANNEL};
+uint8_t loRaNode2Id[1]																										=	{LORA_NODE2_IDENTIFIER};
 
-//typedef struct
-//{
-//	uint8_t LoRa_Sensor_DHT11_Identifier[1];
-//	uint8_t LoRa_Sensor_MQ2_Identifier[1];
-//	uint8_t LoRa_Sensor_Light_Identifier[1];
-//	uint8_t LoRa_Sensor_RS485_Identifier[1];
-//}LoRa_Sensor_Identifiers;
+uint8_t loRaSensorDHT11Id[1]		 																					= {0xEA};
+uint8_t loRaSensorMQ2Id[1]																								=	{0xEB};
+uint8_t loRaSensorLightId[1]																							=	{0xEC};
+uint8_t loRaSensorFireId[1]																								= {0xED};
+uint8_t	loRaExecutorHumidifier[1]																					= {0xFA};
+uint8_t	loRaExecutorFan[1]																								=	{0xFB};
+uint8_t	loRaExecutorBuzzer[1]																							=	{0xFC};
+uint8_t	loRaExecutorLED[1]																								=	{0xFD};
+uint8_t	loRaExecutorServo[1]																							=	{0xFE};
+uint8_t	loRaExecutorStepmotor[1]																					=	{0xFF};
 
-//typedef struct
-//{
-//	uint8_t LoRa_Executor_Humidifier[1];
-//	uint8_t LoRa_Executor_Fan[1];
-//	uint8_t LoRa_Executor_Buzzer[1];
-//	uint8_t LoRa_Executor_LED[1]; 
-//	uint8_t LoRa_Executor_Servo[1];
-//	uint8_t LoRa_Executor_Stepmotor[1];
-//}LoRa_Executor_Identifiers;
+uint8_t loRaLEDStatusOn[1]																								=	{0x01};
+uint8_t loRaLEDStatusOff[1]																								=	{0x00};
 
-//LoRa_Node1_Identifiers Node1IDs = 
-//{
-//	.LoRa_Node1_Addr_High 																	= {0x03},
-//	.LoRa_Node1_Addr_Low 																		= {0xEA},
-//	.LoRa_Node1_Channel																			= {0x17},
-//	.LoRa_Node1_Identifier																	= {0xD1}
-//};
-
-//LoRa_Node2_Identifiers Node2IDs = 
-//{
-//	.LoRa_Node2_Addr_High																		= {0x03},
-//	.LoRa_Node2_Addr_Low																		= {0xEB},
-//	.LoRa_Node2_Channel																			= {0x17},
-//	.LoRa_Node2_Identifier																	= {0xD2}
-//};
-
-//LoRa_Sensor_Identifiers SensorIDs = 
-//{
-//	.LoRa_Sensor_DHT11_Identifier 	 												= {0xEA},
-//	.LoRa_Sensor_MQ2_Identifier 														=	{0xEB},
-//	.LoRa_Sensor_Light_Identifier														=	{0xEC},
-//	.LoRa_Sensor_RS485_Identifier														= {0xED}
-//};
-
-//LoRa_Executor_Identifiers ExecutorsIDs = 
-//{
-//	.LoRa_Executor_Humidifier																= {0xFA},
-//	.LoRa_Executor_Fan																			=	{0xFB},
-//	.LoRa_Executor_Buzzer																		=	{0xFC},
-//	.LoRa_Executor_LED																			=	{0xFD},
-//	.LoRa_Executor_Servo																		=	{0xFE},
-//	.LoRa_Executor_Stepmotor																=	{0xFF}
-//};
-
-
-
-typedef enum
-{
-	LoRa_Sensor_DHT11_Identifier
-	LoRa_Sensor_MQ2_Identifier
-	LoRa_Sensor_Light_Identifier
-	LoRa_Sensor_RS485_Identifier
-}LoRa_Sensor_Identifiers;
-
-typedef enum
-{
-	LoRa_Executor_Humidifier																	= 0xFA,
-	LoRa_Executor_Fan																					= 0xFB,
-	LoRa_Executor_Buzzer																			= 0xFC,
-	LoRa_Executor_LED																					= 0xFD,
-	LoRa_Executor_Servo																				= 0xFE,
-	LoRa_Executor_Stepmotor																		= 0xFF
-}LoRa_Executor_Identifiers;
+uint8_t loraUSART3RxPacket[6];
+uint8_t loraUSART3RxData;
+uint8_t loraUSART3ExecutorFlag = 0;
+uint8_t loraUSART3RxFlag;
 
 /**
   * @brief  LoRa在传输模式下的初始化函数         
@@ -94,7 +33,7 @@ typedef enum
   * @param  Md_Trans_BaudRate
   * @retval None
   */
-void LoRa_USART3_Trans_Mode_Init(uint32_t Md_Trans_BaudRate)
+void LoRa_USART3_Trans_Mode_Init(uint32_t mdTransBaudrate)
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
 
@@ -110,7 +49,7 @@ void LoRa_USART3_Trans_Mode_Init(uint32_t Md_Trans_BaudRate)
 	
 	USART_InitTypeDef USART_InitStructure;
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3,ENABLE);
-	USART_InitStructure.USART_BaudRate = Md_Trans_BaudRate;																						//9600波特率，写完后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
+	USART_InitStructure.USART_BaudRate = mdTransBaudrate;																							//9600波特率，写完后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;										//硬件流控制,不使用流控
 	USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;																			//串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
 	USART_InitStructure.USART_Parity = USART_Parity_No;																								//无校验位
@@ -136,7 +75,7 @@ void LoRa_USART3_Trans_Mode_Init(uint32_t Md_Trans_BaudRate)
   * @param  Md_Set_BaudRate
   * @retval None
   */
-void LoRa_USART3_Set_Mode_Init(uint32_t Md_Set_BaudRate)
+void LoRa_USART3_Set_Mode_Init(uint32_t mdSetBaudrate)
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
 
@@ -150,7 +89,6 @@ void LoRa_USART3_Set_Mode_Init(uint32_t Md_Set_BaudRate)
 	GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_RX;
  	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
-	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
 
  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
@@ -162,10 +100,9 @@ void LoRa_USART3_Set_Mode_Init(uint32_t Md_Set_BaudRate)
 	GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_ATK_MD0;
  	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
-	
 	USART_InitTypeDef USART_InitStructure;
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3,ENABLE);
-	USART_InitStructure.USART_BaudRate = Md_Set_BaudRate;																							//9600波特率，写完后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
+	USART_InitStructure.USART_BaudRate = mdSetBaudrate;																								//9600波特率，写完后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;										//硬件流控制,不使用流控
 	USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;																			//串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
 	USART_InitStructure.USART_Parity = USART_Parity_No;																								//无校验位
@@ -191,9 +128,9 @@ void LoRa_USART3_Set_Mode_Init(uint32_t Md_Set_BaudRate)
   * @param  Byte
   * @retval None
   */
-void LoRa_USART3_SendByte(uint8_t Byte)
+void LoRa_USART3_SendByte(uint8_t byte)
 {
-	USART_SendData(USART3,Byte);																																			//调用这个函数，Byte就写入TDR寄存器了
+	USART_SendData(USART3,byte);																																			//调用这个函数，Byte就写入TDR寄存器了
 																																																		//写完之后还需要等待一下，等TDR的数据转移到移位寄存器就可以了，如果数据还在TDR寄存器中，再写入数据就会产生数据覆盖，所以在发送之后还需要等待一下标志位
 	while(USART_GetFlagStatus(USART3,USART_FLAG_TXE) == RESET);																				//发送数据寄存器空标志位，等待TXE置1，所以需要套一个while循环 TXE:发送数据寄存器空，发送完标志位自动置0，不用手动复位
 }
@@ -205,20 +142,20 @@ void LoRa_USART3_SendByte(uint8_t Byte)
   * @param  *Array，Length
   * @retval None
   */
-void LoRa_USART3_SendArray(uint8_t *Array,uint16_t Length)																					
+void LoRa_USART3_SendArray(uint8_t *array,uint16_t length)																					
 {
-	for(uint16_t i = 0;i < Length;i ++)																																//for循环执行Length次，可以对Array数据进行遍历，实际定义数组不要超出uint16_t的范围即可
+	for(uint16_t i = 0;i < length;i ++)																																//for循环执行Length次，可以对Array数据进行遍历，实际定义数组不要超出uint16_t的范围即可
 	{
-		LoRa_USART3_SendByte(Array[i]);																																	//依次取出数组Array的每一项
+		LoRa_USART3_SendByte(array[i]);																																	//依次取出数组Array的每一项
 	}
 }
 
 /*发送字符串函数*/
-void LoRa_USART3_SendString(char *String)																														//给uint8_t *也可以，由于字符串自带一个标志位，所以就不需要再传递长度参数了
+void LoRa_USART3_SendString(char *string)																														//给uint8_t *也可以，由于字符串自带一个标志位，所以就不需要再传递长度参数了
 {
-	for(uint8_t i = 0;String[i] != '\0';i++)																													//循环结束就可以用标志位来判断了,填'\0'是空字符的转义字符表示形式，和直接写0是一样的
+	for(uint8_t i = 0;string[i] != '\0';i++)																													//循环结束就可以用标志位来判断了,填'\0'是空字符的转义字符表示形式，和直接写0是一样的
 	{
-		LoRa_USART3_SendByte(String[i]);																																//将String字符串一个个取出来，通过SendByte发送
+		LoRa_USART3_SendByte(string[i]);																																//将String字符串一个个取出来，通过SendByte发送
 	}
 }
 
@@ -256,16 +193,100 @@ void LoRa_USART3_Printf(char *format, ...)
   * @param  None
   * @retval None
   */
-void LoRa_USART3_Node1IDsPkt(void)
+void LoRa_USART3_Node1IDPkt(void)
 {
-	LoRa_USART3_SendArray(Node1IDs.LoRa_Node1_Addr_High, 2);																													
-	LoRa_USART3_SendArray(Node1IDs.LoRa_Node1_Addr_Low,1);
-	LoRa_USART3_SendArray(Node1IDs.LoRa_Node1_Channel,1);
+	LoRa_USART3_SendArray(loRaNode1Addr, 2);																													
+	LoRa_USART3_SendArray(loRaNode1Channel,1);
+	LoRa_USART3_SendArray(loRaNode1Id,1);
 }
 
-void LoRa_USART3_Node2IDsPkt(void)
+void LoRa_USART3_Node2IDPkt(void)
 {
-	LoRa_USART3_SendArray(Node2IDs.LoRa_Node2_Addr_High, 2);																													
-	LoRa_USART3_SendArray(Node2IDs.LoRa_Node2_Addr_Low,1);
-	LoRa_USART3_SendArray(Node2IDs.LoRa_Node2_Channel,1);
+	LoRa_USART3_SendArray(loRaNode2Addr, 2);																													
+	LoRa_USART3_SendArray(loRaNode2Channel,1);
+	LoRa_USART3_SendArray(loRaNode2Id,1);
+}
+
+void LoRa_USART3_Node1_Cmd_Msg(void)
+{
+	LoRa_USART3_Node1IDPkt();
+	LoRa_USART3_SendArray(loRaExecutorHumidifier,1);
+	LoRa_USART3_SendArray(loRaExecutorFan,1);
+}
+
+void LoRa_USART3_Node2_Cmd_Msg(void)
+{
+	LoRa_USART3_Node2IDPkt();
+	LoRa_USART3_SendArray(loRaExecutorServo,1);
+	LoRa_USART3_SendArray(loRaExecutorBuzzer,1);
+}
+
+/**
+  * @brief  USART3接收中断函数、状态机 
+  * @note   处理USART3接收到的数据，执行对应操作。
+	* @note		状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收数据和等待包尾。
+	* @note		else if不会造成多个状态都被满足的问题。
+  * @param  None
+  * @retval None
+  */
+void USART3_IRQHandler(void)
+{
+	/*状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收执行器数据、接收执行器状态数据和等待包尾*/
+	static uint8_t rxState = 0;																																				//状态变量S=0
+	static uint8_t pRxPacket = 0;																																			//指示接收到哪一个数据
+	if(USART_GetITStatus(USART3,USART_IT_RXNE) == SET)																								//如果RXNE置1，说明收到数据，开始根据数据处理状态。
+	{
+		/*接收字节，先读取到模块的变量里*/
+		uint32_t rxData = USART_ReceiveData(USART3);																										//获取USART3接收到的数据
+		{
+			switch (rxState)
+			{
+				case 0:
+				{
+					if (rxData == 0x0C)																																				//状态1：等待包头，包头为最后一位信道号
+					{
+						rxState = 1;
+						pRxPacket = 0;																																					//提前清零，为下一次接收做准备
+					}
+				}
+				case 1:																																											//状态2：接收数据
+				{
+					loraUSART3RxPacket[pRxPacket] = rxData;                                                 	//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
+					pRxPacket++;																																							//移动到下一个位置
+					if(pRxPacket == 1)
+					{
+						if(loraUSART3RxPacket[0] == 0x0A)
+						{
+							loraUSART3ExecutorFlag = 3;
+						}
+					}
+					else if(pRxPacket == 2)
+					{
+						if(loraUSART3ExecutorFlag == 3 && loraUSART3RxPacket[1] == 0x01)
+						{
+							loraUSART3RxFlag = 31;
+						}
+						else if(loraUSART3ExecutorFlag == 3 && loraUSART3RxPacket[1] == 0x02)
+						{
+							loraUSART3RxFlag = 30;
+						}
+					}
+					else if(pRxPacket > 2)
+					{
+						rxState = 2;
+					}
+				}
+				case 2:																																											//状态3：等待包尾
+				{
+					if (rxData == 0xAB)
+					{	
+						rxState = 0;																																						//回到最初的状态
+						loraUSART3RxFlag = 1;																																		//代表整个数据包已经收到了，置一个标志位
+					}
+				}
+			}
+			
+			USART_ClearITPendingBit(USART3,USART_IT_RXNE);																								//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
+		}
+	}
 }

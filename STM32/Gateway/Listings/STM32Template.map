@@ -15,12 +15,18 @@ Section Cross References
     startup_stm32f10x_md.o(RESET) refers to stm32f10x_it.o(i.DebugMon_Handler) for DebugMon_Handler
     startup_stm32f10x_md.o(RESET) refers to stm32f10x_it.o(i.PendSV_Handler) for PendSV_Handler
     startup_stm32f10x_md.o(RESET) refers to stm32f10x_it.o(i.SysTick_Handler) for SysTick_Handler
+    startup_stm32f10x_md.o(RESET) refers to lora_gateway.o(i.USART3_IRQHandler) for USART3_IRQHandler
     startup_stm32f10x_md.o(.text) refers to system_stm32f10x.o(i.SystemInit) for SystemInit
     startup_stm32f10x_md.o(.text) refers to entry.o(.ARM.Collect$$$$00000000) for __main
     system_stm32f10x.o(i.SetSysClock) refers to system_stm32f10x.o(i.SetSysClockTo72) for SetSysClockTo72
     system_stm32f10x.o(i.SystemCoreClockUpdate) refers to system_stm32f10x.o(.data) for .data
     system_stm32f10x.o(i.SystemInit) refers to system_stm32f10x.o(i.SetSysClock) for SetSysClock
+    main.o(i.main) refers to system_stm32f10x.o(i.SystemInit) for SystemInit
+    main.o(i.main) refers to delay.o(i.delay_init) for delay_init
     main.o(i.main) refers to lora_gateway.o(i.LoRa_USART3_Trans_Mode_Init) for LoRa_USART3_Trans_Mode_Init
+    main.o(i.main) refers to delay.o(i.delay_ms) for delay_ms
+    main.o(i.main) refers to lora_gateway.o(i.LoRa_USART3_Node1_Cmd_Msg) for LoRa_USART3_Node1_Cmd_Msg
+    main.o(i.main) refers to lora_gateway.o(i.LoRa_USART3_Node2_Cmd_Msg) for LoRa_USART3_Node2_Cmd_Msg
     stm32f10x_adc.o(i.ADC_DeInit) refers to stm32f10x_rcc.o(i.RCC_APB2PeriphResetCmd) for RCC_APB2PeriphResetCmd
     stm32f10x_bkp.o(i.BKP_DeInit) refers to stm32f10x_rcc.o(i.RCC_BackupResetCmd) for RCC_BackupResetCmd
     stm32f10x_can.o(i.CAN_DeInit) refers to stm32f10x_rcc.o(i.RCC_APB1PeriphResetCmd) for RCC_APB1PeriphResetCmd
@@ -80,12 +86,20 @@ Section Cross References
     stm32f10x_usart.o(i.USART_DeInit) refers to stm32f10x_rcc.o(i.RCC_APB1PeriphResetCmd) for RCC_APB1PeriphResetCmd
     stm32f10x_usart.o(i.USART_Init) refers to stm32f10x_rcc.o(i.RCC_GetClocksFreq) for RCC_GetClocksFreq
     stm32f10x_wwdg.o(i.WWDG_DeInit) refers to stm32f10x_rcc.o(i.RCC_APB1PeriphResetCmd) for RCC_APB1PeriphResetCmd
-    delay.o(i.Delay_ms) refers to delay.o(i.Delay_us) for Delay_us
-    delay.o(i.Delay_s) refers to delay.o(i.Delay_ms) for Delay_ms
-    lora_gateway.o(i.LoRa_USART3_Node1IDsPkt) refers to lora_gateway.o(i.LoRa_USART3_SendArray) for LoRa_USART3_SendArray
-    lora_gateway.o(i.LoRa_USART3_Node1IDsPkt) refers to lora_gateway.o(.data) for .data
-    lora_gateway.o(i.LoRa_USART3_Node2IDsPkt) refers to lora_gateway.o(i.LoRa_USART3_SendArray) for LoRa_USART3_SendArray
-    lora_gateway.o(i.LoRa_USART3_Node2IDsPkt) refers to lora_gateway.o(.data) for .data
+    delay.o(i.delay_init) refers to misc.o(i.SysTick_CLKSourceConfig) for SysTick_CLKSourceConfig
+    delay.o(i.delay_init) refers to delay.o(.data) for .data
+    delay.o(i.delay_ms) refers to delay.o(.data) for .data
+    delay.o(i.delay_us) refers to delay.o(.data) for .data
+    lora_gateway.o(i.LoRa_USART3_Node1IDPkt) refers to lora_gateway.o(i.LoRa_USART3_SendArray) for LoRa_USART3_SendArray
+    lora_gateway.o(i.LoRa_USART3_Node1IDPkt) refers to lora_gateway.o(.data) for .data
+    lora_gateway.o(i.LoRa_USART3_Node1_Cmd_Msg) refers to lora_gateway.o(i.LoRa_USART3_Node1IDPkt) for LoRa_USART3_Node1IDPkt
+    lora_gateway.o(i.LoRa_USART3_Node1_Cmd_Msg) refers to lora_gateway.o(i.LoRa_USART3_SendArray) for LoRa_USART3_SendArray
+    lora_gateway.o(i.LoRa_USART3_Node1_Cmd_Msg) refers to lora_gateway.o(.data) for .data
+    lora_gateway.o(i.LoRa_USART3_Node2IDPkt) refers to lora_gateway.o(i.LoRa_USART3_SendArray) for LoRa_USART3_SendArray
+    lora_gateway.o(i.LoRa_USART3_Node2IDPkt) refers to lora_gateway.o(.data) for .data
+    lora_gateway.o(i.LoRa_USART3_Node2_Cmd_Msg) refers to lora_gateway.o(i.LoRa_USART3_Node2IDPkt) for LoRa_USART3_Node2IDPkt
+    lora_gateway.o(i.LoRa_USART3_Node2_Cmd_Msg) refers to lora_gateway.o(i.LoRa_USART3_SendArray) for LoRa_USART3_SendArray
+    lora_gateway.o(i.LoRa_USART3_Node2_Cmd_Msg) refers to lora_gateway.o(.data) for .data
     lora_gateway.o(i.LoRa_USART3_Printf) refers to printfa.o(i.__0vsprintf) for vsprintf
     lora_gateway.o(i.LoRa_USART3_Printf) refers to lora_gateway.o(i.LoRa_USART3_SendString) for LoRa_USART3_SendString
     lora_gateway.o(i.LoRa_USART3_SendArray) refers to lora_gateway.o(i.LoRa_USART3_SendByte) for LoRa_USART3_SendByte
@@ -108,6 +122,10 @@ Section Cross References
     lora_gateway.o(i.LoRa_USART3_Trans_Mode_Init) refers to misc.o(i.NVIC_PriorityGroupConfig) for NVIC_PriorityGroupConfig
     lora_gateway.o(i.LoRa_USART3_Trans_Mode_Init) refers to misc.o(i.NVIC_Init) for NVIC_Init
     lora_gateway.o(i.LoRa_USART3_Trans_Mode_Init) refers to stm32f10x_usart.o(i.USART_Cmd) for USART_Cmd
+    lora_gateway.o(i.USART3_IRQHandler) refers to stm32f10x_usart.o(i.USART_GetITStatus) for USART_GetITStatus
+    lora_gateway.o(i.USART3_IRQHandler) refers to stm32f10x_usart.o(i.USART_ReceiveData) for USART_ReceiveData
+    lora_gateway.o(i.USART3_IRQHandler) refers to stm32f10x_usart.o(i.USART_ClearITPendingBit) for USART_ClearITPendingBit
+    lora_gateway.o(i.USART3_IRQHandler) refers to lora_gateway.o(.data) for .data
     lora_gateway.o(i.fputc) refers to lora_gateway.o(i.LoRa_USART3_SendByte) for LoRa_USART3_SendByte
     entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry10a.o(.ARM.Collect$$$$0000000F) for __rt_final_cpp
     entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry11a.o(.ARM.Collect$$$$00000011) for __rt_final_exit
@@ -191,7 +209,6 @@ Removing Unused input sections from the image.
     Removing system_stm32f10x.o(.data), (20 bytes).
     Removing misc.o(i.NVIC_SetVectorTable), (20 bytes).
     Removing misc.o(i.NVIC_SystemLPConfig), (28 bytes).
-    Removing misc.o(i.SysTick_CLKSourceConfig), (28 bytes).
     Removing stm32f10x_adc.o(i.ADC_AnalogWatchdogCmd), (16 bytes).
     Removing stm32f10x_adc.o(i.ADC_AnalogWatchdogSingleChannelConfig), (12 bytes).
     Removing stm32f10x_adc.o(i.ADC_AnalogWatchdogThresholdsConfig), (6 bytes).
@@ -619,13 +636,10 @@ Removing Unused input sections from the image.
     Removing stm32f10x_tim.o(i.TIM_UpdateDisableConfig), (24 bytes).
     Removing stm32f10x_tim.o(i.TIM_UpdateRequestConfig), (24 bytes).
     Removing stm32f10x_usart.o(i.USART_ClearFlag), (8 bytes).
-    Removing stm32f10x_usart.o(i.USART_ClearITPendingBit), (16 bytes).
     Removing stm32f10x_usart.o(i.USART_ClockInit), (30 bytes).
     Removing stm32f10x_usart.o(i.USART_ClockStructInit), (12 bytes).
     Removing stm32f10x_usart.o(i.USART_DMACmd), (20 bytes).
     Removing stm32f10x_usart.o(i.USART_DeInit), (164 bytes).
-    Removing stm32f10x_usart.o(i.USART_GetFlagStatus), (14 bytes).
-    Removing stm32f10x_usart.o(i.USART_GetITStatus), (64 bytes).
     Removing stm32f10x_usart.o(i.USART_HalfDuplexCmd), (24 bytes).
     Removing stm32f10x_usart.o(i.USART_IrDACmd), (24 bytes).
     Removing stm32f10x_usart.o(i.USART_IrDAConfig), (16 bytes).
@@ -633,10 +647,8 @@ Removing Unused input sections from the image.
     Removing stm32f10x_usart.o(i.USART_LINCmd), (24 bytes).
     Removing stm32f10x_usart.o(i.USART_OneBitMethodCmd), (24 bytes).
     Removing stm32f10x_usart.o(i.USART_OverSampling8Cmd), (24 bytes).
-    Removing stm32f10x_usart.o(i.USART_ReceiveData), (8 bytes).
     Removing stm32f10x_usart.o(i.USART_ReceiverWakeUpCmd), (24 bytes).
     Removing stm32f10x_usart.o(i.USART_SendBreak), (10 bytes).
-    Removing stm32f10x_usart.o(i.USART_SendData), (8 bytes).
     Removing stm32f10x_usart.o(i.USART_SetAddress), (16 bytes).
     Removing stm32f10x_usart.o(i.USART_SetGuardTime), (16 bytes).
     Removing stm32f10x_usart.o(i.USART_SetPrescaler), (16 bytes).
@@ -652,20 +664,20 @@ Removing Unused input sections from the image.
     Removing stm32f10x_wwdg.o(i.WWDG_SetCounter), (16 bytes).
     Removing stm32f10x_wwdg.o(i.WWDG_SetPrescaler), (20 bytes).
     Removing stm32f10x_wwdg.o(i.WWDG_SetWindowValue), (32 bytes).
-    Removing delay.o(i.Delay_ms), (24 bytes).
-    Removing delay.o(i.Delay_s), (24 bytes).
-    Removing delay.o(i.Delay_us), (32 bytes).
-    Removing lora_gateway.o(i.LoRa_USART3_Node1IDsPkt), (36 bytes).
-    Removing lora_gateway.o(i.LoRa_USART3_Node2IDsPkt), (36 bytes).
+    Removing delay.o(i.delay_us), (40 bytes).
     Removing lora_gateway.o(i.LoRa_USART3_Printf), (28 bytes).
-    Removing lora_gateway.o(i.LoRa_USART3_SendArray), (26 bytes).
-    Removing lora_gateway.o(i.LoRa_USART3_SendByte), (32 bytes).
     Removing lora_gateway.o(i.LoRa_USART3_SendString), (24 bytes).
     Removing lora_gateway.o(i.LoRa_USART3_Set_Mode_Init), (236 bytes).
     Removing lora_gateway.o(i.fputc), (14 bytes).
-    Removing lora_gateway.o(.data), (8 bytes).
-    Removing lora_gateway.o(.data), (4 bytes).
-    Removing lora_gateway.o(.data), (6 bytes).
+    Removing lora_gateway.o(.data), (1 bytes).
+    Removing lora_gateway.o(.data), (1 bytes).
+    Removing lora_gateway.o(.data), (1 bytes).
+    Removing lora_gateway.o(.data), (1 bytes).
+    Removing lora_gateway.o(.data), (1 bytes).
+    Removing lora_gateway.o(.data), (1 bytes).
+    Removing lora_gateway.o(.data), (1 bytes).
+    Removing lora_gateway.o(.data), (1 bytes).
+    Removing lora_gateway.o(.data), (1 bytes).
     Removing dadd.o(.text), (334 bytes).
     Removing dmul.o(.text), (228 bytes).
     Removing ddiv.o(.text), (222 bytes).
@@ -673,7 +685,7 @@ Removing Unused input sections from the image.
     Removing cdrcmple.o(.text), (48 bytes).
     Removing depilogue.o(.text), (186 bytes).
 
-487 unused section(s) (total 17686 bytes) removed from the image.
+481 unused section(s) (total 17369 bytes) removed from the image.
 
 ==============================================================================
 
@@ -683,26 +695,26 @@ Image Symbol Table
 
     Symbol Name                              Value     Ov Type        Size  Object(Section)
 
-    ../clib/microlib/division.c              0x00000000   Number         0  uldiv.o ABSOLUTE
     ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry12b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry12a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
+    ../clib/microlib/division.c              0x00000000   Number         0  uldiv.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
-    ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
-    ../clib/microlib/longlong.c              0x00000000   Number         0  llushr.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry12a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry12b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llsshr.o ABSOLUTE
+    ../clib/microlib/longlong.c              0x00000000   Number         0  llushr.o ABSOLUTE
+    ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfa.o ABSOLUTE
     ../clib/microlib/stdio/streams.c         0x00000000   Number         0  stdout.o ABSOLUTE
     ../clib/microlib/stubs.s                 0x00000000   Number         0  iusefp.o ABSOLUTE
@@ -764,34 +776,55 @@ Image Symbol Table
     i.DebugMon_Handler                       0x0800014e   Section        0  stm32f10x_it.o(i.DebugMon_Handler)
     i.GPIO_Init                              0x08000150   Section        0  stm32f10x_gpio.o(i.GPIO_Init)
     i.HardFault_Handler                      0x080001f6   Section        0  stm32f10x_it.o(i.HardFault_Handler)
-    i.LoRa_USART3_Trans_Mode_Init            0x080001f8   Section        0  lora_gateway.o(i.LoRa_USART3_Trans_Mode_Init)
-    i.MemManage_Handler                      0x080002ac   Section        0  stm32f10x_it.o(i.MemManage_Handler)
-    i.NMI_Handler                            0x080002ae   Section        0  stm32f10x_it.o(i.NMI_Handler)
-    i.NVIC_Init                              0x080002b0   Section        0  misc.o(i.NVIC_Init)
-    i.NVIC_PriorityGroupConfig               0x08000314   Section        0  misc.o(i.NVIC_PriorityGroupConfig)
-    i.PendSV_Handler                         0x08000328   Section        0  stm32f10x_it.o(i.PendSV_Handler)
-    i.RCC_APB1PeriphClockCmd                 0x0800032c   Section        0  stm32f10x_rcc.o(i.RCC_APB1PeriphClockCmd)
-    i.RCC_APB2PeriphClockCmd                 0x08000348   Section        0  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
-    i.RCC_GetClocksFreq                      0x08000364   Section        0  stm32f10x_rcc.o(i.RCC_GetClocksFreq)
-    i.SVC_Handler                            0x08000410   Section        0  stm32f10x_it.o(i.SVC_Handler)
-    i.SetSysClock                            0x08000412   Section        0  system_stm32f10x.o(i.SetSysClock)
-    SetSysClock                              0x08000413   Thumb Code     4  system_stm32f10x.o(i.SetSysClock)
-    i.SetSysClockTo72                        0x08000418   Section        0  system_stm32f10x.o(i.SetSysClockTo72)
-    SetSysClockTo72                          0x08000419   Thumb Code   166  system_stm32f10x.o(i.SetSysClockTo72)
-    i.SysTick_Handler                        0x080004c8   Section        0  stm32f10x_it.o(i.SysTick_Handler)
-    i.SystemInit                             0x080004cc   Section        0  system_stm32f10x.o(i.SystemInit)
-    i.USART_Cmd                              0x0800051c   Section        0  stm32f10x_usart.o(i.USART_Cmd)
-    i.USART_ITConfig                         0x08000534   Section        0  stm32f10x_usart.o(i.USART_ITConfig)
-    i.USART_Init                             0x0800056c   Section        0  stm32f10x_usart.o(i.USART_Init)
-    i.UsageFault_Handler                     0x08000628   Section        0  stm32f10x_it.o(i.UsageFault_Handler)
-    i.__scatterload_copy                     0x0800062a   Section       14  handlers.o(i.__scatterload_copy)
-    i.__scatterload_null                     0x08000638   Section        2  handlers.o(i.__scatterload_null)
-    i.__scatterload_zeroinit                 0x0800063a   Section       14  handlers.o(i.__scatterload_zeroinit)
-    i.main                                   0x08000648   Section        0  main.o(i.main)
+    i.LoRa_USART3_Node1IDPkt                 0x080001f8   Section        0  lora_gateway.o(i.LoRa_USART3_Node1IDPkt)
+    i.LoRa_USART3_Node1_Cmd_Msg              0x08000220   Section        0  lora_gateway.o(i.LoRa_USART3_Node1_Cmd_Msg)
+    i.LoRa_USART3_Node2IDPkt                 0x08000240   Section        0  lora_gateway.o(i.LoRa_USART3_Node2IDPkt)
+    i.LoRa_USART3_Node2_Cmd_Msg              0x08000268   Section        0  lora_gateway.o(i.LoRa_USART3_Node2_Cmd_Msg)
+    i.LoRa_USART3_SendArray                  0x08000288   Section        0  lora_gateway.o(i.LoRa_USART3_SendArray)
+    i.LoRa_USART3_SendByte                   0x080002a4   Section        0  lora_gateway.o(i.LoRa_USART3_SendByte)
+    i.LoRa_USART3_Trans_Mode_Init            0x080002c4   Section        0  lora_gateway.o(i.LoRa_USART3_Trans_Mode_Init)
+    i.MemManage_Handler                      0x08000378   Section        0  stm32f10x_it.o(i.MemManage_Handler)
+    i.NMI_Handler                            0x0800037a   Section        0  stm32f10x_it.o(i.NMI_Handler)
+    i.NVIC_Init                              0x0800037c   Section        0  misc.o(i.NVIC_Init)
+    i.NVIC_PriorityGroupConfig               0x080003e0   Section        0  misc.o(i.NVIC_PriorityGroupConfig)
+    i.PendSV_Handler                         0x080003f4   Section        0  stm32f10x_it.o(i.PendSV_Handler)
+    i.RCC_APB1PeriphClockCmd                 0x080003f8   Section        0  stm32f10x_rcc.o(i.RCC_APB1PeriphClockCmd)
+    i.RCC_APB2PeriphClockCmd                 0x08000414   Section        0  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
+    i.RCC_GetClocksFreq                      0x08000430   Section        0  stm32f10x_rcc.o(i.RCC_GetClocksFreq)
+    i.SVC_Handler                            0x080004dc   Section        0  stm32f10x_it.o(i.SVC_Handler)
+    i.SetSysClock                            0x080004de   Section        0  system_stm32f10x.o(i.SetSysClock)
+    SetSysClock                              0x080004df   Thumb Code     4  system_stm32f10x.o(i.SetSysClock)
+    i.SetSysClockTo72                        0x080004e4   Section        0  system_stm32f10x.o(i.SetSysClockTo72)
+    SetSysClockTo72                          0x080004e5   Thumb Code   166  system_stm32f10x.o(i.SetSysClockTo72)
+    i.SysTick_CLKSourceConfig                0x08000594   Section        0  misc.o(i.SysTick_CLKSourceConfig)
+    i.SysTick_Handler                        0x080005b0   Section        0  stm32f10x_it.o(i.SysTick_Handler)
+    i.SystemInit                             0x080005b4   Section        0  system_stm32f10x.o(i.SystemInit)
+    i.USART3_IRQHandler                      0x08000604   Section        0  lora_gateway.o(i.USART3_IRQHandler)
+    i.USART_ClearITPendingBit                0x080006b0   Section        0  stm32f10x_usart.o(i.USART_ClearITPendingBit)
+    i.USART_Cmd                              0x080006c0   Section        0  stm32f10x_usart.o(i.USART_Cmd)
+    i.USART_GetFlagStatus                    0x080006d8   Section        0  stm32f10x_usart.o(i.USART_GetFlagStatus)
+    i.USART_GetITStatus                      0x080006e6   Section        0  stm32f10x_usart.o(i.USART_GetITStatus)
+    i.USART_ITConfig                         0x08000726   Section        0  stm32f10x_usart.o(i.USART_ITConfig)
+    i.USART_Init                             0x0800075c   Section        0  stm32f10x_usart.o(i.USART_Init)
+    i.USART_ReceiveData                      0x08000818   Section        0  stm32f10x_usart.o(i.USART_ReceiveData)
+    i.USART_SendData                         0x08000820   Section        0  stm32f10x_usart.o(i.USART_SendData)
+    i.UsageFault_Handler                     0x08000828   Section        0  stm32f10x_it.o(i.UsageFault_Handler)
+    i.__scatterload_copy                     0x0800082a   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x08000838   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x0800083a   Section       14  handlers.o(i.__scatterload_zeroinit)
+    i.delay_init                             0x08000848   Section        0  delay.o(i.delay_init)
+    i.delay_ms                               0x08000874   Section        0  delay.o(i.delay_ms)
+    i.main                                   0x0800089c   Section        0  main.o(i.main)
     .data                                    0x20000000   Section       20  stm32f10x_rcc.o(.data)
     ADCPrescTable                            0x20000000   Data           4  stm32f10x_rcc.o(.data)
     APBAHBPrescTable                         0x20000004   Data          16  stm32f10x_rcc.o(.data)
-    STACK                                    0x20000018   Section     1024  startup_stm32f10x_md.o(STACK)
+    .data                                    0x20000014   Section        4  delay.o(.data)
+    fac_us                                   0x20000014   Data           1  delay.o(.data)
+    fac_ms                                   0x20000016   Data           2  delay.o(.data)
+    .data                                    0x20000018   Section       22  lora_gateway.o(.data)
+    rxState                                  0x20000021   Data           1  lora_gateway.o(.data)
+    pRxPacket                                0x20000022   Data           1  lora_gateway.o(.data)
+    STACK                                    0x20000030   Section     1024  startup_stm32f10x_md.o(STACK)
 
     Global Symbols
 
@@ -857,7 +890,6 @@ Image Symbol Table
     TIM4_IRQHandler                          0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
     USART1_IRQHandler                        0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
     USART2_IRQHandler                        0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    USART3_IRQHandler                        0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
     USBWakeUp_IRQHandler                     0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
     USB_HP_CAN1_TX_IRQHandler                0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
     USB_LP_CAN1_RX0_IRQHandler               0x0800011f   Thumb Code     0  startup_stm32f10x_md.o(.text)
@@ -868,29 +900,57 @@ Image Symbol Table
     DebugMon_Handler                         0x0800014f   Thumb Code     2  stm32f10x_it.o(i.DebugMon_Handler)
     GPIO_Init                                0x08000151   Thumb Code   166  stm32f10x_gpio.o(i.GPIO_Init)
     HardFault_Handler                        0x080001f7   Thumb Code     2  stm32f10x_it.o(i.HardFault_Handler)
-    LoRa_USART3_Trans_Mode_Init              0x080001f9   Thumb Code   170  lora_gateway.o(i.LoRa_USART3_Trans_Mode_Init)
-    MemManage_Handler                        0x080002ad   Thumb Code     2  stm32f10x_it.o(i.MemManage_Handler)
-    NMI_Handler                              0x080002af   Thumb Code     2  stm32f10x_it.o(i.NMI_Handler)
-    NVIC_Init                                0x080002b1   Thumb Code    96  misc.o(i.NVIC_Init)
-    NVIC_PriorityGroupConfig                 0x08000315   Thumb Code    10  misc.o(i.NVIC_PriorityGroupConfig)
-    PendSV_Handler                           0x08000329   Thumb Code     2  stm32f10x_it.o(i.PendSV_Handler)
-    RCC_APB1PeriphClockCmd                   0x0800032d   Thumb Code    22  stm32f10x_rcc.o(i.RCC_APB1PeriphClockCmd)
-    RCC_APB2PeriphClockCmd                   0x08000349   Thumb Code    22  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
-    RCC_GetClocksFreq                        0x08000365   Thumb Code   154  stm32f10x_rcc.o(i.RCC_GetClocksFreq)
-    SVC_Handler                              0x08000411   Thumb Code     2  stm32f10x_it.o(i.SVC_Handler)
-    SysTick_Handler                          0x080004c9   Thumb Code     2  stm32f10x_it.o(i.SysTick_Handler)
-    SystemInit                               0x080004cd   Thumb Code    64  system_stm32f10x.o(i.SystemInit)
-    USART_Cmd                                0x0800051d   Thumb Code    24  stm32f10x_usart.o(i.USART_Cmd)
-    USART_ITConfig                           0x08000535   Thumb Code    54  stm32f10x_usart.o(i.USART_ITConfig)
-    USART_Init                               0x0800056d   Thumb Code   182  stm32f10x_usart.o(i.USART_Init)
-    UsageFault_Handler                       0x08000629   Thumb Code     2  stm32f10x_it.o(i.UsageFault_Handler)
-    __scatterload_copy                       0x0800062b   Thumb Code    14  handlers.o(i.__scatterload_copy)
-    __scatterload_null                       0x08000639   Thumb Code     2  handlers.o(i.__scatterload_null)
-    __scatterload_zeroinit                   0x0800063b   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    main                                     0x08000649   Thumb Code    10  main.o(i.main)
-    Region$$Table$$Base                      0x08000654   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08000674   Number         0  anon$$obj.o(Region$$Table)
-    __initial_sp                             0x20000418   Data           0  startup_stm32f10x_md.o(STACK)
+    LoRa_USART3_Node1IDPkt                   0x080001f9   Thumb Code    34  lora_gateway.o(i.LoRa_USART3_Node1IDPkt)
+    LoRa_USART3_Node1_Cmd_Msg                0x08000221   Thumb Code    28  lora_gateway.o(i.LoRa_USART3_Node1_Cmd_Msg)
+    LoRa_USART3_Node2IDPkt                   0x08000241   Thumb Code    34  lora_gateway.o(i.LoRa_USART3_Node2IDPkt)
+    LoRa_USART3_Node2_Cmd_Msg                0x08000269   Thumb Code    28  lora_gateway.o(i.LoRa_USART3_Node2_Cmd_Msg)
+    LoRa_USART3_SendArray                    0x08000289   Thumb Code    26  lora_gateway.o(i.LoRa_USART3_SendArray)
+    LoRa_USART3_SendByte                     0x080002a5   Thumb Code    26  lora_gateway.o(i.LoRa_USART3_SendByte)
+    LoRa_USART3_Trans_Mode_Init              0x080002c5   Thumb Code   170  lora_gateway.o(i.LoRa_USART3_Trans_Mode_Init)
+    MemManage_Handler                        0x08000379   Thumb Code     2  stm32f10x_it.o(i.MemManage_Handler)
+    NMI_Handler                              0x0800037b   Thumb Code     2  stm32f10x_it.o(i.NMI_Handler)
+    NVIC_Init                                0x0800037d   Thumb Code    96  misc.o(i.NVIC_Init)
+    NVIC_PriorityGroupConfig                 0x080003e1   Thumb Code    10  misc.o(i.NVIC_PriorityGroupConfig)
+    PendSV_Handler                           0x080003f5   Thumb Code     2  stm32f10x_it.o(i.PendSV_Handler)
+    RCC_APB1PeriphClockCmd                   0x080003f9   Thumb Code    22  stm32f10x_rcc.o(i.RCC_APB1PeriphClockCmd)
+    RCC_APB2PeriphClockCmd                   0x08000415   Thumb Code    22  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
+    RCC_GetClocksFreq                        0x08000431   Thumb Code   154  stm32f10x_rcc.o(i.RCC_GetClocksFreq)
+    SVC_Handler                              0x080004dd   Thumb Code     2  stm32f10x_it.o(i.SVC_Handler)
+    SysTick_CLKSourceConfig                  0x08000595   Thumb Code    28  misc.o(i.SysTick_CLKSourceConfig)
+    SysTick_Handler                          0x080005b1   Thumb Code     2  stm32f10x_it.o(i.SysTick_Handler)
+    SystemInit                               0x080005b5   Thumb Code    64  system_stm32f10x.o(i.SystemInit)
+    USART3_IRQHandler                        0x08000605   Thumb Code   162  lora_gateway.o(i.USART3_IRQHandler)
+    USART_ClearITPendingBit                  0x080006b1   Thumb Code    16  stm32f10x_usart.o(i.USART_ClearITPendingBit)
+    USART_Cmd                                0x080006c1   Thumb Code    24  stm32f10x_usart.o(i.USART_Cmd)
+    USART_GetFlagStatus                      0x080006d9   Thumb Code    14  stm32f10x_usart.o(i.USART_GetFlagStatus)
+    USART_GetITStatus                        0x080006e7   Thumb Code    64  stm32f10x_usart.o(i.USART_GetITStatus)
+    USART_ITConfig                           0x08000727   Thumb Code    54  stm32f10x_usart.o(i.USART_ITConfig)
+    USART_Init                               0x0800075d   Thumb Code   182  stm32f10x_usart.o(i.USART_Init)
+    USART_ReceiveData                        0x08000819   Thumb Code     8  stm32f10x_usart.o(i.USART_ReceiveData)
+    USART_SendData                           0x08000821   Thumb Code     8  stm32f10x_usart.o(i.USART_SendData)
+    UsageFault_Handler                       0x08000829   Thumb Code     2  stm32f10x_it.o(i.UsageFault_Handler)
+    __scatterload_copy                       0x0800082b   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x08000839   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x0800083b   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    delay_init                               0x08000849   Thumb Code    38  delay.o(i.delay_init)
+    delay_ms                                 0x08000875   Thumb Code    36  delay.o(i.delay_ms)
+    main                                     0x0800089d   Thumb Code    44  main.o(i.main)
+    Region$$Table$$Base                      0x080008c8   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x080008e8   Number         0  anon$$obj.o(Region$$Table)
+    loRaNode1Channel                         0x20000018   Data           1  lora_gateway.o(.data)
+    loRaNode1Id                              0x20000019   Data           1  lora_gateway.o(.data)
+    loRaNode2Channel                         0x2000001a   Data           1  lora_gateway.o(.data)
+    loRaNode2Id                              0x2000001b   Data           1  lora_gateway.o(.data)
+    loRaExecutorHumidifier                   0x2000001c   Data           1  lora_gateway.o(.data)
+    loRaExecutorFan                          0x2000001d   Data           1  lora_gateway.o(.data)
+    loRaExecutorBuzzer                       0x2000001e   Data           1  lora_gateway.o(.data)
+    loRaExecutorServo                        0x2000001f   Data           1  lora_gateway.o(.data)
+    loraUSART3ExecutorFlag                   0x20000020   Data           1  lora_gateway.o(.data)
+    loraUSART3RxFlag                         0x20000023   Data           1  lora_gateway.o(.data)
+    loRaNode1Addr                            0x20000024   Data           2  lora_gateway.o(.data)
+    loRaNode2Addr                            0x20000026   Data           2  lora_gateway.o(.data)
+    loraUSART3RxPacket                       0x20000028   Data           6  lora_gateway.o(.data)
+    __initial_sp                             0x20000430   Data           0  startup_stm32f10x_md.o(STACK)
 
 
 
@@ -900,66 +960,82 @@ Memory Map of the image
 
   Image Entry point : 0x080000ed
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00000688, Max: 0x00010000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00000918, Max: 0x00010000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00000674, Max: 0x00010000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x000008e8, Max: 0x00010000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08000000   0x08000000   0x000000ec   Data   RO           19    RESET               startup_stm32f10x_md.o
-    0x080000ec   0x080000ec   0x00000000   Code   RO         3304  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
-    0x080000ec   0x080000ec   0x00000004   Code   RO         3335    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
-    0x080000f0   0x080000f0   0x00000004   Code   RO         3338    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
-    0x080000f4   0x080000f4   0x00000000   Code   RO         3340    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
-    0x080000f4   0x080000f4   0x00000000   Code   RO         3342    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
-    0x080000f4   0x080000f4   0x00000008   Code   RO         3343    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
-    0x080000fc   0x080000fc   0x00000004   Code   RO         3350    .ARM.Collect$$$$0000000E  mc_w.l(entry12b.o)
-    0x08000100   0x08000100   0x00000000   Code   RO         3345    .ARM.Collect$$$$0000000F  mc_w.l(entry10a.o)
-    0x08000100   0x08000100   0x00000000   Code   RO         3347    .ARM.Collect$$$$00000011  mc_w.l(entry11a.o)
-    0x08000100   0x08000100   0x00000004   Code   RO         3336    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
+    0x080000ec   0x080000ec   0x00000000   Code   RO         3338  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
+    0x080000ec   0x080000ec   0x00000004   Code   RO         3369    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
+    0x080000f0   0x080000f0   0x00000004   Code   RO         3372    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
+    0x080000f4   0x080000f4   0x00000000   Code   RO         3374    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
+    0x080000f4   0x080000f4   0x00000000   Code   RO         3376    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
+    0x080000f4   0x080000f4   0x00000008   Code   RO         3377    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
+    0x080000fc   0x080000fc   0x00000004   Code   RO         3384    .ARM.Collect$$$$0000000E  mc_w.l(entry12b.o)
+    0x08000100   0x08000100   0x00000000   Code   RO         3379    .ARM.Collect$$$$0000000F  mc_w.l(entry10a.o)
+    0x08000100   0x08000100   0x00000000   Code   RO         3381    .ARM.Collect$$$$00000011  mc_w.l(entry11a.o)
+    0x08000100   0x08000100   0x00000004   Code   RO         3370    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
     0x08000104   0x08000104   0x00000024   Code   RO           20    .text               startup_stm32f10x_md.o
-    0x08000128   0x08000128   0x00000024   Code   RO         3367    .text               mc_w.l(init.o)
-    0x0800014c   0x0800014c   0x00000002   Code   RO          182    i.BusFault_Handler  stm32f10x_it.o
-    0x0800014e   0x0800014e   0x00000002   Code   RO          183    i.DebugMon_Handler  stm32f10x_it.o
-    0x08000150   0x08000150   0x000000a6   Code   RO         1396    i.GPIO_Init         stm32f10x_gpio.o
-    0x080001f6   0x080001f6   0x00000002   Code   RO          184    i.HardFault_Handler  stm32f10x_it.o
-    0x080001f8   0x080001f8   0x000000b4   Code   RO         3243    i.LoRa_USART3_Trans_Mode_Init  lora_gateway.o
-    0x080002ac   0x080002ac   0x00000002   Code   RO          185    i.MemManage_Handler  stm32f10x_it.o
-    0x080002ae   0x080002ae   0x00000002   Code   RO          186    i.NMI_Handler       stm32f10x_it.o
-    0x080002b0   0x080002b0   0x00000064   Code   RO          245    i.NVIC_Init         misc.o
-    0x08000314   0x08000314   0x00000014   Code   RO          246    i.NVIC_PriorityGroupConfig  misc.o
-    0x08000328   0x08000328   0x00000002   Code   RO          187    i.PendSV_Handler    stm32f10x_it.o
-    0x0800032a   0x0800032a   0x00000002   PAD
-    0x0800032c   0x0800032c   0x0000001c   Code   RO         1812    i.RCC_APB1PeriphClockCmd  stm32f10x_rcc.o
-    0x08000348   0x08000348   0x0000001c   Code   RO         1814    i.RCC_APB2PeriphClockCmd  stm32f10x_rcc.o
-    0x08000364   0x08000364   0x000000ac   Code   RO         1822    i.RCC_GetClocksFreq  stm32f10x_rcc.o
-    0x08000410   0x08000410   0x00000002   Code   RO          188    i.SVC_Handler       stm32f10x_it.o
-    0x08000412   0x08000412   0x00000004   Code   RO           24    i.SetSysClock       system_stm32f10x.o
-    0x08000416   0x08000416   0x00000002   PAD
-    0x08000418   0x08000418   0x000000b0   Code   RO           25    i.SetSysClockTo72   system_stm32f10x.o
-    0x080004c8   0x080004c8   0x00000002   Code   RO          189    i.SysTick_Handler   stm32f10x_it.o
-    0x080004ca   0x080004ca   0x00000002   PAD
-    0x080004cc   0x080004cc   0x00000050   Code   RO           27    i.SystemInit        system_stm32f10x.o
-    0x0800051c   0x0800051c   0x00000018   Code   RO         2982    i.USART_Cmd         stm32f10x_usart.o
-    0x08000534   0x08000534   0x00000036   Code   RO         2988    i.USART_ITConfig    stm32f10x_usart.o
-    0x0800056a   0x0800056a   0x00000002   PAD
-    0x0800056c   0x0800056c   0x000000bc   Code   RO         2989    i.USART_Init        stm32f10x_usart.o
-    0x08000628   0x08000628   0x00000002   Code   RO          190    i.UsageFault_Handler  stm32f10x_it.o
-    0x0800062a   0x0800062a   0x0000000e   Code   RO         3379    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x08000638   0x08000638   0x00000002   Code   RO         3380    i.__scatterload_null  mc_w.l(handlers.o)
-    0x0800063a   0x0800063a   0x0000000e   Code   RO         3381    i.__scatterload_zeroinit  mc_w.l(handlers.o)
-    0x08000648   0x08000648   0x0000000a   Code   RO          137    i.main              main.o
-    0x08000652   0x08000652   0x00000002   PAD
-    0x08000654   0x08000654   0x00000020   Data   RO         3377    Region$$Table       anon$$obj.o
+    0x08000128   0x08000128   0x00000024   Code   RO         3401    .text               mc_w.l(init.o)
+    0x0800014c   0x0800014c   0x00000002   Code   RO          186    i.BusFault_Handler  stm32f10x_it.o
+    0x0800014e   0x0800014e   0x00000002   Code   RO          187    i.DebugMon_Handler  stm32f10x_it.o
+    0x08000150   0x08000150   0x000000a6   Code   RO         1400    i.GPIO_Init         stm32f10x_gpio.o
+    0x080001f6   0x080001f6   0x00000002   Code   RO          188    i.HardFault_Handler  stm32f10x_it.o
+    0x080001f8   0x080001f8   0x00000028   Code   RO         3245    i.LoRa_USART3_Node1IDPkt  lora_gateway.o
+    0x08000220   0x08000220   0x00000020   Code   RO         3246    i.LoRa_USART3_Node1_Cmd_Msg  lora_gateway.o
+    0x08000240   0x08000240   0x00000028   Code   RO         3247    i.LoRa_USART3_Node2IDPkt  lora_gateway.o
+    0x08000268   0x08000268   0x00000020   Code   RO         3248    i.LoRa_USART3_Node2_Cmd_Msg  lora_gateway.o
+    0x08000288   0x08000288   0x0000001a   Code   RO         3250    i.LoRa_USART3_SendArray  lora_gateway.o
+    0x080002a2   0x080002a2   0x00000002   PAD
+    0x080002a4   0x080002a4   0x00000020   Code   RO         3251    i.LoRa_USART3_SendByte  lora_gateway.o
+    0x080002c4   0x080002c4   0x000000b4   Code   RO         3254    i.LoRa_USART3_Trans_Mode_Init  lora_gateway.o
+    0x08000378   0x08000378   0x00000002   Code   RO          189    i.MemManage_Handler  stm32f10x_it.o
+    0x0800037a   0x0800037a   0x00000002   Code   RO          190    i.NMI_Handler       stm32f10x_it.o
+    0x0800037c   0x0800037c   0x00000064   Code   RO          249    i.NVIC_Init         misc.o
+    0x080003e0   0x080003e0   0x00000014   Code   RO          250    i.NVIC_PriorityGroupConfig  misc.o
+    0x080003f4   0x080003f4   0x00000002   Code   RO          191    i.PendSV_Handler    stm32f10x_it.o
+    0x080003f6   0x080003f6   0x00000002   PAD
+    0x080003f8   0x080003f8   0x0000001c   Code   RO         1816    i.RCC_APB1PeriphClockCmd  stm32f10x_rcc.o
+    0x08000414   0x08000414   0x0000001c   Code   RO         1818    i.RCC_APB2PeriphClockCmd  stm32f10x_rcc.o
+    0x08000430   0x08000430   0x000000ac   Code   RO         1826    i.RCC_GetClocksFreq  stm32f10x_rcc.o
+    0x080004dc   0x080004dc   0x00000002   Code   RO          192    i.SVC_Handler       stm32f10x_it.o
+    0x080004de   0x080004de   0x00000004   Code   RO           24    i.SetSysClock       system_stm32f10x.o
+    0x080004e2   0x080004e2   0x00000002   PAD
+    0x080004e4   0x080004e4   0x000000b0   Code   RO           25    i.SetSysClockTo72   system_stm32f10x.o
+    0x08000594   0x08000594   0x0000001c   Code   RO          253    i.SysTick_CLKSourceConfig  misc.o
+    0x080005b0   0x080005b0   0x00000002   Code   RO          193    i.SysTick_Handler   stm32f10x_it.o
+    0x080005b2   0x080005b2   0x00000002   PAD
+    0x080005b4   0x080005b4   0x00000050   Code   RO           27    i.SystemInit        system_stm32f10x.o
+    0x08000604   0x08000604   0x000000ac   Code   RO         3255    i.USART3_IRQHandler  lora_gateway.o
+    0x080006b0   0x080006b0   0x00000010   Code   RO         2983    i.USART_ClearITPendingBit  stm32f10x_usart.o
+    0x080006c0   0x080006c0   0x00000018   Code   RO         2986    i.USART_Cmd         stm32f10x_usart.o
+    0x080006d8   0x080006d8   0x0000000e   Code   RO         2989    i.USART_GetFlagStatus  stm32f10x_usart.o
+    0x080006e6   0x080006e6   0x00000040   Code   RO         2990    i.USART_GetITStatus  stm32f10x_usart.o
+    0x08000726   0x08000726   0x00000036   Code   RO         2992    i.USART_ITConfig    stm32f10x_usart.o
+    0x0800075c   0x0800075c   0x000000bc   Code   RO         2993    i.USART_Init        stm32f10x_usart.o
+    0x08000818   0x08000818   0x00000008   Code   RO         3000    i.USART_ReceiveData  stm32f10x_usart.o
+    0x08000820   0x08000820   0x00000008   Code   RO         3003    i.USART_SendData    stm32f10x_usart.o
+    0x08000828   0x08000828   0x00000002   Code   RO          194    i.UsageFault_Handler  stm32f10x_it.o
+    0x0800082a   0x0800082a   0x0000000e   Code   RO         3413    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x08000838   0x08000838   0x00000002   Code   RO         3414    i.__scatterload_null  mc_w.l(handlers.o)
+    0x0800083a   0x0800083a   0x0000000e   Code   RO         3415    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x08000848   0x08000848   0x0000002c   Code   RO         3216    i.delay_init        delay.o
+    0x08000874   0x08000874   0x00000028   Code   RO         3217    i.delay_ms          delay.o
+    0x0800089c   0x0800089c   0x0000002c   Code   RO          137    i.main              main.o
+    0x080008c8   0x080008c8   0x00000020   Data   RO         3411    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08000674, Size: 0x00000418, Max: 0x00005000, ABSOLUTE)
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x080008e8, Size: 0x00000430, Max: 0x00005000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x08000674   0x00000014   Data   RW         1842    .data               stm32f10x_rcc.o
-    0x20000014   0x08000688   0x00000004   PAD
-    0x20000018        -       0x00000400   Zero   RW           17    STACK               startup_stm32f10x_md.o
+    0x20000000   0x080008e8   0x00000014   Data   RW         1846    .data               stm32f10x_rcc.o
+    0x20000014   0x080008fc   0x00000004   Data   RW         3219    .data               delay.o
+    0x20000018   0x08000900   0x00000016   Data   RW         3257    .data               lora_gateway.o
+    0x2000002e   0x08000916   0x00000002   PAD
+    0x20000030        -       0x00000400   Zero   RW           17    STACK               startup_stm32f10x_md.o
 
 
 ==============================================================================
@@ -970,20 +1046,21 @@ Image component sizes
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
          0          0          0          0          0       4604   core_cm3.o
-       180         10          0          0          0        782   lora_gateway.o
-        10          0          0          0          0     203863   main.o
-       120         14          0          0          0       1683   misc.o
-        36          8        236          0       1024        816   startup_stm32f10x_md.o
-       166          0          0          0          0       2132   stm32f10x_gpio.o
-        18          0          0          0          0       3874   stm32f10x_it.o
-       228         30          0         20          0       4718   stm32f10x_rcc.o
-       266          6          0          0          0       3962   stm32f10x_usart.o
-       260         26          0          0          0      25221   system_stm32f10x.o
+        84         10          0          4          0       1176   delay.o
+       554         46          0         22          0       6499   lora_gateway.o
+        44          0          0          0          0     204539   main.o
+       148         14          0          0          0       2149   misc.o
+        36          8        236          0       1024        800   startup_stm32f10x_md.o
+       166          0          0          0          0       2096   stm32f10x_gpio.o
+        18          0          0          0          0       3722   stm32f10x_it.o
+       228         30          0         20          0       4626   stm32f10x_rcc.o
+       376          6          0          0          0       7035   stm32f10x_usart.o
+       260         26          0          0          0      25105   system_stm32f10x.o
 
     ----------------------------------------------------------------------
-      1294         94        268         20       1028     251655   Object Totals
+      1922        140        268         48       1024     262351   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-        10          0          0          0          4          0   (incl. Padding)
+         8          0          0          2          0          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -1021,15 +1098,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      1384        110        268         20       1028     250887   Grand Totals
-      1384        110        268         20       1028     250887   ELF Image Totals
-      1384        110        268         20          0          0   ROM Totals
+      2012        156        268         48       1024     260855   Grand Totals
+      2012        156        268         48       1024     260855   ELF Image Totals
+      2012        156        268         48          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 1652 (   1.61kB)
-    Total RW  Size (RW Data + ZI Data)              1048 (   1.02kB)
-    Total ROM Size (Code + RO Data + RW Data)       1672 (   1.63kB)
+    Total RO  Size (Code + RO Data)                 2280 (   2.23kB)
+    Total RW  Size (RW Data + ZI Data)              1072 (   1.05kB)
+    Total ROM Size (Code + RO Data + RW Data)       2328 (   2.27kB)
 
 ==============================================================================
 
