@@ -15,10 +15,10 @@ uint8_t loraSensorDHT11Identifier[1]		 																			= {0xEA};
 uint8_t loraSensorMQ2Identifier[1]																						=	{0xEB};
 uint8_t loraSensorLightIdentifier[1]																					=	{0xEC};
 uint8_t loraSensorFireIdentifier[1]																						= {0xED};
-uint8_t	loraExecutorHumidifier[1]																							= {0xFA};
-uint8_t	loraExecutorFan[1]																										=	{0xFB};
-uint8_t	loraExecutorBuzzer[1]																									=	{0xFC};
-uint8_t	loraExecutorLED[1]																										=	{0xFD};
+uint8_t	loraExecutorLED[1]																										=	{0xFA};
+uint8_t	loraExecutorHumidifier[1]																							= {0xFB};
+uint8_t	loraExecutorFan[1]																										=	{0xFC};
+uint8_t	loraExecutorBuzzer[1]																									=	{0xFD};
 uint8_t	loraExecutorServo[1]																									=	{0xFE};
 uint8_t	loraExecutorStepmotor[1]																							=	{0xFF};
 
@@ -233,10 +233,11 @@ void LoRa_USART3_Gate_IdentifierPkt(void)
 
 /**
   * @brief  USART3接收中断函数
-  * @note   处理USART3接收到的数据，执行相应操作。
-	* @note		状态变量一共分为3个，分别是等待包头（0xD1）、接收数据和等待包尾（0xAB）。
-	* @note		else if不会造成多个状态都被满足的问题。
-	* @note		中断只会执行第一个满足条件的if语句
+  * @note   1、处理USART3接收到的数据，执行相应操作。
+	* 				2、状态变量一共分为3个，分别是等待包头（0xD1）、接收数据和等待包尾（0xAB）。
+	* 				3、else if不会造成多个状态都被满足的问题。
+	* 				4、中断只会执行第一个满足条件的if语句
+	* 				5、exeState分如下的状态：如LED灯：10表示收到网关的LED请求，11表示打开LED，12表示关闭LED。
   * @param  None
   * @retval None
   */
@@ -259,21 +260,28 @@ void USART3_IRQHandler(void)
 		}
 		else if(rxState == 1)
 		{
-			loraUsart3RxPacket[pRxPacket++]	= rxData;																										//第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
-			if(pRxPacket == 1&&rxData == 0xFA)
+			loraUsart3RxPacket[pRxPacket++]	= rxData;																											//第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
+			if(pRxPacket == 1)
 			{
-				exeState = 1;
+				if(loraUsart3RxPacket[0] == 0xFA)
+				{
+					exeState = 10;
+				}
 			}
-			else if(pRxPacket == 2&&rxData == 0x01)
+			else if(pRxPacket == 2)
 			{
-				LoRa_USART3_Gate_IdentifierPkt();
-				LoRa_USART3_SendArray(loraLEDStatusOn,1);
-				exeState = 0;
-				rxState = 0;
-				pRxPacket = 0;
+				if(exeState == 10&&loraUsart3RxPacket[1] == 0x01)
+				{
+					exeState = 11;
+				}
+				else if(exeState == 10&&loraUsart3RxPacket[1] == 0x00)
+				{
+					exeState = 12;
+				}
 			}
+			rxState = 0;
+			pRxPacket = 0;
 		}
-		
 		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																								//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
 	}
 }

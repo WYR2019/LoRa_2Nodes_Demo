@@ -24,6 +24,7 @@ extern uint8_t loraLEDStatusOff[];
 extern uint8_t loraUsart3RxPacket[];
 extern uint8_t loraUsart3RxFlag;
 extern uint8_t exeState;
+extern uint8_t rxState;
 
 void LoRa_USART3_Trans_Mode_Init(uint32_t mdTransBaudrate);
 void LoRa_USART3_Set_Mode_Init(uint32_t mdSetBaudrate);

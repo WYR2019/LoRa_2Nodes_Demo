@@ -16,9 +16,13 @@ int main(void){
 		DHT11_Read_Data(&temp,&humi);
 		delay_ms(1500);
 		LoRa_USART3_Md_Trans_Msg();
-		if(exeState == 1)
+		if(exeState == 11)
 		{
 			LED_PC13_ON();
+		}
+		else if(exeState == 12)
+		{
+			LED_PC13_OFF();
 		}
 	}
 }
