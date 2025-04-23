@@ -3,6 +3,8 @@
 #include "stm32f10x.h"                  																 		// Device header
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
+#include "LED_PC13.h"
 
 /* LoRaµƒ…Ë÷√ */
 #define LORA_GPIO_PIN_TX           														GPIO_Pin_10
@@ -21,6 +23,7 @@ extern uint8_t loraLEDStatusOn[];
 extern uint8_t loraLEDStatusOff[];
 extern uint8_t loraUsart3RxPacket[];
 extern uint8_t loraUsart3RxFlag;
+extern uint8_t exeState;
 
 void LoRa_USART3_Trans_Mode_Init(uint32_t mdTransBaudrate);
 void LoRa_USART3_Set_Mode_Init(uint32_t mdSetBaudrate);
@@ -28,8 +31,8 @@ void LoRa_USART3_SendByte(uint8_t byte);
 void LoRa_USART3_SendArray(uint8_t *array,uint16_t length);
 void LoRa_USART3_SendString(char *string);
 void LoRa_USART3_Printf(char *format, ...);
-void LoRa_USART3_IdentifierPkt(void);
+void LoRa_USART3_Gate_IdentifierPkt(void);
 void LoRa_USART3_Md_Trans_Msg(void);
-uint8_t LoRa_USART3_GetRxFlag(void);
+//uint8_t LoRa_USART3_GetRxFlag(void);
 
 #endif

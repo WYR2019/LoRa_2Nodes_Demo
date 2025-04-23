@@ -31,4 +31,5 @@
 .\objects\lora.o: .\Libraries\inc\misc.h
 .\objects\lora.o: D:\Program Files\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdio.h
 .\objects\lora.o: D:\Program Files\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdarg.h
+.\objects\lora.o: D:\Program Files\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\string.h
 .\objects\lora.o: Drivers\LED_PC13.h

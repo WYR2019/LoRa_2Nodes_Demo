@@ -14,7 +14,7 @@ uint8_t loraGateIdentifier[1]		 																							= {LORA_NODE_IDENTIFIER};
 uint8_t loraSensorDHT11Identifier[1]		 																			= {0xEA};
 uint8_t loraSensorMQ2Identifier[1]																						=	{0xEB};
 uint8_t loraSensorLightIdentifier[1]																					=	{0xEC};
-uint8_t loraSensorRS485Identifier[1]																					= {0xED};
+uint8_t loraSensorFireIdentifier[1]																						= {0xED};
 uint8_t	loraExecutorHumidifier[1]																							= {0xFA};
 uint8_t	loraExecutorFan[1]																										=	{0xFB};
 uint8_t	loraExecutorBuzzer[1]																									=	{0xFC};
@@ -25,10 +25,12 @@ uint8_t	loraExecutorStepmotor[1]																							=	{0xFF};
 uint8_t loraLEDStatusOn[1]																										=	{0x01};
 uint8_t loraLEDStatusOff[1]																										=	{0x00};
 
-uint8_t loraUsart3RxPacket[6];
+uint8_t loraUsart3RxPacket[2];
 uint8_t loraUsart3RxData;
 uint8_t loraUsart3ExecutorFlag = 0;
-uint8_t loraUsart3RxFlag;
+uint8_t loraUsart3RxFlag = 0;
+
+uint8_t exeState;
 
 /**
   * @brief  LoRa在传输模式下的初始化函数         
@@ -191,33 +193,30 @@ void LoRa_USART3_Printf(char *format, ...)
 }
 
 /**
-  * @brief  获取标志位					
+  * @brief  获取标志位（该函数需要改进）					
   * @note   根据LoRa收到的数据包接收
   * @param  None
   * @retval 0、1、2
   */
-uint8_t LoRa_USART3_GetRxFlag(void)
-{
-	switch (loraUsart3RxFlag)
-	{
-		case 1:
-		{
-			loraUsart3RxFlag = 0;
-			return 1;
-		}
-		case 30:
-		{
-			loraUsart3RxFlag = 0;
-			return 30;
-		}
-		case 31:
-		{
-			loraUsart3RxFlag = 0;
-			return 31;
-		}
-	}
-	return 0;
-}
+//uint8_t LoRa_USART3_GetRxFlag(void)
+//{
+//	switch (loraUsart3RxFlag)
+//	{
+//		case 1:
+//			loraUsart3RxFlag = 0;
+//			return 1;
+//			break;
+//		case 30:
+//			loraUsart3RxFlag = 0;
+//			return 30;
+//			break;
+//		case 31:
+//			loraUsart3RxFlag = 0;
+//			return 31;
+//			break;
+//	}
+//	return 0;
+//}
 
 /**
   * @brief  LoRa发送发送hex数据包函数,也是LoRa在定点模式下执行节点间通信的主要函数。				
@@ -225,7 +224,7 @@ uint8_t LoRa_USART3_GetRxFlag(void)
   * @param  None
   * @retval None
   */
-void LoRa_USART3_IdentifierPkt(void)
+void LoRa_USART3_Gate_IdentifierPkt(void)
 {
 	LoRa_USART3_SendArray(loraGateAddr, 2);																														//发送载荷
 	LoRa_USART3_SendArray(loraGateChannel,1);
@@ -233,10 +232,11 @@ void LoRa_USART3_IdentifierPkt(void)
 }
 
 /**
-  * @brief  USART3接收中断函数、状态机 
-  * @note   处理USART3接收到的数据，执行对应操作。
-	* @note		状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收数据和等待包尾。
+  * @brief  USART3接收中断函数
+  * @note   处理USART3接收到的数据，执行相应操作。
+	* @note		状态变量一共分为3个，分别是等待包头（0xD1）、接收数据和等待包尾（0xAB）。
 	* @note		else if不会造成多个状态都被满足的问题。
+	* @note		中断只会执行第一个满足条件的if语句
   * @param  None
   * @retval None
   */
@@ -244,60 +244,36 @@ void USART3_IRQHandler(void)
 {
 	/*状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收执行器数据、接收执行器状态数据和等待包尾*/
 	static uint8_t rxState = 0;																																				//状态变量S=0
-	static uint8_t pRxPacket = 0;																																			//指示接收到哪一个数据
+	static uint8_t pRxPacket = 0;																																								//指示接收到哪一个数据
+	
 	if(USART_GetITStatus(USART3,USART_IT_RXNE) == SET)																								//如果RXNE置1，说明收到数据，开始根据数据处理状态。
 	{
 		/*接收字节，先读取到模块的变量里*/
-		uint32_t RxData = USART_ReceiveData(USART3);																										//获取USART3接收到的数据
+		uint32_t rxData = USART_ReceiveData(USART3);																										//获取USART3接收到的数据
+		if(rxState == 0)																																							//判断是否收到0xD1，若收到则进入数据处理状态。
 		{
-			switch (rxState)
+			if(rxData == 0xD1)																																					//判断包头是否正确
 			{
-				case 0:
-				{
-					if (RxData == 0x0C)																																				//状态1：等待包头，包头为最后一位信道号
-					{
-						rxState = 1;
-						pRxPacket = 0;																																					//提前清零，为下一次接收做准备
-					}
-				}
-				case 1:																																											//状态2：接收数据
-				{
-					loraUsart3RxPacket[pRxPacket] = RxData;                                                 	//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
-					pRxPacket++;																																							//移动到下一个位置
-					if(pRxPacket == 1)
-					{
-						if(loraUsart3RxPacket[0] == 0x0A)
-						{
-							loraUsart3ExecutorFlag = 3;
-						}
-					}
-					else if(pRxPacket == 2)
-					{
-						if(loraUsart3ExecutorFlag == 3 && loraUsart3RxPacket[1] == 0x01)
-						{
-							loraUsart3RxFlag = 31;
-						}
-						else if(loraUsart3ExecutorFlag == 3 && loraUsart3RxPacket[1] == 0x02)
-						{
-							loraUsart3RxFlag = 30;
-						}
-					}
-					else if(pRxPacket > 2)
-					{
-						rxState = 2;
-					}
-				}
-				case 2:																																											//状态3：等待包尾
-				{
-					if (RxData == 0xAB)
-					{	
-						rxState = 0;																																						//回到最初的状态
-						loraUsart3RxFlag = 1;																																		//代表整个数据包已经收到了，置一个标志位
-					}
-				}
+				rxState = 1;
 			}
-			
-			USART_ClearITPendingBit(USART3,USART_IT_RXNE);																								//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
 		}
+		else if(rxState == 1)
+		{
+			loraUsart3RxPacket[pRxPacket++]	= rxData;																										//第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
+			if(pRxPacket == 1&&rxData == 0xFA)
+			{
+				exeState = 1;
+			}
+			else if(pRxPacket == 2&&rxData == 0x01)
+			{
+				LoRa_USART3_Gate_IdentifierPkt();
+				LoRa_USART3_SendArray(loraLEDStatusOn,1);
+				exeState = 0;
+				rxState = 0;
+				pRxPacket = 0;
+			}
+		}
+		
+		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																								//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
 	}
 }

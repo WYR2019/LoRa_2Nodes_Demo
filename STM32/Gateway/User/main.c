@@ -14,5 +14,3 @@ int main(void){
 		LoRa_USART3_Node2_Cmd_Msg();
 	}
 }
-
-

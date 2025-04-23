@@ -681,14 +681,14 @@
           <GroupName>System</GroupName>
           <Files>
             <File>
-              <FileName>Delay.c</FileName>
+              <FileName>SysTick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\System\Delay.c</FilePath>
+              <FilePath>.\System\SysTick.c</FilePath>
             </File>
             <File>
-              <FileName>Delay.h</FileName>
+              <FileName>SysTick.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\System\Delay.h</FilePath>
+              <FilePath>.\System\SysTick.h</FilePath>
             </File>
           </Files>
         </Group>

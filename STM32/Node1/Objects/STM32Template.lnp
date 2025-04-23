@@ -27,7 +27,7 @@
 ".\objects\stm32f10x_tim.o"
 ".\objects\stm32f10x_usart.o"
 ".\objects\stm32f10x_wwdg.o"
-".\objects\delay.o"
+".\objects\systick.o"
 ".\objects\oled.o"
 ".\objects\lora.o"
 ".\objects\dht11.o"

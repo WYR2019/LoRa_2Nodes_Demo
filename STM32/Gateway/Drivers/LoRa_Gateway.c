@@ -19,12 +19,13 @@ uint8_t	loRaExecutorLED[1]																								=	{0xFD};
 uint8_t	loRaExecutorServo[1]																							=	{0xFE};
 uint8_t	loRaExecutorStepmotor[1]																					=	{0xFF};
 
-uint8_t loRaLEDStatusOn[1]																								=	{0x01};
-uint8_t loRaLEDStatusOff[1]																								=	{0x00};
+uint8_t loRaExecutorStatusOn[1]																						=	{0x01};
+uint8_t loRaExecutorStatusOff[1]																					=	{0x00};
+
 
 uint8_t loraUSART3RxPacket[6];
 uint8_t loraUSART3RxData;
-uint8_t loraUSART3ExecutorFlag = 0;
+uint8_t loraUSART3ExecutorFlag 																						= 0;
 uint8_t loraUSART3RxFlag;
 
 /**
@@ -217,8 +218,8 @@ void LoRa_USART3_Node1_Cmd_Msg(void)
 void LoRa_USART3_Node2_Cmd_Msg(void)
 {
 	LoRa_USART3_Node2IDPkt();
-	LoRa_USART3_SendArray(loRaExecutorServo,1);
 	LoRa_USART3_SendArray(loRaExecutorBuzzer,1);
+	LoRa_USART3_SendArray(loRaExecutorServo,1);
 }
 
 /**
