@@ -23,10 +23,10 @@ uint8_t loRaExecutorStatusOn[1]																						=	{0x01};
 uint8_t loRaExecutorStatusOff[1]																					=	{0x00};
 
 
-uint8_t loraUSART3RxPacket[6];
-uint8_t loraUSART3RxData;
-uint8_t loraUSART3ExecutorFlag 																						= 0;
-uint8_t loraUSART3RxFlag;
+uint8_t loRaUSART3RxPacket[6];
+uint8_t loRaUSART3RxData;
+uint8_t loRaUSART3ExecutorFlag 																						= 0;
+uint8_t loRaUSART3RxFlag;
 
 /**
   * @brief  LoRa在传输模式下的初始化函数         
@@ -244,7 +244,7 @@ void USART3_IRQHandler(void)
 			{
 				case 0:
 				{
-					if (rxData == 0x0C)																																				//状态1：等待包头，包头为最后一位信道号
+					if (rxData == 0xD1)																																				//状态1：等待包头，包头为最后一位信道号
 					{
 						rxState = 1;
 						pRxPacket = 0;																																					//提前清零，为下一次接收做准备
@@ -252,24 +252,23 @@ void USART3_IRQHandler(void)
 				}
 				case 1:																																											//状态2：接收数据
 				{
-					loraUSART3RxPacket[pRxPacket] = rxData;                                                 	//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
-					pRxPacket++;																																							//移动到下一个位置
+					loRaUSART3RxPacket[pRxPacket++] = rxData;                                                 //每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
 					if(pRxPacket == 1)
 					{
-						if(loraUSART3RxPacket[0] == 0x0A)
+						if(loRaUSART3RxPacket[0] == 0x0A)
 						{
-							loraUSART3ExecutorFlag = 3;
+							loRaUSART3ExecutorFlag = 3;
 						}
 					}
 					else if(pRxPacket == 2)
 					{
-						if(loraUSART3ExecutorFlag == 3 && loraUSART3RxPacket[1] == 0x01)
+						if(loRaUSART3ExecutorFlag == 3 && loRaUSART3RxPacket[1] == 0x01)
 						{
-							loraUSART3RxFlag = 31;
+							loRaUSART3RxFlag = 31;
 						}
-						else if(loraUSART3ExecutorFlag == 3 && loraUSART3RxPacket[1] == 0x02)
+						else if(loRaUSART3ExecutorFlag == 3 && loRaUSART3RxPacket[1] == 0x02)
 						{
-							loraUSART3RxFlag = 30;
+							loRaUSART3RxFlag = 30;
 						}
 					}
 					else if(pRxPacket > 2)
@@ -282,7 +281,7 @@ void USART3_IRQHandler(void)
 					if (rxData == 0xAB)
 					{	
 						rxState = 0;																																						//回到最初的状态
-						loraUSART3RxFlag = 1;																																		//代表整个数据包已经收到了，置一个标志位
+						loRaUSART3RxFlag = 1;																																		//代表整个数据包已经收到了，置一个标志位
 					}
 				}
 			}

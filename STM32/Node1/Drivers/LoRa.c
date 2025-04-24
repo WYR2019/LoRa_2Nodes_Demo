@@ -25,7 +25,7 @@ uint8_t	loRaExecutorStepmotor[1]																							=	{0xFF};
 uint8_t loRaLEDStatusOn[1]																										=	{0x01};
 uint8_t loRaLEDStatusOff[1]																										=	{0x00};
 
-uint8_t loRaUSART3RxPacket[2];
+uint8_t loRaUSART3RxPacket[3];
 uint8_t loRaUSART3RxData;
 uint8_t loRaUSART3ExecutorFlag = 0;
 uint8_t loRaUSART3RxFlag = 0;
@@ -237,30 +237,45 @@ void USART3_IRQHandler(void)
 			loRaUSART3RxPacket[pRxPacket++]	= rxData;																											//第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
 			if(pRxPacket == 1)
 			{
-				if(loRaUSART3RxPacket[0] == 0xFA)
-				{
+				if(loRaUSART3RxPacket[0] == 0xFA)	
 					executorID = 10;
-				}
+				else if(loRaUSART3RxPacket[0] == 0xFB) 
+					executorID = 20;
+				else if(loRaUSART3RxPacket[0] == 0xFC) 
+					executorID = 30;
 			}
 			else if(pRxPacket == 2)
 			{
 				if(executorID == 10)
 				{
-					if(loRaUSART3RxPacket[1] == 0x01)
-					{
+					if(loRaUSART3RxPacket[1] == 0x01) 
 						executorState = 11;
-					}
-					else if(loRaUSART3RxPacket[1] == 0x00)
-					{
+					else if(loRaUSART3RxPacket[1] == 0x00) 
 						executorState = 12;
-					}
 				}
+				else if(executorID == 20)
+				{
+					if(loRaUSART3RxPacket[1] == 0x01) 
+						executorState = 21;
+					else if(loRaUSART3RxPacket[1] == 0x00) 
+						executorState = 22;
+				}
+				else if(executorID == 30)
+				{
+					if(loRaUSART3RxPacket[1] == 0x01) 
+						executorState = 31;
+					else if(loRaUSART3RxPacket[1] == 0x00) 
+						executorState = 32;
+				}
+				/* DeepSeek修改部分 */
+				rxState = 0;
+				pRxPacket = 0;
 			}
-			/* DeepSeek修改部分 */
-			else if(pRxPacket >= 3)
+			else
 			{
 				rxState = 0;
 				pRxPacket = 0;
+//				executorState = 0;
 			}
 		}
 		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																									//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除

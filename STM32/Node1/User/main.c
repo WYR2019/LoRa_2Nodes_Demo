@@ -19,10 +19,12 @@ int main(void){
 		if(executorState == 11)
 		{
 			LED_PC13_ON();
+//			LoRa_USART3_SendArray(loRaLEDStatusOn,1);
 		}
 		else if(executorState == 12)
 		{
 			LED_PC13_OFF();
+//			LoRa_USART3_SendArray(loRaLEDStatusOff,1);
 		}
 	}
 }
@@ -35,5 +37,7 @@ void LoRa_USART3_Md_Trans_Msg(void)
 	LoRa_USART3_SendArray(&humi,1);
 }
 
-//bug：无法正常关灯（已解决）
-
+/*bug：1、第一次执行指令正常，但第二次会有一次延迟，第三次才会控制成功，而且第二次节点发送数据由“0xEA”变为“0xD1”。（已解决） 
+ *     2、在网关发布第一次指令后，节点发送数据异常。（已解决） 
+ *
+ */
