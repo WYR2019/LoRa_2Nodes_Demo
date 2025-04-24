@@ -7,30 +7,30 @@
 2、需要在C/C++、杂项中加上这样的参数：--no-multibyte-chars
 */
 
-uint8_t loraGateAddr[2] 				 																							= {LORA_GATE_ADDR_HIGH,LORA_GATE_ADDR_LOW};
-uint8_t loraGateChannel[1]			 																							= {LORA_GATE_CHANNEL};
-uint8_t loraGateIdentifier[1]		 																							= {LORA_NODE_IDENTIFIER};
+uint8_t loRaGateAddr[2] 				 																							= {LORA_GATE_ADDR_HIGH,LORA_GATE_ADDR_LOW};
+uint8_t loRaGateChannel[1]			 																							= {LORA_GATE_CHANNEL};
+uint8_t loRaGateIdentifier[1]		 																							= {LORA_NODE_IDENTIFIER};
 
-uint8_t loraSensorDHT11Identifier[1]		 																			= {0xEA};
-uint8_t loraSensorMQ2Identifier[1]																						=	{0xEB};
-uint8_t loraSensorLightIdentifier[1]																					=	{0xEC};
-uint8_t loraSensorFireIdentifier[1]																						= {0xED};
-uint8_t	loraExecutorLED[1]																										=	{0xFA};
-uint8_t	loraExecutorHumidifier[1]																							= {0xFB};
-uint8_t	loraExecutorFan[1]																										=	{0xFC};
-uint8_t	loraExecutorBuzzer[1]																									=	{0xFD};
-uint8_t	loraExecutorServo[1]																									=	{0xFE};
-uint8_t	loraExecutorStepmotor[1]																							=	{0xFF};
+uint8_t loRaSensorDHT11Identifier[1]		 																			= {0xEA};
+uint8_t loRaSensorMQ2Identifier[1]																						=	{0xEB};
+uint8_t loRaSensorLightIdentifier[1]																					=	{0xEC};
+uint8_t loRaSensorFireIdentifier[1]																						= {0xED};
+uint8_t	loRaExecutorLED[1]																										=	{0xFA};
+uint8_t	loRaExecutorHumidifier[1]																							= {0xFB};
+uint8_t	loRaExecutorFan[1]																										=	{0xFC};
+uint8_t	loRaExecutorBuzzer[1]																									=	{0xFD};
+uint8_t	loRaExecutorServo[1]																									=	{0xFE};
+uint8_t	loRaExecutorStepmotor[1]																							=	{0xFF};
 
-uint8_t loraLEDStatusOn[1]																										=	{0x01};
-uint8_t loraLEDStatusOff[1]																										=	{0x00};
+uint8_t loRaLEDStatusOn[1]																										=	{0x01};
+uint8_t loRaLEDStatusOff[1]																										=	{0x00};
 
-uint8_t loraUsart3RxPacket[2];
-uint8_t loraUsart3RxData;
-uint8_t loraUsart3ExecutorFlag = 0;
-uint8_t loraUsart3RxFlag = 0;
+uint8_t loRaUSART3RxPacket[2];
+uint8_t loRaUSART3RxData;
+uint8_t loRaUSART3ExecutorFlag = 0;
+uint8_t loRaUSART3RxFlag = 0;
 
-uint8_t exeState;
+uint8_t executorState,executorID;
 
 /**
   * @brief  LoRa在传输模式下的初始化函数         
@@ -143,7 +143,7 @@ void LoRa_USART3_SendByte(uint8_t byte)
 /**
   * @brief  LoRa发送数组函数
   * @note   一般用于16进制模式下。
-	*	@note		uint8_t的指针类型，指向待发送数组的首地址,由于数组无法判断是否结束，所以需要再传递一个Length进来。
+  * @note		uint8_t的指针类型，指向待发送数组的首地址,由于数组无法判断是否结束，所以需要再传递一个Length进来。
   * @param  *array，length
   * @retval None
   */
@@ -193,32 +193,6 @@ void LoRa_USART3_Printf(char *format, ...)
 }
 
 /**
-  * @brief  获取标志位（该函数需要改进）					
-  * @note   根据LoRa收到的数据包接收
-  * @param  None
-  * @retval 0、1、2
-  */
-//uint8_t LoRa_USART3_GetRxFlag(void)
-//{
-//	switch (loraUsart3RxFlag)
-//	{
-//		case 1:
-//			loraUsart3RxFlag = 0;
-//			return 1;
-//			break;
-//		case 30:
-//			loraUsart3RxFlag = 0;
-//			return 30;
-//			break;
-//		case 31:
-//			loraUsart3RxFlag = 0;
-//			return 31;
-//			break;
-//	}
-//	return 0;
-//}
-
-/**
   * @brief  LoRa发送发送hex数据包函数,也是LoRa在定点模式下执行节点间通信的主要函数。				
   * @note   hex数据包的格式为固定包长
   * @param  None
@@ -226,18 +200,18 @@ void LoRa_USART3_Printf(char *format, ...)
   */
 void LoRa_USART3_Gate_IdentifierPkt(void)
 {
-	LoRa_USART3_SendArray(loraGateAddr, 2);																														//发送载荷
-	LoRa_USART3_SendArray(loraGateChannel,1);
-	LoRa_USART3_SendArray(loraGateIdentifier,1);
+	LoRa_USART3_SendArray(loRaGateAddr, 2);																														//发送载荷
+	LoRa_USART3_SendArray(loRaGateChannel,1);
+	LoRa_USART3_SendArray(loRaGateIdentifier,1);
 }
 
 /**
   * @brief  USART3接收中断函数
   * @note   1、处理USART3接收到的数据，执行相应操作。
-	* 				2、状态变量一共分为3个，分别是等待包头（0xD1）、接收数据和等待包尾（0xAB）。
-	* 				3、else if不会造成多个状态都被满足的问题。
-	* 				4、中断只会执行第一个满足条件的if语句
-	* 				5、exeState分如下的状态：如LED灯：10表示收到网关的LED请求，11表示打开LED，12表示关闭LED。
+  *         2、状态变量一共分为3个，分别是等待包头（0xD1）、接收数据和等待包尾（0xAB）。
+  *         3、else if不会造成多个状态都被满足的问题。
+  *         4、中断只会执行第一个满足条件的if语句
+  *         5、exeState分如下的状态：如LED灯：10表示收到网关的LED请求，11表示打开LED，12表示关闭LED。
   * @param  None
   * @retval None
   */
@@ -251,37 +225,44 @@ void USART3_IRQHandler(void)
 	{
 		/*接收字节，先读取到模块的变量里*/
 		uint32_t rxData = USART_ReceiveData(USART3);																										//获取USART3接收到的数据
-		if(rxState == 0)																																							//判断是否收到0xD1，若收到则进入数据处理状态。
+		if(rxState == 0)																																								//判断是否收到0xD1，若收到则进入数据处理状态。
 		{
-			if(rxData == 0xD1)																																					//判断包头是否正确
+			if(rxData == 0xD1)																																						//判断包头是否正确
 			{
 				rxState = 1;
 			}
 		}
 		else if(rxState == 1)
 		{
-			loraUsart3RxPacket[pRxPacket++]	= rxData;																											//第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
+			loRaUSART3RxPacket[pRxPacket++]	= rxData;																											//第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
 			if(pRxPacket == 1)
 			{
-				if(loraUsart3RxPacket[0] == 0xFA)
+				if(loRaUSART3RxPacket[0] == 0xFA)
 				{
-					exeState = 10;
+					executorID = 10;
 				}
 			}
 			else if(pRxPacket == 2)
 			{
-				if(exeState == 10&&loraUsart3RxPacket[1] == 0x01)
+				if(executorID == 10)
 				{
-					exeState = 11;
-				}
-				else if(exeState == 10&&loraUsart3RxPacket[1] == 0x00)
-				{
-					exeState = 12;
+					if(loRaUSART3RxPacket[1] == 0x01)
+					{
+						executorState = 11;
+					}
+					else if(loRaUSART3RxPacket[1] == 0x00)
+					{
+						executorState = 12;
+					}
 				}
 			}
-			rxState = 0;
-			pRxPacket = 0;
+			/* DeepSeek修改部分 */
+			else if(pRxPacket >= 3)
+			{
+				rxState = 0;
+				pRxPacket = 0;
+			}
 		}
-		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																								//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
+		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																									//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
 	}
 }

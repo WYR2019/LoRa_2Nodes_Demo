@@ -16,11 +16,11 @@ int main(void){
 		DHT11_Read_Data(&temp,&humi);
 		delay_ms(1500);
 		LoRa_USART3_Md_Trans_Msg();
-		if(exeState == 11)
+		if(executorState == 11)
 		{
 			LED_PC13_ON();
 		}
-		else if(exeState == 12)
+		else if(executorState == 12)
 		{
 			LED_PC13_OFF();
 		}
@@ -30,10 +30,10 @@ int main(void){
 void LoRa_USART3_Md_Trans_Msg(void)
 {
 	LoRa_USART3_Gate_IdentifierPkt();
-	LoRa_USART3_SendArray(loraSensorDHT11Identifier,1);
+	LoRa_USART3_SendArray(loRaSensorDHT11Identifier,1);
 	LoRa_USART3_SendArray(&temp,1);
 	LoRa_USART3_SendArray(&humi,1);
 }
 
-//bug：无法正常关灯
+//bug：无法正常关灯（已解决）
 

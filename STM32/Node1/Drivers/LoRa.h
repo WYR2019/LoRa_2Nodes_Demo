@@ -17,13 +17,14 @@
 #define LORA_NODE_IDENTIFIER																	0xD1
 
 /* LoRa发送数据数组 */
-extern uint8_t loraSensorDHT11Identifier[];
-extern uint8_t loraExecutorLED[];
-extern uint8_t loraLEDStatusOn[];
-extern uint8_t loraLEDStatusOff[];
-extern uint8_t loraUsart3RxPacket[];
-extern uint8_t loraUsart3RxFlag;
-extern uint8_t exeState;
+extern uint8_t loRaSensorDHT11Identifier[];
+extern uint8_t loRaExecutorLED[];
+extern uint8_t loRaLEDStatusOn[];
+extern uint8_t loRaLEDStatusOff[];
+extern uint8_t loRaUSART3RxPacket[];
+extern uint8_t loRaUSART3RxFlag;
+extern uint8_t executorState;
+extern uint8_t executorID;
 extern uint8_t rxState;
 
 void LoRa_USART3_Trans_Mode_Init(uint32_t mdTransBaudrate);
