@@ -4,6 +4,7 @@
 #include "LoRa.h"
 #include "DHT11.h"
 #include "LED_PC13.h"
+#include "Relay.h"
 
 uint8_t temp,humi;
 
@@ -11,6 +12,7 @@ int main(void){
 	SysTick_Init(72);
 	LoRa_USART3_Trans_Mode_Init(9600);
 	LED_PC13_Init();
+	RELAY_Init();
 	while(1)
 	{
 		DHT11_Read_Data(&temp,&humi);
@@ -19,12 +21,26 @@ int main(void){
 		if(executorState == 11)
 		{
 			LED_PC13_ON();
-//			LoRa_USART3_SendArray(loRaLEDStatusOn,1);
+			LoRa_USART3_SendArray(loRaExecutorLED,1);
+			LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
 		}
 		else if(executorState == 12)
 		{
 			LED_PC13_OFF();
-//			LoRa_USART3_SendArray(loRaLEDStatusOff,1);
+			LoRa_USART3_SendArray(loRaExecutorLED,1);
+			LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
+		}
+		else if(executorState == 21)
+		{
+			RELAY_ON;
+			LoRa_USART3_SendArray(loRaExecutorFan,1);
+			LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
+		}
+		else if(executorState == 22)
+		{
+			RELAY_OFF;
+			LoRa_USART3_SendArray(loRaExecutorFan,1);
+			LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
 		}
 	}
 }

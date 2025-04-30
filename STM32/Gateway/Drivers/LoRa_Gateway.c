@@ -23,9 +23,9 @@ uint8_t loRaExecutorStatusOn[1]																						=	{0x01};
 uint8_t loRaExecutorStatusOff[1]																					=	{0x00};
 
 
-uint8_t loRaUSART3RxPacket[6];
+uint8_t loRaUSART3RxPacket[4];
 uint8_t loRaUSART3RxData;
-uint8_t loRaUSART3ExecutorFlag 																						= 0;
+uint8_t sensorID;
 uint8_t loRaUSART3RxFlag;
 
 /**
@@ -240,53 +240,29 @@ void USART3_IRQHandler(void)
 		/*接收字节，先读取到模块的变量里*/
 		uint32_t rxData = USART_ReceiveData(USART3);																										//获取USART3接收到的数据
 		{
-			switch (rxState)
+			if(rxState == 0)																																							//状态1：等待包头，包头为节点号
 			{
-				case 0:
+				if (rxData == 0xD1)																					
 				{
-					if (rxData == 0xD1)																																				//状态1：等待包头，包头为最后一位信道号
-					{
-						rxState = 1;
-						pRxPacket = 0;																																					//提前清零，为下一次接收做准备
-					}
-				}
-				case 1:																																											//状态2：接收数据
-				{
-					loRaUSART3RxPacket[pRxPacket++] = rxData;                                                 //每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
-					if(pRxPacket == 1)
-					{
-						if(loRaUSART3RxPacket[0] == 0x0A)
-						{
-							loRaUSART3ExecutorFlag = 3;
-						}
-					}
-					else if(pRxPacket == 2)
-					{
-						if(loRaUSART3ExecutorFlag == 3 && loRaUSART3RxPacket[1] == 0x01)
-						{
-							loRaUSART3RxFlag = 31;
-						}
-						else if(loRaUSART3ExecutorFlag == 3 && loRaUSART3RxPacket[1] == 0x02)
-						{
-							loRaUSART3RxFlag = 30;
-						}
-					}
-					else if(pRxPacket > 2)
-					{
-						rxState = 2;
-					}
-				}
-				case 2:																																											//状态3：等待包尾
-				{
-					if (rxData == 0xAB)
-					{	
-						rxState = 0;																																						//回到最初的状态
-						loRaUSART3RxFlag = 1;																																		//代表整个数据包已经收到了，置一个标志位
-					}
+					rxState = 1;
 				}
 			}
-			
-			USART_ClearITPendingBit(USART3,USART_IT_RXNE);																								//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
+			else if(rxState == 1)
+			{
+				loRaUSART3RxPacket[pRxPacket++] = rxData;                                                 	//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
+				if(loRaUSART3RxPacket[0] == 0xEA)
+				{
+					ESP8266_USART2_Printf("Current temperature is:%d\r\n",loRaUSART3RxPacket[2]);
+					delay_ms(1500);
+					ESP8266_USART2_Printf("Current humidity is:%d\r\n",loRaUSART3RxPacket[3]);
+					delay_ms(1500);
+				}
+				/* 清除标志位 */
+				sensorID = 0;
+				rxState = 0;
+				pRxPacket = 0;
+			}
 		}
+		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																									//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
 	}
 }

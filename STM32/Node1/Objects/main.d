@@ -37,3 +37,4 @@
 .\objects\main.o: .\Drivers\LED_PC13.h
 .\objects\main.o: .\Drivers\DHT11.h
 .\objects\main.o: .\System\Delay.h
+.\objects\main.o: .\Drivers\Relay.h

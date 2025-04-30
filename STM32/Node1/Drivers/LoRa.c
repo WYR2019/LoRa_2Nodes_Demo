@@ -16,14 +16,14 @@ uint8_t loRaSensorMQ2Identifier[1]																						=	{0xEB};
 uint8_t loRaSensorLightIdentifier[1]																					=	{0xEC};
 uint8_t loRaSensorFireIdentifier[1]																						= {0xED};
 uint8_t	loRaExecutorLED[1]																										=	{0xFA};
-uint8_t	loRaExecutorHumidifier[1]																							= {0xFB};
-uint8_t	loRaExecutorFan[1]																										=	{0xFC};
+uint8_t	loRaExecutorFan[1]																										=	{0xFB};
+uint8_t	loRaExecutorHumidifier[1]																							= {0xFC};
 uint8_t	loRaExecutorBuzzer[1]																									=	{0xFD};
 uint8_t	loRaExecutorServo[1]																									=	{0xFE};
 uint8_t	loRaExecutorStepmotor[1]																							=	{0xFF};
 
-uint8_t loRaLEDStatusOn[1]																										=	{0x01};
-uint8_t loRaLEDStatusOff[1]																										=	{0x00};
+uint8_t loRaExecutorStatusOn[1]																								=	{0x01};
+uint8_t loRaExecutorStatusOff[1]																							=	{0x00};
 
 uint8_t loRaUSART3RxPacket[3];
 uint8_t loRaUSART3RxData;
@@ -219,7 +219,7 @@ void USART3_IRQHandler(void)
 {
 	/*状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收执行器数据、接收执行器状态数据和等待包尾*/
 	static uint8_t rxState = 0;																																				//状态变量S=0
-	static uint8_t pRxPacket = 0;																																								//指示接收到哪一个数据
+	static uint8_t pRxPacket = 0;																																			//指示接收到哪一个数据
 	
 	if(USART_GetITStatus(USART3,USART_IT_RXNE) == SET)																								//如果RXNE置1，说明收到数据，开始根据数据处理状态。
 	{
@@ -275,7 +275,6 @@ void USART3_IRQHandler(void)
 			{
 				rxState = 0;
 				pRxPacket = 0;
-//				executorState = 0;
 			}
 		}
 		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																									//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除

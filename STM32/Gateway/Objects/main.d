@@ -28,7 +28,10 @@
 .\objects\main.o: .\Libraries\inc\stm32f10x_usart.h
 .\objects\main.o: .\Libraries\inc\stm32f10x_wwdg.h
 .\objects\main.o: .\Libraries\inc\misc.h
+.\objects\main.o: .\System\Delay.h
 .\objects\main.o: .\Drivers\LoRa_Gateway.h
 .\objects\main.o: D:\Program Files\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdio.h
 .\objects\main.o: D:\Program Files\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdarg.h
-.\objects\main.o: .\System\Delay.h
+.\objects\main.o: .\Drivers\ESP8266.h
+.\objects\main.o: D:\Program Files\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\string.h
+.\objects\main.o: .\Drivers\LED_PC13.h

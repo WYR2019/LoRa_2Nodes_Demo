@@ -29,10 +29,11 @@
 ".\objects\stm32f10x_wwdg.o"
 ".\objects\delay.o"
 ".\objects\systick.o"
+".\objects\adcx.o"
 ".\objects\oled.o"
 ".\objects\led.o"
 ".\objects\lora.o"
-".\objects\dht11.o"
+".\objects\mq2.o"
 --library_type=microlib --strict --scatter ".\Objects\STM32Template.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

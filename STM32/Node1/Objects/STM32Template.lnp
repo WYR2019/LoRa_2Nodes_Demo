@@ -32,6 +32,7 @@
 ".\objects\lora.o"
 ".\objects\dht11.o"
 ".\objects\led_pc13.o"
+".\objects\relay.o"
 --library_type=microlib --strict --scatter ".\Objects\STM32Template.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

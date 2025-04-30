@@ -19,8 +19,10 @@
 /* LoRa发送数据数组 */
 extern uint8_t loRaSensorDHT11Identifier[];
 extern uint8_t loRaExecutorLED[];
-extern uint8_t loRaLEDStatusOn[];
-extern uint8_t loRaLEDStatusOff[];
+extern uint8_t loRaExecutorFan[];
+extern uint8_t loRaExecutorHumidifier[];
+extern uint8_t loRaExecutorStatusOn[];
+extern uint8_t loRaExecutorStatusOff[];
 extern uint8_t loRaUSART3RxPacket[];
 extern uint8_t loRaUSART3RxFlag;
 extern uint8_t executorState;
@@ -35,6 +37,5 @@ void LoRa_USART3_SendString(char *string);
 void LoRa_USART3_Printf(char *format, ...);
 void LoRa_USART3_Gate_IdentifierPkt(void);
 void LoRa_USART3_Md_Trans_Msg(void);
-//uint8_t LoRa_USART3_GetRxFlag(void);
 
 #endif

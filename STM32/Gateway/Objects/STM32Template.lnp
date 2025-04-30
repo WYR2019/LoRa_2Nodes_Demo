@@ -29,6 +29,8 @@
 ".\objects\stm32f10x_wwdg.o"
 ".\objects\delay.o"
 ".\objects\lora_gateway.o"
+".\objects\esp8266.o"
+".\objects\led_pc13.o"
 --library_type=microlib --strict --scatter ".\Objects\STM32Template.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

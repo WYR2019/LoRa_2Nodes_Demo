@@ -6,14 +6,30 @@
 2、需要在C/C++、杂项中加上这样的参数：--no-multibyte-chars
 */
 
-uint8_t LoRa_USART3_RxPacket[4];
-uint8_t LoRa_USART3_RXData;
-uint8_t LoRa_USART3_RXFlag;
+uint8_t loRaGateAddr[2] 				 																							= {LORA_DEST_ADDR_HIGH,LORA_DEST_ADDR_LOW};
+uint8_t loRaGateChannel[1]			 																							= {LORA_DEST_CHANNEL};
+uint8_t loRaGateIdentifier[1]		 																							= {LORA_NODE_IDENTIFIER};
 
-uint8_t LoRa_Dest_Addr[2] 				 														= {LORA_DEST_ADDR_HIGH,LORA_DEST_ADDR_LOW};
-uint8_t LoRa_Dest_Channel[1]			 														= {LORA_DEST_CHANNEL};
-uint8_t LoRa_Node_Identifier[1]		 														= {LORA_NODE_IDENTIFIER};
-uint8_t LoRa_Sensor_Identifier[1]		 													= {0xEC};
+uint8_t loRaSensorDHT11Identifier[1]		 																			= {0xEA};
+uint8_t loRaSensorMQ2Identifier[1]																						=	{0xEB};
+uint8_t loRaSensorLightIdentifier[1]																					=	{0xEC};
+uint8_t loRaSensorFireIdentifier[1]																						= {0xED};
+uint8_t	loRaExecutorLED[1]																										=	{0xFA};
+uint8_t	loRaExecutorHumidifier[1]																							= {0xFB};
+uint8_t	loRaExecutorFan[1]																										=	{0xFC};
+uint8_t	loRaExecutorBuzzer[1]																									=	{0xFD};
+uint8_t	loRaExecutorServo[1]																									=	{0xFE};
+uint8_t	loRaExecutorStepmotor[1]																							=	{0xFF};
+
+uint8_t loRaLEDStatusOn[1]																										=	{0x01};
+uint8_t loRaLEDStatusOff[1]																										=	{0x00};
+
+uint8_t loRaUSART3RxPacket[3];
+uint8_t loRaUSART3RxData;
+uint8_t loRaUSART3ExecutorFlag = 0;
+uint8_t loRaUSART3RxFlag = 0;
+
+uint8_t executorState,executorID;
 	
 /**
   * @brief  LoRa的初始化函数         
@@ -77,7 +93,7 @@ void LoRa_USART3_SendByte(uint8_t Byte)
   * @param  *Array，Length
   * @retval None
   */
-void LoRa_USART3_SendArray(uint8_t *Array,uint16_t Length)																					
+void LoRa_USART3_SendArray(uint16_t *Array,uint16_t Length)																					
 {
 	for(uint16_t i = 0;i < Length;i ++)																																//for循环执行Length次，可以对Array数据进行遍历，实际定义数组不要超出uint16_t的范围即可
 	{
@@ -93,10 +109,10 @@ void LoRa_USART3_SendArray(uint8_t *Array,uint16_t Length)
   */
 void LoRa_USART3_IdentifierPkt(void)
 {
-	LoRa_USART3_SendArray(LoRa_Dest_Addr, 2);																													//发送载荷
-	LoRa_USART3_SendArray(LoRa_Dest_Channel,1);
-	LoRa_USART3_SendArray(LoRa_Node_Identifier,1);
-	LoRa_USART3_SendArray(LoRa_Sensor_Identifier,1);
+	LoRa_USART3_SendArray(loRaGateAddr, 2);																													//发送载荷
+	LoRa_USART3_SendArray(loRaGateChannel,1);
+	LoRa_USART3_SendArray(loRaGateIdentifier,1);
+	LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
 }
 
 /*接收hex数据包*/
@@ -138,60 +154,75 @@ void LoRa_USART3_Printf(char *format, ...)
 	LoRa_USART3_SendString(String);
 }
 
-/*两个变量的封装*/
-uint8_t LoRa_USART3_GetRxFlag(void)
-{
-	if(LoRa_USART3_RXFlag == 1)
-	{
-		LoRa_USART3_RXFlag = 0;
-		return 1;
-	}
-	return 0;
-}
-
 /**
   * @brief  USART3接收中断函数					
   * @note   处理USART3接收到的数据，执行对应操作。
   * @param  None
   * @retval None
   */
-//void USART3_IRQHandler(void)
-//{
-//	//用状态机接收逻辑
-//	//状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收数据和等待包尾
-//	static uint8_t RxState = 0;																																				//状态变量S=0
-//	static uint8_t pRxPacket = 0;																																			//指示接收到哪一个变量
-//	if(USART_GetITStatus(USART3,USART_IT_RXNE) == SET)																								//如果RXNE确实置1了，就进if
-//	{
-//		//接收字节，先读取到模块的变量里
-//		//注意：如果使用3个if，可能会导致其中两个或3个条件同时成立的问题
-//		
-//		uint8_t RxData = USART_ReceiveData(USART3);																											//获取RxData
-//		if (RxState == 0)
-//		{
-//			if (RxData == 0xFF)
-//			{
-//				RxState = 1;
-//				pRxPacket = 0;																																							//清零，为下一次接收做准备
-//			}
-//		}
-//		else if (RxState == 1)
-//		{
-//			LoRa_USART3_RxPacket[pRxPacket] = RxData;                                                     //每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
-//			pRxPacket++;																																									//移动到下一个位置
-//			if(pRxPacket >= 4)
-//			{
-//				RxState = 2;
-//			}
-//		}
-//		else if (RxState == 2)
-//		{
-//			if (RxData == 0xFE)
-//			{
-//				RxState = 0;																																								//回到最初的状态
-//				LoRa_USART3_RXFlag = 1;																																			//代表整个数据包已经收到了，置一个标志位
-//			}
-//		}
-//		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																									//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
-//	}
-//}
+void USART3_IRQHandler(void)
+{
+	/*状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收执行器数据、接收执行器状态数据和等待包尾*/
+	static uint8_t rxState = 0;																																				//状态变量S=0
+	static uint8_t pRxPacket = 0;																																			//指示接收到哪一个数据
+	
+	if(USART_GetITStatus(USART3,USART_IT_RXNE) == SET)																								//如果RXNE置1，说明收到数据，开始根据数据处理状态。
+	{
+		/*接收字节，先读取到模块的变量里*/
+		uint32_t rxData = USART_ReceiveData(USART3);																										//获取USART3接收到的数据
+		if(rxState == 0)																																								//判断是否收到0xD1，若收到则进入数据处理状态。
+		{
+			if(rxData == 0xD1)																																						//判断包头是否正确
+			{
+				rxState = 1;
+			}
+		}
+		else if(rxState == 1)
+		{
+			loRaUSART3RxPacket[pRxPacket++]	= rxData;																											//第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
+			if(pRxPacket == 1)
+			{
+				if(loRaUSART3RxPacket[0] == 0xFA)	
+					executorID = 10;
+				else if(loRaUSART3RxPacket[0] == 0xFB) 
+					executorID = 20;
+				else if(loRaUSART3RxPacket[0] == 0xFC) 
+					executorID = 30;
+			}
+			else if(pRxPacket == 2)
+			{
+				if(executorID == 10)
+				{
+					if(loRaUSART3RxPacket[1] == 0x01) 
+						executorState = 11;
+					else if(loRaUSART3RxPacket[1] == 0x00) 
+						executorState = 12;
+				}
+				else if(executorID == 20)
+				{
+					if(loRaUSART3RxPacket[1] == 0x01) 
+						executorState = 21;
+					else if(loRaUSART3RxPacket[1] == 0x00) 
+						executorState = 22;
+				}
+				else if(executorID == 30)
+				{
+					if(loRaUSART3RxPacket[1] == 0x01) 
+						executorState = 31;
+					else if(loRaUSART3RxPacket[1] == 0x00) 
+						executorState = 32;
+				}
+				/* DeepSeek修改部分 */
+				rxState = 0;
+				pRxPacket = 0;
+			}
+			else
+			{
+				rxState = 0;
+				pRxPacket = 0;
+			}
+		}
+		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																									//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
+	}
+}
+

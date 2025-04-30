@@ -700,6 +700,16 @@
               <FileType>5</FileType>
               <FilePath>.\System\SysTick.h</FilePath>
             </File>
+            <File>
+              <FileName>ADCx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\System\ADCx.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADCx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\System\ADCx.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -741,14 +751,14 @@
               <FilePath>.\Drivers\LoRa.h</FilePath>
             </File>
             <File>
-              <FileName>DHT11.c</FileName>
+              <FileName>MQ2.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Drivers\DHT11.c</FilePath>
+              <FilePath>.\Drivers\MQ2.c</FilePath>
             </File>
             <File>
-              <FileName>DHT11.h</FileName>
+              <FileName>MQ2.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Drivers\DHT11.h</FilePath>
+              <FilePath>.\Drivers\MQ2.h</FilePath>
             </File>
           </Files>
         </Group>
