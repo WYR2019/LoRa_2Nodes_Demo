@@ -1,0 +1,5 @@
+1、引入fragment：
+（1）创建所需要的fragment文件。
+（2）创建一个menu包和menu文件，在里面声明所有的fragment按钮及图标。
+（3）在“drawable”包中右键新建“Vector Asset”，新建所需要的图标。
+（4）在主xml和activity中完成fragment的控制代码。

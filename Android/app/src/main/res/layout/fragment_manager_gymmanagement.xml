@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Manager.Fragments.ManagerGymManFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        android:id="@+id/tb_furniture_items"
+        app:title="球馆管理" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tb_furniture_items"
+        android:id="@+id/tv_title_doors_and_windows"
+        android:text="门窗"
+        android:textSize="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="30dp"/>
+
+    <ImageButton
+        android:id="@+id/ib_turn_on_the_door"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/tv_title_doors_and_windows"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/pic_door_on"
+        android:background="#00FF0000"/>
+
+    <TextView
+        android:id="@+id/tv_turn_on_the_door"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ib_turn_on_the_door"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="30dp"
+        android:gravity="center"
+        android:text="开门"
+        android:textSize="20dp" />
+
+    <ImageButton
+        android:id="@+id/ib_turn_on_the_window"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/tv_title_doors_and_windows"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/pic_windows_on"
+        android:background="#00FF0000"/>
+
+    <TextView
+        android:id="@+id/tv_turn_on_the_window"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ib_turn_on_the_window"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30dp"
+        android:gravity="center"
+        android:text="开窗"
+        android:textSize="20dp" />
+
+
+
+    <ImageButton
+        android:id="@+id/ib_turn_on_the_light"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/tv_title_doors_and_windows"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/pic_light_off"
+        android:background="#00FF0000"
+        android:scaleType="centerInside"/>
+
+    <TextView
+        android:id="@+id/tv_turn_on_the_light"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ib_turn_on_the_light"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:gravity="center"
+        android:text="开灯"
+        android:textSize="20dp" />
+
+</RelativeLayout>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Manager.Nodes.ManagerSafetyMonitoringNodeActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        app:title="节点2"
+        android:id="@+id/tb_manager_safety_monitoring_node"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ll_smoke"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/tb_manager_safety_monitoring_node"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp">
+
+        <TextView
+            android:id="@+id/tv_smoke"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="安全"
+            android:textSize="30dp"
+            android:gravity="center"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:id="@+id/tv_title_smoke"
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ll_smoke"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:gravity="center"
+        android:text="烟雾"
+        android:textSize="20dp" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ll_fire"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/tb_manager_safety_monitoring_node"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="30dp">
+
+        <TextView
+            android:id="@+id/tv_fire"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="安全"
+            android:textSize="30dp"
+            android:gravity="center"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:id="@+id/tv_title_fire"
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ll_fire"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:gravity="center"
+        android:text="火焰"
+        android:textSize="20dp" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ll_windows"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/tv_title_smoke"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp">
+
+        <TextView
+            android:id="@+id/tv_windows"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="关"
+            android:textSize="30dp"
+            android:gravity="center"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:id="@+id/tv_title_windows"
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ll_windows"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:gravity="center"
+        android:text="窗户"
+        android:textSize="20dp" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ll_buzzer"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/tv_title_smoke"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="30dp">
+
+        <TextView
+            android:id="@+id/tv_buzzer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="关"
+            android:textSize="30dp"
+            android:gravity="center"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:id="@+id/tv_title_buzzer"
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ll_buzzer"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:gravity="center"
+        android:text="蜂鸣器"
+        android:textSize="20dp" />
+
+</RelativeLayout>

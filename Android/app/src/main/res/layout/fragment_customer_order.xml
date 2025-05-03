@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Customer.Fragment.CustomerOrderFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tb_order"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        app:title="预约场地"/>
+
+    <TextView
+        android:id="@+id/tv_title_order_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tb_order"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="50dp"
+        android:text="预约日期："
+        android:textSize="20dp"/>
+
+    <Button
+        android:id="@+id/btn_order_date_today"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_title_order_date"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="50dp"
+        android:text="今日" />
+
+    <Button
+        android:id="@+id/btn_order_date_tomorrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_title_order_date"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:text="明日" />
+
+    <Button
+        android:id="@+id/btn_order_date_thedayaftertomorrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_title_order_date"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="50dp"
+        android:text="后日" />
+
+</RelativeLayout>

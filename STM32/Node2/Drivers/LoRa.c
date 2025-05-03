@@ -12,8 +12,8 @@ uint8_t loRaGateIdentifier[1]		 																							= {LORA_NODE_IDENTIFIER};
 
 uint8_t loRaSensorDHT11Identifier[1]		 																			= {0xEA};
 uint8_t loRaSensorMQ2Identifier[1]																						=	{0xEB};
-uint8_t loRaSensorLightIdentifier[1]																					=	{0xEC};
-uint8_t loRaSensorFireIdentifier[1]																						= {0xED};
+uint8_t loRaSensorFireIdentifier[1]																						= {0xEC};
+uint8_t loRaSensorLightIdentifier[1]																					=	{0xED};
 uint8_t	loRaExecutorLED[1]																										=	{0xFA};
 uint8_t	loRaExecutorHumidifier[1]																							= {0xFB};
 uint8_t	loRaExecutorFan[1]																										=	{0xFC};
@@ -21,8 +21,8 @@ uint8_t	loRaExecutorBuzzer[1]																									=	{0xFD};
 uint8_t	loRaExecutorServo[1]																									=	{0xFE};
 uint8_t	loRaExecutorStepmotor[1]																							=	{0xFF};
 
-uint8_t loRaLEDStatusOn[1]																										=	{0x01};
-uint8_t loRaLEDStatusOff[1]																										=	{0x00};
+uint8_t loRaExecutorStatusOn[1]																								=	{0x01};
+uint8_t loRaExecutorStatusOff[1]																							=	{0x00};
 
 uint8_t loRaUSART3RxPacket[3];
 uint8_t loRaUSART3RxData;
@@ -93,7 +93,7 @@ void LoRa_USART3_SendByte(uint8_t Byte)
   * @param  *Array，Length
   * @retval None
   */
-void LoRa_USART3_SendArray(uint16_t *Array,uint16_t Length)																					
+void LoRa_USART3_SendArray(uint8_t *Array,uint16_t Length)																					
 {
 	for(uint16_t i = 0;i < Length;i ++)																																//for循环执行Length次，可以对Array数据进行遍历，实际定义数组不要超出uint16_t的范围即可
 	{
@@ -112,7 +112,6 @@ void LoRa_USART3_IdentifierPkt(void)
 	LoRa_USART3_SendArray(loRaGateAddr, 2);																													//发送载荷
 	LoRa_USART3_SendArray(loRaGateChannel,1);
 	LoRa_USART3_SendArray(loRaGateIdentifier,1);
-	LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
 }
 
 /*接收hex数据包*/

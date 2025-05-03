@@ -760,6 +760,36 @@
               <FileType>5</FileType>
               <FilePath>.\Drivers\MQ2.h</FilePath>
             </File>
+            <File>
+              <FileName>Beep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\Beep.c</FilePath>
+            </File>
+            <File>
+              <FileName>Beep.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\Beep.h</FilePath>
+            </File>
+            <File>
+              <FileName>IR.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\IR.c</FilePath>
+            </File>
+            <File>
+              <FileName>IR.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\IR.h</FilePath>
+            </File>
+            <File>
+              <FileName>Servo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\Servo.c</FilePath>
+            </File>
+            <File>
+              <FileName>Servo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\Servo.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

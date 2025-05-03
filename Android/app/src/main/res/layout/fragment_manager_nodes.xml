@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Manager.Fragments.ManagerNodesFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        app:title="节点"
+        android:id="@+id/tb_home"/>
+
+    <TextView
+        android:id="@+id/tv_emqx_connection_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tb_home"
+        android:layout_marginTop="30dp"
+        android:text="未连接我的球馆"
+        android:textSize="20dp"
+        android:gravity="center"/>
+
+    <Button
+        android:id="@+id/btn_node1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_emqx_connection_status"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:text="节点1" />
+
+    <Button
+        android:id="@+id/btn_node2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_node1"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:text="节点2"/>
+
+    <Button
+        android:id="@+id/btn_node3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_node2"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:text="节点3"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/btn_node3"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"
+        android:id="@+id/ll_temp">
+
+        <TextView
+            android:id="@+id/tv_temp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="--"
+            android:textSize="30dp"
+            android:gravity="center"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ll_temp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:gravity="center"
+        android:id="@+id/tv_title_temp"
+        android:text="温度"
+        android:textSize="20dp" />
+
+
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/btn_node3"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="30dp"
+        android:id="@+id/ll_humi">
+
+        <TextView
+            android:id="@+id/tv_humi"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="--"
+            android:textSize="30dp"
+            android:gravity="center"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ll_humi"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:gravity="center"
+        android:id="@+id/tv_title_humi"
+        android:text="湿度"
+        android:textSize="20dp" />
+</RelativeLayout>

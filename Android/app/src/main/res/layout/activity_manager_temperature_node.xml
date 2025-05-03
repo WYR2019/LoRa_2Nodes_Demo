@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Manager.Nodes.ManagerTemperatureNodeActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        app:title="节点1"
+        android:id="@+id/tb_manager_temperature_node"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/tb_manager_temperature_node"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"
+        android:id="@+id/ll_temp">
+
+        <TextView
+            android:id="@+id/tv_temp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="--"
+            android:textSize="30dp"
+            android:gravity="center"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ll_temp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:gravity="center"
+        android:id="@+id/tv_title_temp"
+        android:text="温度"
+        android:textSize="20dp" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/tb_manager_temperature_node"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="30dp"
+        android:id="@+id/ll_humi">
+
+        <TextView
+            android:id="@+id/tv_humi"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="--"
+            android:textSize="30dp"
+            android:gravity="center"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ll_humi"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:gravity="center"
+        android:id="@+id/tv_title_humi"
+        android:text="湿度"
+        android:textSize="20dp" />
+
+
+    <ImageButton
+        android:id="@+id/ib_turn_on_the_fan"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/tv_title_temp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"
+        android:background="#00FF0000"
+        android:src="@drawable/pic_fan_on" />
+
+    <TextView
+        android:id="@+id/tv_open_the_fan"
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ib_turn_on_the_fan"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:gravity="center"
+        android:text="开风扇"
+        android:textSize="20dp" />
+
+    <ImageButton
+        android:id="@+id/ib_turn_on_the_humidifier"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/tv_title_humi"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/pic_humidifier_on"
+        android:background="#00FF0000"/>
+
+    <TextView
+        android:id="@+id/tv_turn_on_the_humidifier"
+        android:layout_width="125dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/ib_turn_on_the_fan"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:gravity="center"
+        android:text="开加湿器"
+        android:textSize="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_turn_on_the_humidifier"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="10dp"
+        android:text="温度最高："
+        android:textSize="20dp" />
+
+    <EditText
+        android:id="@+id/et_tempmax"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_turn_on_the_humidifier"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_turn_on_the_humidifier"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="130dp"
+        android:layout_marginTop="10dp"
+        android:text="℃"
+        android:textSize="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_tempmax"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="10dp"
+        android:text="温度最低："
+        android:textSize="20dp" />
+
+    <EditText
+        android:id="@+id/et_tempmin"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_tempmax"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_tempmax"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="130dp"
+        android:layout_marginTop="10dp"
+        android:text="℃"
+        android:textSize="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_tempmin"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="10dp"
+        android:text="湿度最高："
+        android:textSize="20dp" />
+
+    <EditText
+        android:id="@+id/et_humimax"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_tempmin"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_tempmin"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="130dp"
+        android:layout_marginTop="10dp"
+        android:text="%"
+        android:textSize="20dp" />
+
+</RelativeLayout>
