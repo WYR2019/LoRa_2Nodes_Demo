@@ -248,7 +248,7 @@ void USART3_IRQHandler(void)
 		}
 		else if(rxState == 1)
 		{
-			if(pRxPacket < 3)																																							//确保数组不越界
+			if(pRxPacket <= 3)																																							//确保数组不越界
 			{
 				loRaUSART3RxPacket[pRxPacket++] = rxData;																										//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
 			}
@@ -259,27 +259,18 @@ void USART3_IRQHandler(void)
 					nodeID = 1;			
 				}
 			}
-			else if(pRxPacket == 2)
+			else if(pRxPacket == 3)
 			{
 				if(nodeID == 1)
 				{
-					ESP8266_USART2_Printf("Current temperature is:%d\r\n",loRaUSART3RxPacket[1]);
-					nodeID = 2;
-					rxData = 0;
-				}
-			}
-			if (pRxPacket == 3)
-			{
-				if(nodeID == 2)
-				{
+					ESP8266_USART2_Printf("Current temperature is:%d℃\r\n",loRaUSART3RxPacket[1]);
 					ESP8266_USART2_Printf("Current humidity is:%d\r\n",loRaUSART3RxPacket[2]);
+					nodeID = 2;
+					rxState = 0;
+					pRxPacket = 0;
 				}
-				rxState = 0;
-				pRxPacket = 0;
 			}
-			/* 清除标志位 */
 		}
-		
 		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																									//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
 	}
 }
