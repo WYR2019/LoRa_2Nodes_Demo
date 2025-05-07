@@ -23,10 +23,10 @@ uint8_t loRaExecutorStatusOn[1]																						=	{0x01};
 uint8_t loRaExecutorStatusOff[1]																					=	{0x00};
 
 
-uint8_t loRaUSART3RxPacket[4];
+uint8_t loRaUSART3RxPacket[3];
 uint8_t loRaUSART3RxData;
-uint8_t sensorID;
-uint8_t loRaUSART3RxFlag;
+uint8_t nodeID;
+uint8_t loRaUSART3RxFlag = 0;
 
 /**
   * @brief  LoRa在传输模式下的初始化函数         
@@ -231,7 +231,7 @@ void LoRa_USART3_Node2_Cmd_Msg(void)
   * @retval None
   */
 void USART3_IRQHandler(void)
-{
+{	
 	/*状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收执行器数据、接收执行器状态数据和等待包尾*/
 	static uint8_t rxState = 0;																																				//状态变量S=0
 	static uint8_t pRxPacket = 0;																																			//指示接收到哪一个数据
@@ -239,30 +239,47 @@ void USART3_IRQHandler(void)
 	{
 		/*接收字节，先读取到模块的变量里*/
 		uint32_t rxData = USART_ReceiveData(USART3);																										//获取USART3接收到的数据
+		if(rxState == 0)																																							//状态1：等待包头，包头为节点号
 		{
-			if(rxState == 0)																																							//状态1：等待包头，包头为节点号
+			if (rxData == 0xD1)																					
 			{
-				if (rxData == 0xD1)																					
-				{
-					rxState = 1;
-				}
+				rxState = 1;
 			}
-			else if(rxState == 1)
+		}
+		else if(rxState == 1)
+		{
+			if(pRxPacket < 3)																																							//确保数组不越界
 			{
-				loRaUSART3RxPacket[pRxPacket++] = rxData;                                                 	//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
+				loRaUSART3RxPacket[pRxPacket++] = rxData;																										//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
+			}
+			if(pRxPacket == 1)
+			{
 				if(loRaUSART3RxPacket[0] == 0xEA)
 				{
-					ESP8266_USART2_Printf("Current temperature is:%d\r\n",loRaUSART3RxPacket[2]);
-					delay_ms(1500);
-					ESP8266_USART2_Printf("Current humidity is:%d\r\n",loRaUSART3RxPacket[3]);
-					delay_ms(1500);
+					nodeID = 1;			
 				}
-				/* 清除标志位 */
-				sensorID = 0;
+			}
+			else if(pRxPacket == 2)
+			{
+				if(nodeID == 1)
+				{
+					ESP8266_USART2_Printf("Current temperature is:%d\r\n",loRaUSART3RxPacket[1]);
+					nodeID = 2;
+					rxData = 0;
+				}
+			}
+			if (pRxPacket == 3)
+			{
+				if(nodeID == 2)
+				{
+					ESP8266_USART2_Printf("Current humidity is:%d\r\n",loRaUSART3RxPacket[2]);
+				}
 				rxState = 0;
 				pRxPacket = 0;
 			}
+			/* 清除标志位 */
 		}
+		
 		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																									//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
 	}
 }

@@ -4,7 +4,6 @@
 #include "stm32f10x.h"                  															 // Device header
 #include <stdio.h>
 #include <stdarg.h>
-#include "Delay.h"
 #include "ESP8266.h"
 
 /* LoRaµƒ…Ë÷√ */
@@ -45,9 +44,9 @@ extern uint8_t loRaExecutorStepmotor[1];
 extern uint8_t loRaExecutorStatusOn[1];
 extern uint8_t loRaExecutorStatusOff[1];
 
-extern uint8_t sensorID;
+extern uint8_t nodeID;
 
-extern uint8_t loRaUSART3RxPacket[4];
+extern uint8_t loRaUSART3RxPacket[3];
 
 void LoRa_USART3_Trans_Mode_Init(uint32_t mdTransBaudrate);
 void LoRa_USART3_Set_Mode_Init(uint32_t mdSetBaudrate);

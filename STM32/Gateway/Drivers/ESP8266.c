@@ -101,19 +101,19 @@ void ESP8266_USART2_Connection_Init(void)
 {
 	LED_PC13_Init();
 	ESP8266_USART2_Printf("AT+RESTORE\r\n");
-	LED_PC13_Twinkle();
+//	LED_PC13_Twinkle();
 	delay_ms(3000);
 	ESP8266_USART2_Printf("AT\r\n");
 	ESP8266_USART2_Printf("%d\n",strlen("AT\r\n"));
-	LED_PC13_Twinkle();
+//	LED_PC13_Twinkle();
 	delay_ms(3000);
 	ESP8266_USART2_Printf("AT+CWMODE=1\r\n");
 	ESP8266_USART2_Printf("%d\n",strlen("AT+CWMODE=1\r\n"));
-	LED_PC13_Twinkle();
+//	LED_PC13_Twinkle();
 	delay_ms(3000);
 	ESP8266_USART2_Printf("AT+CWJAP=\"%s\",\"%s\"\r\n",WIFINAME,WIFIPASSWORD);
 	ESP8266_USART2_Printf("%d\n",strlen("AT+CWJAP=\"%s\",\"%s\"\r\n"));
-	LED_PC13_Twinkle();
+//	LED_PC13_Twinkle();
 	delay_ms(3000);
 }
 
@@ -126,65 +126,65 @@ void ESP8266_USART2_Connection_Init(void)
 void ESP8266_USART2_MQTT_Mode_Init(void)
 {
 	ESP8266_USART2_Printf("AT+MQTTUSERCFG=0,1,\"NULL\",\"%s\",\"%s\",0,0,\"\"\r\n",MQTTUSERNAME,MQTTPASSWORD);
-	LED_PC13_Twinkle();
+//	LED_PC13_Twinkle();
 	delay_ms(3000);
 	ESP8266_USART2_Printf("AT+MQTTCLIENTID=0,\"%s\"\r\n",MQTTCLIENTID);
-	LED_PC13_Twinkle();
+//	LED_PC13_Twinkle();
 	delay_ms(3000);
 	ESP8266_USART2_Printf("AT+MQTTCONN=0,\"%s\",1883,1\r\n",MQTTBROKERIP);
-	LED_PC13_Twinkle();
+//	LED_PC13_Twinkle();
 	delay_ms(3000);
 	ESP8266_USART2_Printf("AT+MQTTSUB=0,\"%s\",1\r\n",MQTTSUBSCRIBETOPIC);
-	LED_PC13_Twinkle();
+//	LED_PC13_Twinkle();
 	delay_ms(3000);
 }
 
-/**
-  * @brief  USART2中断处理函数
-  *	@brief	采用16进制判断发送AT指令后ESP8266的回传字符串，用于接收ESP8266是否回传“OK”指令，如果回传则执行对应的指令。
-  * @brief	状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收数据和等待包尾
-  * @param  无
-  * @retval 无
-  */
-void USART2_IRQHandler(void)
-{
-	static uint8_t RxState = 0;//状态变量S=0
-	static uint8_t pRxPacket = 0;//指示接收到哪一个变量
-	
-	if(USART_GetITStatus(USART2,USART_IT_RXNE) == SET)//如果RXNE确实置1了，就进if
-	{
-		uint8_t RxData = USART_ReceiveData(USART2);//获取接收到的数据
-		switch (RxState)
-		{
-			case 0:
-			{
-				if (RxData == 'O')
-				{
-					RxState = 1;
-					pRxPacket = 0;//清零，为下一次接收做准备
-				}
-			}
-			case 1:
-			{
-				if(RxData == '\r')//先判断是不是包尾
-				{
-					RxState = 2;
-				}
-				else
-				{	
-					esp8266RxPacket[pRxPacket++] = RxData;//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
-				}
-			}
-			case 2:
-			{
-				if (RxData == '\n')//等待第二个包尾
-				{
-					RxState = 0;//回到最初的状态
-					esp8266RxPacket[pRxPacket] = '\0';//加一个字符串结束标志位\0，以确定字符串的长度
-					esp8266RxFlag = 1;//代表整个数据包已经收到了，置一个标志位
-				}
-			}
-		}
-		USART_ClearITPendingBit(USART2,USART_IT_RXNE);//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
-	}
-}	
+///**
+//  * @brief  USART2中断处理函数
+//  *	@brief	采用16进制判断发送AT指令后ESP8266的回传字符串，用于接收ESP8266是否回传“OK”指令，如果回传则执行对应的指令。
+//  * @brief	状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收数据和等待包尾
+//  * @param  无
+//  * @retval 无
+//  */
+//void USART2_IRQHandler(void)
+//{
+//	static uint8_t RxState = 0;//状态变量S=0
+//	static uint8_t pRxPacket = 0;//指示接收到哪一个变量
+//	
+//	if(USART_GetITStatus(USART2,USART_IT_RXNE) == SET)//如果RXNE确实置1了，就进if
+//	{
+//		uint8_t RxData = USART_ReceiveData(USART2);//获取接收到的数据
+//		switch (RxState)
+//		{
+//			case 0:
+//			{
+//				if (RxData == 'O')
+//				{
+//					RxState = 1;
+//					pRxPacket = 0;//清零，为下一次接收做准备
+//				}
+//			}
+//			case 1:
+//			{
+//				if(RxData == '\r')//先判断是不是包尾
+//				{
+//					RxState = 2;
+//				}
+//				else
+//				{	
+//					esp8266RxPacket[pRxPacket++] = RxData;//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
+//				}
+//			}
+//			case 2:
+//			{
+//				if (RxData == '\n')//等待第二个包尾
+//				{
+//					RxState = 0;//回到最初的状态
+//					esp8266RxPacket[pRxPacket] = '\0';//加一个字符串结束标志位\0，以确定字符串的长度
+//					esp8266RxFlag = 1;//代表整个数据包已经收到了，置一个标志位
+//				}
+//			}
+//		}
+//		USART_ClearITPendingBit(USART2,USART_IT_RXNE);//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
+//	}
+//}	

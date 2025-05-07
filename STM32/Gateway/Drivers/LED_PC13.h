@@ -3,7 +3,7 @@
 #define __LED_H__
 
 #include "stm32f10x.h"                  // Device header
-#include "Delay.h"
+#include "SysTick.h"
 
 #define LED_PC13_PORT         GPIOC
 #define LED_PC13_GPIO_PIN     GPIO_Pin_13

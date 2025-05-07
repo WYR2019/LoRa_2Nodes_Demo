@@ -13,11 +13,12 @@ int main(void){
 	LoRa_USART3_Trans_Mode_Init(9600);
 	LED_PC13_Init();
 	RELAY_Init();
+	
 	while(1)
 	{
 		DHT11_Read_Data(&temp,&humi);
-		delay_ms(1500);
 		LoRa_USART3_Md_Trans_Msg();
+		delay_ms(1500);
 		if(executorState == 11)
 		{
 			LED_PC13_ON();

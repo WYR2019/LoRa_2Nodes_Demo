@@ -21,7 +21,6 @@ int main(void){
 	while(1)
 	{
 //		LoRa_USART3_Printf("%.02fppm\r\n",ppmValue);
-		LoRa_USART3_IdentifierPkt();
 		ppmValue = MQ2_GetData_PPM();
 		fireValue = IR_FireData();
 		switch (fireValue)
@@ -32,6 +31,7 @@ int main(void){
 				{
 					Beep_ON();
 					Servo_SetAngle(180);
+					LoRa_USART3_IdentifierPkt();
 					LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
 					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
 					LoRa_USART3_SendArray(loRaSensorFireIdentifier,1);
@@ -46,6 +46,7 @@ int main(void){
 				{
 					Beep_OFF();
 					Servo_SetAngle(0);
+					LoRa_USART3_IdentifierPkt();
 					LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
 					LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
 					LoRa_USART3_SendArray(loRaSensorFireIdentifier,1);
@@ -63,6 +64,7 @@ int main(void){
 				{
 					Beep_ON();
 					Servo_SetAngle(180);
+					LoRa_USART3_IdentifierPkt();
 					LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
 					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
 					LoRa_USART3_SendArray(loRaSensorFireIdentifier,1);
@@ -77,6 +79,7 @@ int main(void){
 				{
 					Beep_ON();
 					Servo_SetAngle(180);
+					LoRa_USART3_IdentifierPkt();
 					LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
 					LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
 					LoRa_USART3_SendArray(loRaSensorFireIdentifier,1);
