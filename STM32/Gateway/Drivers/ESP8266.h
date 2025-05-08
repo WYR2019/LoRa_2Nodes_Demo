@@ -31,5 +31,6 @@ void ESP8266_USART2_Printf(char *format, ...);
 uint8_t ESP8266_GetRxFlag(void);
 void ESP8266_USART2_Connection_Init(void);
 void ESP8266_USART2_MQTT_Mode_Init(void);
+//void ESP8266_USART2_MQTT_Mode_Publish(void);
 
 #endif

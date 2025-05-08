@@ -44,9 +44,9 @@ extern uint8_t loRaExecutorStepmotor[1];
 extern uint8_t loRaExecutorStatusOn[1];
 extern uint8_t loRaExecutorStatusOff[1];
 
-extern uint8_t nodeID;
+extern uint8_t loRaNodeID, sensorID;
 
-extern uint8_t loRaUSART3RxPacket[3];
+extern uint8_t loRaUSART3RxPacket[10];
 
 void LoRa_USART3_Trans_Mode_Init(uint32_t mdTransBaudrate);
 void LoRa_USART3_Set_Mode_Init(uint32_t mdSetBaudrate);

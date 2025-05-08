@@ -13,13 +13,8 @@ int main(void){
 	LED_PC13_Init();
 	while(1)
 	{
-		if (nodeID == 1)
-		{
-			LED_PC13_ON();
-		}
-		else if (nodeID == 2)
-		{
-			LED_PC13_OFF();
-		}
+//		ESP8266_USART2_MQTT_Mode_Publish();
+//		ESP8266_USART2_Printf("AT+MQTTPUB=0,\"%s\",\"{\"name\":\"LoRa2NodeDemo\", \"Node1:\"{\"Temperature:\"\"%d\",\"Humidity:\"\"%d\"}\",0,0\r\n",MQTTPUBLISHTOPIC,jsonTemp,jsonHumi);
+//		delay_ms(1000);
 	}
 }

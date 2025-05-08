@@ -23,9 +23,11 @@ uint8_t loRaExecutorStatusOn[1]																						=	{0x01};
 uint8_t loRaExecutorStatusOff[1]																					=	{0x00};
 
 
-uint8_t loRaUSART3RxPacket[3];
+uint8_t loRaUSART3RxPacket[10];
 uint8_t loRaUSART3RxData;
-uint8_t nodeID;
+uint8_t loRaNodeID, sensorID;
+uint32_t jsonTemp = 0;
+uint32_t jsonHumi = 0;
 uint8_t loRaUSART3RxFlag = 0;
 
 /**
@@ -225,8 +227,8 @@ void LoRa_USART3_Node2_Cmd_Msg(void)
 /**
   * @brief  USART3接收中断函数、状态机 
   * @note   处理USART3接收到的数据，执行对应操作。
-	* @note		状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收数据和等待包尾。
-	* @note		else if不会造成多个状态都被满足的问题。
+  * @note   状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收数据和等待包尾。
+  * @note   else if不会造成多个状态都被满足的问题。
   * @param  None
   * @retval None
   */
@@ -239,36 +241,71 @@ void USART3_IRQHandler(void)
 	{
 		/*接收字节，先读取到模块的变量里*/
 		uint32_t rxData = USART_ReceiveData(USART3);																										//获取USART3接收到的数据
-		if(rxState == 0)																																							//状态1：等待包头，包头为节点号
+		switch(rxState)
 		{
-			if (rxData == 0xD1)																					
+			case 0:																																												//状态1：等待包头，包头为节点号			
 			{
-				rxState = 1;
-			}
-		}
-		else if(rxState == 1)
-		{
-			if(pRxPacket <= 3)																																							//确保数组不越界
-			{
-				loRaUSART3RxPacket[pRxPacket++] = rxData;																										//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
-			}
-			if(pRxPacket == 1)
-			{
-				if(loRaUSART3RxPacket[0] == 0xEA)
+				if (rxData == 0xD1)																					
 				{
-					nodeID = 1;			
+					rxState = 1;
+					loRaNodeID = 1;
 				}
-			}
-			else if(pRxPacket == 3)
-			{
-				if(nodeID == 1)
+				else if (rxData == 0xD2)
 				{
-					ESP8266_USART2_Printf("Current temperature is:%d℃\r\n",loRaUSART3RxPacket[1]);
-					ESP8266_USART2_Printf("Current humidity is:%d\r\n",loRaUSART3RxPacket[2]);
-					nodeID = 2;
-					rxState = 0;
-					pRxPacket = 0;
+					rxState = 1;
+					loRaNodeID = 2;
 				}
+				break;
+			}
+			case 1:
+			{
+				if(pRxPacket <= 8)																																						//确保数组不越界
+				{
+					loRaUSART3RxPacket[pRxPacket++] = rxData;																										//每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
+				}
+				
+				switch(loRaNodeID)
+				{
+					case 1:
+					{
+						if(pRxPacket == 3)
+						{
+							ESP8266_USART2_Printf("Current temperature is:%d℃\r\n",loRaUSART3RxPacket[1]);
+							ESP8266_USART2_Printf("Current humidity is:%d\r\n",loRaUSART3RxPacket[2]);
+							jsonTemp = loRaUSART3RxPacket[1];
+							jsonHumi = loRaUSART3RxPacket[2];
+							ESP8266_USART2_Printf("AT+MQTTPUB=0,\"%s\",\"{\"name\":\"LoRa2NodeDemo\", \"Node1\":{\"Temperature\":\"%d\",\"Humidity\":\"%d\"}}\",0,0\r\n",MQTTPUBLISHTOPIC,jsonTemp,jsonHumi);
+							rxState = 0;
+							pRxPacket = 0;
+						}
+						break;
+					}
+					case 2:
+					{
+						if(pRxPacket == 8)
+						{
+							if(loRaUSART3RxPacket[1] == 0 && loRaUSART3RxPacket[3] == 0)
+							{
+								ESP8266_USART2_Printf("Environment safe.\r\n");
+							}
+							else if(loRaUSART3RxPacket[1] == 0 && loRaUSART3RxPacket[3] == 1)
+							{
+								ESP8266_USART2_Printf("Fire dangerous.\r\n");
+							}
+							else if(loRaUSART3RxPacket[1] == 1 && loRaUSART3RxPacket[3] == 0)
+							{
+								ESP8266_USART2_Printf("Smoke dangerous.\r\n");
+							}
+							else if(loRaUSART3RxPacket[3] == 1 && loRaUSART3RxPacket[3] == 1)
+							{
+								ESP8266_USART2_Printf("Environment dangerous.\r\n");
+							}
+							rxState = 0;
+							pRxPacket = 0;
+						}
+					}
+				}
+				break;
 			}
 		}
 		USART_ClearITPendingBit(USART3,USART_IT_RXNE);																									//if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
