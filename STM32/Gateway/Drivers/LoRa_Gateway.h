@@ -45,6 +45,12 @@ extern uint8_t loRaExecutorStatusOn[1];
 extern uint8_t loRaExecutorStatusOff[1];
 
 extern uint8_t loRaNodeID, sensorID;
+extern uint8_t jsonTemp;
+extern uint8_t jsonHumi;
+extern uint8_t jsonFan;
+extern uint8_t jsonHumidifier;
+extern uint8_t jsonSmoke;
+extern uint8_t jsonFire;
 
 extern uint8_t loRaUSART3RxPacket[10];
 

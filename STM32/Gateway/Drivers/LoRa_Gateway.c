@@ -22,13 +22,17 @@ uint8_t	loRaExecutorStepmotor[1]																					=	{0xFF};
 uint8_t loRaExecutorStatusOn[1]																						=	{0x01};
 uint8_t loRaExecutorStatusOff[1]																					=	{0x00};
 
-
 uint8_t loRaUSART3RxPacket[10];
 uint8_t loRaUSART3RxData;
-uint8_t loRaNodeID, sensorID;
-uint32_t jsonTemp = 0;
-uint32_t jsonHumi = 0;
 uint8_t loRaUSART3RxFlag = 0;
+
+uint8_t loRaNodeID, sensorID;
+uint8_t jsonTemp = 0;
+uint8_t jsonHumi = 0;
+uint8_t jsonFan = 0;
+uint8_t jsonHumidifier = 0;
+uint8_t jsonSmoke = 0;
+uint8_t jsonFire = 0;
 
 /**
   * @brief  LoRa在传输模式下的初始化函数         
@@ -38,38 +42,38 @@ uint8_t loRaUSART3RxFlag = 0;
   */
 void LoRa_USART3_Trans_Mode_Init(uint32_t mdTransBaudrate)
 {
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
 
-	GPIO_InitTypeDef GPIO_InitStructure;
- 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_TX;
- 	GPIO_Init(GPIOB, &GPIO_InitStructure);
- 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											//上拉输入
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_RX;
- 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_InitTypeDef GPIO_InitStructure;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_TX;
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											//上拉输入
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_RX;
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
-	USART_InitTypeDef USART_InitStructure;
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3,ENABLE);
-	USART_InitStructure.USART_BaudRate = mdTransBaudrate;																							//9600波特率，写完后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;										//硬件流控制,不使用流控
-	USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;																			//串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
-	USART_InitStructure.USART_Parity = USART_Parity_No;																								//无校验位
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;																						//一位停止位
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;																				//字长，不需要校验，字长就选择8位
-	USART_Init(USART3,&USART_InitStructure);
+  USART_InitTypeDef USART_InitStructure;
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3,ENABLE);
+  USART_InitStructure.USART_BaudRate = mdTransBaudrate;																							//9600波特率，写完后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
+  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;										//硬件流控制,不使用流控
+  USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;																			//串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
+  USART_InitStructure.USART_Parity = USART_Parity_No;																								//无校验位
+  USART_InitStructure.USART_StopBits = USART_StopBits_1;																						//一位停止位
+  USART_InitStructure.USART_WordLength = USART_WordLength_8b;																				//字长，不需要校验，字长就选择8位
+  USART_Init(USART3,&USART_InitStructure);
 																																																		//上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
-	USART_ITConfig(USART3,USART_IT_RXNE,ENABLE);																											//选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
+  USART_ITConfig(USART3,USART_IT_RXNE,ENABLE);																											//选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
 	
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);																										//分组
-	NVIC_InitTypeDef NVIC_InitStructure;																															//初始化NVIC的USART1通道
-	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;																									//中断通道
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-	NVIC_Init(&NVIC_InitStructure);																																		//指向NVIC_InitStructure的地址
-	USART_Cmd(USART3,ENABLE);
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);																										//分组
+  NVIC_InitTypeDef NVIC_InitStructure;																															//初始化NVIC的USART1通道
+  NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;																									//中断通道
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  NVIC_Init(&NVIC_InitStructure);																																		//指向NVIC_InitStructure的地址
+  USART_Cmd(USART3,ENABLE);
 }
 
 /**
@@ -270,11 +274,8 @@ void USART3_IRQHandler(void)
 					{
 						if(pRxPacket == 3)
 						{
-							ESP8266_USART2_Printf("Current temperature is:%d℃\r\n",loRaUSART3RxPacket[1]);
-							ESP8266_USART2_Printf("Current humidity is:%d\r\n",loRaUSART3RxPacket[2]);
 							jsonTemp = loRaUSART3RxPacket[1];
 							jsonHumi = loRaUSART3RxPacket[2];
-							ESP8266_USART2_Printf("AT+MQTTPUB=0,\"%s\",\"{\"name\":\"LoRa2NodeDemo\", \"Node1\":{\"Temperature\":\"%d\",\"Humidity\":\"%d\"}}\",0,0\r\n",MQTTPUBLISHTOPIC,jsonTemp,jsonHumi);
 							rxState = 0;
 							pRxPacket = 0;
 						}
@@ -286,19 +287,23 @@ void USART3_IRQHandler(void)
 						{
 							if(loRaUSART3RxPacket[1] == 0 && loRaUSART3RxPacket[3] == 0)
 							{
-								ESP8266_USART2_Printf("Environment safe.\r\n");
+								jsonSmoke = 0;
+								jsonFire = 0;
 							}
 							else if(loRaUSART3RxPacket[1] == 0 && loRaUSART3RxPacket[3] == 1)
 							{
-								ESP8266_USART2_Printf("Fire dangerous.\r\n");
+								jsonSmoke = 0;
+								jsonFire = 1;
 							}
 							else if(loRaUSART3RxPacket[1] == 1 && loRaUSART3RxPacket[3] == 0)
 							{
-								ESP8266_USART2_Printf("Smoke dangerous.\r\n");
+								jsonSmoke = 1;
+								jsonFire = 0;
 							}
 							else if(loRaUSART3RxPacket[3] == 1 && loRaUSART3RxPacket[3] == 1)
 							{
-								ESP8266_USART2_Printf("Environment dangerous.\r\n");
+								jsonSmoke = 1;
+								jsonFire = 1;
 							}
 							rxState = 0;
 							pRxPacket = 0;

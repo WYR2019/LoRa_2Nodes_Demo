@@ -14,7 +14,7 @@ int main(void){
 	while(1)
 	{
 //		ESP8266_USART2_MQTT_Mode_Publish();
-//		ESP8266_USART2_Printf("AT+MQTTPUB=0,\"%s\",\"{\"name\":\"LoRa2NodeDemo\", \"Node1:\"{\"Temperature:\"\"%d\",\"Humidity:\"\"%d\"}\",0,0\r\n",MQTTPUBLISHTOPIC,jsonTemp,jsonHumi);
-//		delay_ms(1000);
+		ESP8266_USART2_Printf("AT+MQTTPUB=0,\"%s\",\"{\"Node1\":{\"Temperature\":%d,\"Humidity\":%d,\"Fan\":%d,\"Humidifier\":%d}}\",0,0\r\n",MQTTPUBLISHTOPIC,jsonTemp,jsonHumi,jsonFan,jsonHumidifier);
+		delay_ms(1000);
 	}
 }
