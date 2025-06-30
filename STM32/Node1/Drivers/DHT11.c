@@ -1,6 +1,4 @@
-#include "dht11.h"
-#include "Delay.h"
-      
+#include "DHT11.h"      
 /*****************辰哥单片机设计******************
 											STM32
  * 文件			:	DHT11温度湿度传感器c文件                   

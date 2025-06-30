@@ -1,0 +1,19 @@
+#include "stm32f10x.h"                  // Device header
+#include "Delay.h"
+#include "LoRa_Gateway.h"
+#include "LED_PC13.h"
+#include "ESP8266.h"
+
+int main(void){
+	SystemInit();//配置系统时钟为72M	
+	delay_init(72);
+	LoRa_USART3_Trans_Mode_Init(9600);
+	ESP8266_USART2_Init(115200);
+	ESP8266_USART2_Connection_Init();
+//	ESP8266_USART2_MQTT_Mode_Init();
+	while(1)
+	{
+//		ESP8266_USART2_MQTT_Mode_Publish();
+//		ESP8266_USART2_Printf("AT+MQTTPUB=0,\"%s\",\"{\"Node1\":{\"Temperature\":%d,\"Humidity\":%d,\"Fan\":%d,\"Humidifier\":%d}}\",0,0\r\n",MQTTPUBLISHTOPIC,jsonTemp,jsonHumi,jsonFan,jsonHumidifier);
+	}
+}

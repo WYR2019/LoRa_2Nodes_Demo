@@ -1,7 +1,7 @@
 #ifndef __RELAY_H
 #define	__RELAY_H
 #include "stm32f10x.h"
-#include "delay.h"
+#include "SysTick.h"
 
 /*****************辰哥单片机设计******************
 											STM32
@@ -24,10 +24,10 @@
 
 #define RELAY_GPIO_PIN 				GPIO_Pin_0
 
-#define RELAY_GPIO_PROT 			GPIOA
+#define RELAY_GPIO_PORT 			GPIOA
 
-#define RELAY_ON 		GPIO_SetBits(RELAY_GPIO_PROT,RELAY_GPIO_PIN)
-#define RELAY_OFF 	GPIO_ResetBits(RELAY_GPIO_PROT,RELAY_GPIO_PIN)
+#define RELAY_ON 							GPIO_SetBits(RELAY_GPIO_PORT,RELAY_GPIO_PIN)
+#define RELAY_OFF 						GPIO_ResetBits(RELAY_GPIO_PORT,RELAY_GPIO_PIN)
 
 
 /*********************END**********************/
