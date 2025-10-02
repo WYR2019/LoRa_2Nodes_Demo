@@ -235,7 +235,7 @@ void USART3_IRQHandler(void)
 
           default:
           {
-            xLoRaUSART3Rx.ucRxState = 0;
+		  			xLoRaUSART3Rx.ucRxState = 0;
             xLoRaUSART3Rx.ucPRxPacket = 0;
           }
         }

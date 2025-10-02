@@ -1,28 +1,8 @@
-#include "LoRa.h"
+#include "LoRa_Gateway.h"
 
-/**
-  ******************************************************************************
-  * @file    LoRa.c
-  * @author  github/WYR2019
-  * @version V1.0
-  * @date    2025/5/25
-  * @brief   LoRa节点1驱动
-  ******************************************************************************
-  * @attention
-  * 1、该驱动为LoRa数据采集节点1的驱动，运行于STM32F103C8T6主控下，支持3种模式，
-  * 分别为透传模式、定点模式和初始化模式，通过宏定义初始化LoRa使用模式，0为初始
-  * 化模式，1为定点模式，2为透传模式。目前已完成定点模式传输的代码编写。
-  * 2、LoRa数据采集节点1主要使用DHT11传感器采集温湿度，用户可在移动端远程控制风扇、
-  * LED灯和加湿器。
-  * 3、定点模式以16进制数据包格式传输数据，仿modbus协议进行传输。
-  * 示例：03 E9 17 D1 EA 17 45
-  * 其中：03 E9为LoRa网关地址的16进制数字，3E9转为10进制为1001；17为LoRa网关信道的16
-  * 进制数字，转10进制为23；D1为节点1的标识，EA为DHT11传感器的标识，17、45分别为温湿
-  * 度的16进制数字。
-  ******************************************************************************
-  */
+uint8_t loRaUSART3RxPacket[80];
 
-static uint8_t ucLoRaUSART3RxPacket[3];
+uint8_t loRaNodeID, sensorID;
 
 /**
   * @brief  LoRa的初始化函数         
@@ -76,7 +56,7 @@ void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_ATK_AUX;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
+ 	  GPIO_Init(GPIOB, &GPIO_InitStructure);
     GPIO_SetBits(GPIOB,LORA_GPIO_PIN_ATK_MD0);
 
   #elif LORA_MODE_INIT == 2
@@ -91,7 +71,7 @@ void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate)
 /**
   * @brief  LoRa发送单个字节函数
   * @note   调用这个函数，就可以从TX引脚发送一个字节数据。
-  * @param  byte
+  * @param  Byte
   * @retval None
   */
 void vLoRaUSART3SendByte(uint8_t ucByte)
@@ -116,26 +96,62 @@ void vLoRaUSART3SendByte(uint8_t ucByte)
       vLoRaUSART3SendByte(pucArray[i]);                                                               //依次取出数组Array的每一项
     }
   }
-	
+
   /**
     * @brief  LoRa发送发送hex数据包函数,也是LoRa在定点模式下执行节点间通信的主要函数。				
     * @note   hex数据包的格式为固定包长
     * @param  None
     * @retval None
     */
-  void vLoRaUSART3GateIdPkt(void)
+  void vLoRaUSART3Node1IDPkt(void)
   {
-    vLoRaUSART3SendArray(&xLoRaConfig.ucLoRaGateAddr, 2);                                             //发送载荷
-    vLoRaUSART3SendArray(&xLoRaConfig.ucLoRaChannel, 1);
-    vLoRaUSART3SendArray(&xLoRaConfig.ucLoRaIdentifier, 1);
+    vLoRaUSART3SendArray(&xLoRaConfig.ucLoRaNode1Addr, 2);																													
+    vLoRaUSART3SendArray(&xLoRaConfig.ucLoRaNode1Channel, 1);
+    vLoRaUSART3SendArray(&xLoRaConfig.ucLoRaNode1Identifier, 1);
   }
+
+  void vLoRaUSART3Node2IDPkt(void)
+  {
+    vLoRaUSART3SendArray(&xLoRaConfig.ucLoRaNode2Addr, 2);																													
+    vLoRaUSART3SendArray(&xLoRaConfig.ucLoRaNode2Channel, 1);
+    vLoRaUSART3SendArray(&xLoRaConfig.ucLoRaNode2Identifier, 1);
+  }
+
+  void LoRa_USART3_Node1_Fan_On_Msg(void)
+  {
+    vLoRaUSART3Node1IDPkt();
+    vLoRaUSART3SendArray(&xLoRaExecutorID.ucFan, 1);
+    vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn, 1);
+  }
+
+  void LoRa_USART3_Node1_Fan_Off_Msg(void)
+  {
+    vLoRaUSART3Node1IDPkt();
+    vLoRaUSART3SendArray(&xLoRaExecutorID.ucFan, 1);
+    vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOff, 1);
+  }
+
+  void LoRa_USART3_Node1_Humidifier_On_Msg(void)
+  {
+    vLoRaUSART3Node1IDPkt();
+    vLoRaUSART3SendArray(&xLoRaExecutorID.ucHumidifier, 1);
+    vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn, 1);
+  }
+
+  void LoRa_USART3_Node1_Humidifier_Off_Msg(void)
+  {
+    vLoRaUSART3Node1IDPkt();
+    vLoRaUSART3SendArray(&xLoRaExecutorID.ucHumidifier, 1);
+    vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOff, 1);
+  }
+
 #else
   /*发送字符串函数*/
-  void vLoRaUSART3SendString(char *pcString)                                                          //给uint8_t *也可以，由于字符串自带一个标志位，所以就不需要再传递长度参数了
+  void vLoRaUSART3SendString(char *String)                                                            //给uint8_t *也可以，由于字符串自带一个标志位，所以就不需要再传递长度参数了
   {
-    for(uint8_t i = 0;string[i] != '\0';i++)                                                          //循环结束就可以用标志位来判断了,填'\0'是空字符的转义字符表示形式，和直接写0是一样的
+    for(uint8_t i = 0;String[i] != '\0';i++)                                                          //循环结束就可以用标志位来判断了,填'\0'是空字符的转义字符表示形式，和直接写0是一样的
     {
-      vLoRaUSART3SendByte(pcString[i]);                                                               //将String字符串一个个取出来，通过SendByte发送
+      vLoRaUSART3SendByte(String[i]);                                                                 //将String字符串一个个取出来，通过SendByte发送
     }
   }
 
@@ -157,7 +173,7 @@ void vLoRaUSART3SendByte(uint8_t ucByte)
     * @param  *format,...
     * @retval None
     */
-  void vLoRaUSART3Printf(char *format, ...)                        																												
+  void vLoRaUSART3Printf(char *format, ...)																													
   {
     char String[100];
     va_list arg;                                                                                      //arg是定义一个参数列表变量
@@ -166,86 +182,91 @@ void vLoRaUSART3SendByte(uint8_t ucByte)
     va_end(arg);                                                                                      //释放参数表
     vLoRaUSART3SendString(String);
   }
+
 #endif
 
+
+
 /**
-  * @brief  USART3接收中断函数
-  * @note   1、处理USART3接收到的数据，执行相应操作。
-  *         2、状态变量一共分为3个，分别是等待包头（0xD1）、接收数据和等待包尾（0xAB）。
-  *         3、else if不会造成多个状态都被满足的问题。
-  *         4、中断只会执行第一个满足条件的if语句
-  *         5、exeState分如下的状态：如LED灯：10表示收到网关的LED请求，11表示打开LED，12表示关闭LED。
+  * @brief  USART3接收中断函数、状态机 
+  * @note   处理USART3接收到的数据，执行对应操作。
+  * @note   状态变量一共分为3个，分别是0、1、2，也就是等待包头、接收数据和等待包尾。
+  * @note   else if不会造成多个状态都被满足的问题。
   * @param  None
   * @retval None
   */
 void USART3_IRQHandler(void)
-{
-  LoRaExecutorFlag_t xLoRaExecutorFlag;
-
+{	
   if(USART_GetITStatus(USART3,USART_IT_RXNE) == SET)                                                  //如果RXNE置1，说明收到数据，开始根据数据处理状态。
   {
     /*接收字节，先读取到模块的变量里*/
-    uint32_t ucRxData = USART_ReceiveData(USART3);                                                    //获取USART3接收到的数据
-
-    #if LORA_MODE_INIT == 0
-      functions();
-
-    #elif LORA_MODE_INIT
-      if(xLoRaUSART3Rx.ucRxState == 0)
+    uint32_t rxData = USART_ReceiveData(USART3);                                                      //获取USART3接收到的数据
+    switch(xLoRaUSART3Rx.ucRxState)
+    {
+      case 0:                                                                                         //状态1：等待包头，包头为节点号			
       {
-        if(ucRxData == 0xD1)                                                                          //判断包头是否正,是否收到0xD1，若收到则进入数据处理状态。
+        if (rxData == 0xD1)																					
         {
           xLoRaUSART3Rx.ucRxState = 1;
+          loRaNodeID = 1;
         }
+        else if (rxData == 0xD2)
+        {
+          xLoRaUSART3Rx.ucRxState = 1;
+          loRaNodeID = 2;
+        }
+        break;
       }
-      else if(xLoRaUSART3Rx.ucRxState == 1)
+      case 1:
       {
-        ucLoRaUSART3RxPacket[xLoRaUSART3Rx.ucPRxPacket++] = ucRxData;                                 //第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
-        switch(xLoRaUSART3Rx.ucPRxPacket)
+        if(xLoRaUSART3Rx.ucPRxPacket <= 8)                                                            //确保数组不越界
+        {
+          loRaUSART3RxPacket[xLoRaUSART3Rx.ucPRxPacket++] = rxData;                                   //每进一次接收状态，数据就转存一次缓存数组，同时存的位置++
+        }
+
+        switch(loRaNodeID)
         {
           case 1:
-            switch(ucLoRaUSART3RxPacket[0])
-            {
-              case 0xFA:xLoRaExecutorFlag.ucId = 10;break;
-              case 0xFB:xLoRaExecutorFlag.ucId = 20;break;
-              case 0xFC:xLoRaExecutorFlag.ucId = 30;break;
-            }
-          case 2:
-          switch(xLoRaExecutorFlag.ucId)
           {
-            case 10:
+            if(xLoRaUSART3Rx.ucPRxPacket == 3)
             {
-              xLoRaExecutorFlag.ucState = (ucLoRaUSART3RxPacket[1] == 0x01) ? 11 : 12;
-              break;
+              xLoRaRxJsonFlag.iTemp = loRaUSART3RxPacket[1];
+              xLoRaRxJsonFlag.iHumi = loRaUSART3RxPacket[2];
+              xLoRaUSART3Rx.ucRxState = 0;
+              xLoRaUSART3Rx.ucPRxPacket = 0;
             }
-            case 20:
-            {
-              xLoRaExecutorFlag.ucState = (ucLoRaUSART3RxPacket[1] == 0x01) ? 21 : 22;
-              break;
-            }
-            case 30:
-            {
-              xLoRaExecutorFlag.ucState = (ucLoRaUSART3RxPacket[1] == 0x01) ? 31 : 32;
-              break;
-            }
+            break;
           }
-          /* DeepSeek修改部分 */
-          xLoRaUSART3Rx.ucRxState = 0;
-          xLoRaUSART3Rx.ucPRxPacket = 0;
-
-          default:
+          case 2:
           {
-            xLoRaUSART3Rx.ucRxState = 0;
-            xLoRaUSART3Rx.ucPRxPacket = 0;
+            if(xLoRaUSART3Rx.ucPRxPacket == 8)
+            {
+              if(loRaUSART3RxPacket[1] == 0 && loRaUSART3RxPacket[3] == 0)
+              {
+                xLoRaRxJsonFlag.iSmoke = xLoRaRxJsonFlag.iFire = xLoRaRxJsonFlag.iBeep = xLoRaRxJsonFlag.iServo = 0;
+              }
+              else if(loRaUSART3RxPacket[1] == 0 && loRaUSART3RxPacket[3] == 1)
+              {
+                xLoRaRxJsonFlag.iSmoke = 0;
+                xLoRaRxJsonFlag.iFire = xLoRaRxJsonFlag.iBeep = xLoRaRxJsonFlag.iServo = 1;
+              }
+              else if(loRaUSART3RxPacket[1] == 1 && loRaUSART3RxPacket[3] == 0)
+              {
+                xLoRaRxJsonFlag.iFire = 0;
+                xLoRaRxJsonFlag.iSmoke = xLoRaRxJsonFlag.iBeep = xLoRaRxJsonFlag.iServo = 1;	
+              }
+              else if(loRaUSART3RxPacket[1] == 1 && loRaUSART3RxPacket[3] == 1)
+              {
+                xLoRaRxJsonFlag.iSmoke = xLoRaRxJsonFlag.iFire = xLoRaRxJsonFlag.iBeep = xLoRaRxJsonFlag.iServo = 1;
+              }
+              xLoRaUSART3Rx.ucRxState = 0;
+              xLoRaUSART3Rx.ucPRxPacket = 0;
+            }
           }
         }
+        break;
       }
-
-    #elif LORA_MODE_INIT == 2
-      functions();
-
-    #endif
-
-    USART_ClearITPendingBit(USART3,USART_IT_RXNE);                                                     //if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
+    }
+    USART_ClearITPendingBit(USART3,USART_IT_RXNE);                                                   //if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
   }
 }

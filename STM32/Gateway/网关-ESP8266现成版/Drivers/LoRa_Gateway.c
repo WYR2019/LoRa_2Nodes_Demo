@@ -56,7 +56,7 @@ void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_ATK_AUX;
- 	  GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
     GPIO_SetBits(GPIOB,LORA_GPIO_PIN_ATK_MD0);
 
   #elif LORA_MODE_INIT == 2
