@@ -31,7 +31,7 @@ typedef struct {
   uint8_t ucHumi;
 } DHT11DataID_t;
 
-int main(void){
+int main(void) {
   DHT11DataID_t xDHT11DataID;
   SysTick_Init(72);
   vLoRaUSART3EnableInit(115200);
@@ -39,12 +39,12 @@ int main(void){
   Fan_Relay_Init();
   while(1)
   {
-		DHT11_Read_Data(&xDHT11DataID.ucTemp,&xDHT11DataID.ucHumi);
-		#if LORA_MODE_INIT
+    DHT11_Read_Data(&xDHT11DataID.ucTemp,&xDHT11DataID.ucHumi);
+    #if LORA_MODE_INIT
       vLoRaNode1SendMsg();
-		  vLoRaNode1Executing();
-		  delay_ms(3000);
-		#endif
+      vLoRaNode1Executing();
+      delay_ms(3000);
+    #endif
   }
 }
 

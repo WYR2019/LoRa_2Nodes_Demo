@@ -22,11 +22,11 @@ void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate)
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_TX;
- 	GPIO_Init(GPIOB, &GPIO_InitStructure);
- 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_RX;
- 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
 
   USART_InitTypeDef USART_InitStructure;
   USART_InitStructure.USART_BaudRate = ulLoRaUSART3Baudrate;                                        //设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
@@ -55,9 +55,9 @@ void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_ATK_MD0;
- 	  GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
- 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_ATK_AUX;
  	  GPIO_Init(GPIOB, &GPIO_InitStructure);
@@ -67,7 +67,7 @@ void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_ATK_MD0;
- 	  GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
   #endif
 }

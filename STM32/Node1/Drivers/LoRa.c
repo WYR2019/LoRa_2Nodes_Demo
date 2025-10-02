@@ -38,11 +38,11 @@ void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate)
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_TX;
- 	GPIO_Init(GPIOB, &GPIO_InitStructure);
- 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_RX;
- 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
 
   USART_InitTypeDef USART_InitStructure;
   USART_InitStructure.USART_BaudRate = ulLoRaUSART3Baudrate;                                        //设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
@@ -71,9 +71,9 @@ void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_ATK_MD0;
- 	  GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
- 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_ATK_AUX;
  	  GPIO_Init(GPIOB, &GPIO_InitStructure);
@@ -83,7 +83,7 @@ void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = LORA_GPIO_PIN_ATK_MD0;
- 	  GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
   #endif
 }
@@ -188,10 +188,10 @@ void USART3_IRQHandler(void)
     uint32_t ucRxData = USART_ReceiveData(USART3);                                                    //获取USART3接收到的数据
 
     #if LORA_MODE_INIT == 0
-		  functions();
+      functions();
 
     #elif LORA_MODE_INIT
-		  if(xLoRaUSART3Rx.ucRxState == 0)
+      if(xLoRaUSART3Rx.ucRxState == 0)
       {
         if(ucRxData == 0xD1)                                                                          //判断包头是否正,是否收到0xD1，若收到则进入数据处理状态。
         {
@@ -200,7 +200,7 @@ void USART3_IRQHandler(void)
       }
       else if(xLoRaUSART3Rx.ucRxState == 1)
       {
-		    ucLoRaUSART3RxPacket[xLoRaUSART3Rx.ucPRxPacket++]	= ucRxData;                                               //第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
+        ucLoRaUSART3RxPacket[xLoRaUSART3Rx.ucPRxPacket++] = ucRxData;                                 //第pRxPacket个数据赋值给rxData，将rxData存到接收数组里。每进一次接收状态，数据就转存一次接收数组，同时存的位置++,挪到下一个位置。
         switch(xLoRaUSART3Rx.ucPRxPacket)
         {
           case 1:
@@ -210,42 +210,42 @@ void USART3_IRQHandler(void)
               case 0xFB:xLoRaExecutorFlag.ucId = 20;break;
               case 0xFC:xLoRaExecutorFlag.ucId = 30;break;
             }
-				  case 2:
-				  switch(xLoRaExecutorFlag.ucId)
-			  	{
-			  		case 10:
-			  		{
-			  			xLoRaExecutorFlag.ucState = (ucLoRaUSART3RxPacket[1] == 0x01) ? 11 : 12;
-			  			break;
-		  			}
-		  			case 20:
-		  			{
-		   				xLoRaExecutorFlag.ucState = (ucLoRaUSART3RxPacket[1] == 0x01) ? 21 : 22;
-		  				break;
-		  			}
-		  			case 30:
-		  			{
-			  			xLoRaExecutorFlag.ucState = (ucLoRaUSART3RxPacket[1] == 0x01) ? 31 : 32;
-			  			break;
-		  			}
-		  		}
-			  	/* DeepSeek修改部分 */
+          case 2:
+          switch(xLoRaExecutorFlag.ucId)
+          {
+            case 10:
+            {
+              xLoRaExecutorFlag.ucState = (ucLoRaUSART3RxPacket[1] == 0x01) ? 11 : 12;
+              break;
+            }
+            case 20:
+            {
+              xLoRaExecutorFlag.ucState = (ucLoRaUSART3RxPacket[1] == 0x01) ? 21 : 22;
+              break;
+            }
+            case 30:
+            {
+              xLoRaExecutorFlag.ucState = (ucLoRaUSART3RxPacket[1] == 0x01) ? 31 : 32;
+              break;
+            }
+          }
+          /* DeepSeek修改部分 */
           xLoRaUSART3Rx.ucRxState = 0;
           xLoRaUSART3Rx.ucPRxPacket = 0;
 
-		  		default:
-		  		{
+          default:
+          {
 		  			xLoRaUSART3Rx.ucRxState = 0;
             xLoRaUSART3Rx.ucPRxPacket = 0;
-		  		}
+          }
         }
       }
 
     #elif LORA_MODE_INIT == 2
-		  functions();
+      functions();
 
     #endif
 
-    USART_ClearITPendingBit(USART3,USART_IT_RXNE);                                                   //if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
+    USART_ClearITPendingBit(USART3,USART_IT_RXNE);                                                     //if是否要清除标志位呢，如果读取了DR，就会自动清除，如果没读取就需要手动清除
   }
 }
