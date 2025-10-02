@@ -421,6 +421,11 @@
           <GroupName>User</GroupName>
           <Files>
             <File>
+              <FileName>BspConfig.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\BspConfig.h</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\main.c</FilePath>
@@ -741,14 +746,14 @@
               <FilePath>.\Drivers\LED_PC13.h</FilePath>
             </File>
             <File>
-              <FileName>Relay.c</FileName>
+              <FileName>Fan_Relay_PA0.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Drivers\Relay.c</FilePath>
+              <FilePath>.\Drivers\Fan_Relay_PA0.c</FilePath>
             </File>
             <File>
-              <FileName>Relay.h</FileName>
+              <FileName>Fan_Relay_PA0.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Drivers\Relay.h</FilePath>
+              <FilePath>.\Drivers\Fan_Relay_PA0.h</FilePath>
             </File>
           </Files>
         </Group>

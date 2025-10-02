@@ -8,90 +8,92 @@
 #include "IR.h"
 #include "Servo.h"
 
-uint16_t fireValue;
-uint8_t buff[30];//参数显示缓存数组
-float ppmValue;
+typedef struct {
+  uint16_t usFireValue;
+  float fPpmValue;
+} FireSensor_t;
+
 int main(void){
-	SysTick_Init(72);
-	LoRa_USART3_Trans_Mode_Init(9600);
-	MQ2_Init();
-	Beep_Init();
-	IR_Init();
-	Servo_Init();
-	while(1)
-	{
-//		LoRa_USART3_Printf("%.02fppm\r\n",ppmValue);
-		ppmValue = MQ2_GetData_PPM();
-		fireValue = IR_FireData();
-		switch (fireValue)
-		{
-			case 0:
-			{
-				if(ppmValue >= 10)
-				{
-					Beep_ON();
-					Servo_SetAngle(180);
-					LoRa_USART3_IdentifierPkt();
-					LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					LoRa_USART3_SendArray(loRaSensorFireIdentifier,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
-					LoRa_USART3_SendArray(loRaExecutorBuzzer,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					LoRa_USART3_SendArray(loRaExecutorServo,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					break;
-				}
-				else
-				{
-					Beep_OFF();
-					Servo_SetAngle(0);
-					LoRa_USART3_IdentifierPkt();
-					LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
-					LoRa_USART3_SendArray(loRaSensorFireIdentifier,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
-					LoRa_USART3_SendArray(loRaExecutorBuzzer,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
-					LoRa_USART3_SendArray(loRaExecutorServo,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
-					break;
-				}
-			}
-			case 1:
-			{
-				if(ppmValue >= 10)
-				{
-					Beep_ON();
-					Servo_SetAngle(180);
-					LoRa_USART3_IdentifierPkt();
-					LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					LoRa_USART3_SendArray(loRaSensorFireIdentifier,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					LoRa_USART3_SendArray(loRaExecutorBuzzer,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					LoRa_USART3_SendArray(loRaExecutorServo,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					break;
-				}
-				else
-				{
-					Beep_ON();
-					Servo_SetAngle(180);
-					LoRa_USART3_IdentifierPkt();
-					LoRa_USART3_SendArray(loRaSensorMQ2Identifier,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOff,1);
-					LoRa_USART3_SendArray(loRaSensorFireIdentifier,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					LoRa_USART3_SendArray(loRaExecutorBuzzer,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					LoRa_USART3_SendArray(loRaExecutorServo,1);
-					LoRa_USART3_SendArray(loRaExecutorStatusOn,1);
-					break;
-				}
-			}
-		}
-		delay_ms(1500);
-	}
+  FireSensor_t xFireSensor;
+  SysTick_Init(72);
+  vLoRaUSART3EnableInit(115200);
+  MQ2_Init();
+  Beep_Init();
+  IR_Init();
+  Servo_Init();
+  while(1)
+  {
+    xFireSensor.fPpmValue = MQ2_GetData_PPM();
+    xFireSensor.usFireValue = IR_FireData();
+    switch (xFireSensor.usFireValue)
+    {
+      case 0:
+      {
+        if(xFireSensor.fPpmValue >= 10)
+        {
+          Beep_ON();
+          Servo_SetAngle(180);
+          vLoRaUSART3GateIdPkt();
+          vLoRaUSART3SendArray(&xLoRaSensorID.ucMQ2,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          vLoRaUSART3SendArray(&xLoRaSensorID.ucFire,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOff,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorID.ucBuzzer,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorID.ucServo,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          break;
+        }
+        else
+        {
+          Beep_OFF();
+          Servo_SetAngle(0);
+          vLoRaUSART3GateIdPkt();
+          vLoRaUSART3SendArray(&xLoRaSensorID.ucMQ2,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOff,1);
+          vLoRaUSART3SendArray(&xLoRaSensorID.ucFire,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOff,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorID.ucBuzzer,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOff,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorID.ucServo,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOff,1);
+          break;
+        }
+      }
+      case 1:
+      {
+        if(xFireSensor.fPpmValue >= 10)
+        {
+          Beep_ON();
+          Servo_SetAngle(180);
+          vLoRaUSART3GateIdPkt();
+          vLoRaUSART3SendArray(&xLoRaSensorID.ucMQ2,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          vLoRaUSART3SendArray(&xLoRaSensorID.ucFire,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorID.ucBuzzer,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorID.ucServo,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          break;
+        }
+        else
+        {
+          Beep_ON();
+          Servo_SetAngle(180);
+          vLoRaUSART3GateIdPkt();
+          vLoRaUSART3SendArray(&xLoRaSensorID.ucMQ2,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOff,1);
+          vLoRaUSART3SendArray(&xLoRaSensorID.ucFire,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorID.ucBuzzer,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorID.ucServo,1);
+          vLoRaUSART3SendArray(&xLoRaExecutorStatus.ucStatusOn,1);
+          break;
+        }
+      }
+    }
+    delay_ms(1500);
+  }
 }

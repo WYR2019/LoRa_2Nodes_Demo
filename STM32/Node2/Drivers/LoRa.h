@@ -1,48 +1,110 @@
 #ifndef __LORA_H__
 #define __LORA_H__
-#include "stm32f10x.h"                  																 		// Device header
+#include "stm32f10x.h"                                                   // Device header
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
-/* LoRa的设置 */
-#define LORA_GPIO_PIN_TX           														GPIO_Pin_10
-#define LORA_GPIO_PIN_RX           														GPIO_Pin_11
-#define LORA_GPIO_PIN_ATK_AUX      														GPIO_Pin_4 	 	//PA4
-#define LORA_GPIO_PIN_ATK_MD0			 														GPIO_Pin_3 		//PB3
-#define LORA_DEST_ADDR_HIGH																		0x03
-#define LORA_DEST_ADDR_LOW																		0xE9
-#define LORA_DEST_CHANNEL																			0x17
-#define LORA_NODE_IDENTIFIER																	0xD2
+/* LoRa的静态设置 */
+#define LORA_MODE_INIT                                        1
+#define LORA_GPIO_PIN_TX                                      GPIO_Pin_10
+#define LORA_GPIO_PIN_RX                                      GPIO_Pin_11
+#define LORA_GPIO_PIN_ATK_AUX                                 GPIO_Pin_4 //PA4
+#define LORA_GPIO_PIN_ATK_MD0                                 GPIO_Pin_3 //PB3
+#define LORA_GATE_ADDR_HIGH                                   0x03
+#define LORA_GATE_ADDR_LOW                                    0xE9
+#define LORA_GATE_CHANNEL                                     0x17
+#define LORA_NODE_IDENTIFIER                                  0xD1
+#define LORA_SENSOR_DHT11                                     0xEA
+#define LORA_SENSOR_MQ2                                       0xEB
+#define LORA_SENSOR_LIGHT                                     0xEC
+#define LORA_SENSOR_FIRE                                      0xED
+#define LORA_EXECUTOR_LED                                     0xFA
+#define LORA_EXECUTOR_FAN                                     0xFB
+#define LORA_EXECUTOR_HUMIDIFIER                              0xFC
+#define LORA_EXECUTOR_BUZZER                                  0xFD
+#define LORA_EXECUTOR_SERVO                                   0xFE
+#define LORA_EXECUTOR_STATUS_ON                               0x01
+#define LORA_EXECUTOR_STATUS_OFF                              0x00
+#define LORA_GATE_ADDR                                        ((LORA_GATE_ADDR_HIGH << 8) | LORA_GATE_ADDR_LOW)
 
-/* LoRa发送数据数组 */
+#if LORA_MODE_INIT
 
-extern uint8_t loRaSensorDHT11Identifier[1];
-extern uint8_t loRaSensorMQ2Identifier[1];
-extern uint8_t loRaSensorLightIdentifier[1];
-extern uint8_t loRaSensorFireIdentifier[1];
-extern uint8_t loRaExecutorLED[1];
-extern uint8_t loRaExecutorHumidifier[1];
-extern uint8_t loRaExecutorFan[1];
-extern uint8_t loRaExecutorBuzzer[1];
-extern uint8_t loRaExecutorServo[1];
-extern uint8_t loRaExecutorStepmotor[1];
-extern uint8_t loRaExecutorStatusOn[1];
-extern uint8_t loRaExecutorStatusOff[1];
+  typedef struct {
+    uint8_t ucLoRaAddr;
+    uint8_t ucLoRaChannel;
+    uint8_t ucLoRaGateAddr;
+    uint8_t ucLoRaGateChannel;
+    uint8_t ucLoRaIdentifier;
+  } LoRaConfig_t;
 
-extern uint8_t loRaUSART3RxPacket[];
-extern uint8_t loRaUSART3RxFlag;
-extern uint8_t executorState;
-extern uint8_t executorID;
-extern uint8_t rxState;
+  typedef struct {
+    uint8_t ucDHT11;
+    uint8_t ucMQ2;
+    uint8_t ucLight;
+    uint8_t	ucFire;
+  } LoRaSensorID_t;
 
-void LoRa_USART3_Trans_Mode_Init(uint32_t Md_Trans_BaudRate);
-void LoRa_USART3_SendByte(uint8_t Byte);
-void LoRa_USART3_SendArray(uint8_t *Array,uint16_t Length);
-void LoRa_USART3_SendString(char *String);
-void LoRa_USART3_Printf(char *format, ...);
-uint32_t Serial_Pow(uint32_t X, uint32_t Y);
-void LoRa_USART3_SendNumber(uint32_t Number,uint8_t Length);
-void LoRa_USART3_IdentifierPkt(void);
-uint8_t LoRa_USART3_GetRxFlag(void);
+  typedef struct {
+    uint8_t ucLED;
+    uint8_t ucFan;
+    uint8_t ucHumidifier;
+    uint8_t ucBuzzer;
+    uint8_t ucServo;
+  } LoRaExecutorID_t;
 
+  typedef struct {
+    uint8_t ucState;
+    uint8_t ucId;
+    uint8_t ucStatusOn;
+    uint8_t ucStatusOff;
+  } LoRaExecutorFlag_t;
+
+  typedef struct {
+    uint8_t ucRxState;                                        //状态变量S=0
+    uint8_t ucPRxPacket;                                      //指示接收到哪一个数据
+  } LoRaUSART3Rx_t;
+
+  static LoRaConfig_t xLoRaConfig = {
+    .ucLoRaGateAddr    = (uint8_t) LORA_GATE_ADDR,
+    .ucLoRaGateChannel = LORA_GATE_CHANNEL,
+    .ucLoRaIdentifier  = LORA_NODE_IDENTIFIER
+  };
+
+  static LoRaSensorID_t xLoRaSensorID = {
+    .ucDHT11      = LORA_SENSOR_DHT11,
+    .ucMQ2        = LORA_SENSOR_MQ2,
+    .ucLight      = LORA_SENSOR_LIGHT,
+    .ucFire       = LORA_SENSOR_FIRE
+  };
+
+  static LoRaExecutorID_t xLoRaExecutorID = {
+    .ucLED        = LORA_EXECUTOR_LED,
+    .ucFan        = LORA_EXECUTOR_FAN,
+    .ucHumidifier = LORA_EXECUTOR_HUMIDIFIER,
+    .ucBuzzer     = LORA_EXECUTOR_BUZZER,
+    .ucServo      = LORA_EXECUTOR_SERVO
+  };
+
+  static LoRaExecutorFlag_t xLoRaExecutorStatus = {
+    .ucStatusOn   = LORA_EXECUTOR_STATUS_ON,
+    .ucStatusOff  = LORA_EXECUTOR_STATUS_OFF,
+  };
+
+  static LoRaUSART3Rx_t xLoRaUSART3Rx = {
+    .ucRxState = 0,
+    .ucPRxPacket = 0,
+  };
+
+  void vLoRaUSART3EnableInit(uint32_t ulLoRaUSART3Baudrate);
+  void vLoRaUSART3SendArray(uint8_t *pucArray,uint16_t usLength);
+
+  void vLoRaUSART3GateIdPkt(void);
+  void vLoRaNode1SendMsg(void);
+  void vLoRaNode1Executing(void);
+
+#else
+  void vLoRaUSART3SendString(char *pcString);
+  void vLoRaUSART3Printf(char *format, ...);
+#endif
 #endif

@@ -124,7 +124,8 @@ void USART2_IRQHandler(void)
 
 void ESP8266_USART1_Scan_Actions(void)
 {
-	sscanf((char *)USART1_RX_BUF,"{%d,%d,%d,%d,%d,%d,%d,%d,}",&jsonTemp, &jsonHumi, &jsonFan, &jsonHumidifier, &jsonSmoke, &jsonFire, &jsonBeep, &jsonServo);
+	sscanf((char *)USART1_RX_BUF,"{%d,%d,%d,%d,%d,%d,%d,%d,}",&xLoRaRxJsonFlag.iTemp, &xLoRaRxJsonFlag.iHumi, &xLoRaRxJsonFlag.iFan, 
+    &xLoRaRxJsonFlag.iHumidifier, &xLoRaRxJsonFlag.iSmoke, &xLoRaRxJsonFlag.iFire, &xLoRaRxJsonFlag.iBeep, &xLoRaRxJsonFlag.iServo);
 	memset(USART1_RX_BUF,0,600);
 }
 
@@ -133,7 +134,9 @@ void ESP8266_MQTT_Publish(void)
 	if(sendData >= 30)
 	{
 		sendData = 0;	
-		sprintf((char*)pubPayloadBuffer,"{\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d}",ID_TEMP,jsonTemp,ID_HUMI,jsonHumi,ID_FAN,jsonFan,ID_HUMIDIFIER,jsonHumidifier,ID_SMOKE,jsonSmoke,ID_FIRE,jsonFire,ID_BEEP,jsonBeep,ID_SERVO,jsonServo);	
+		sprintf((char*)pubPayloadBuffer,"{\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d,\"%s\":%d}",ID_TEMP,
+      xLoRaRxJsonFlag.iTemp,ID_HUMI,xLoRaRxJsonFlag.iHumi,ID_FAN,xLoRaRxJsonFlag.iFan,ID_HUMIDIFIER,xLoRaRxJsonFlag.iHumidifier,
+      ID_SMOKE,xLoRaRxJsonFlag.iSmoke,ID_FIRE,xLoRaRxJsonFlag.iFire,ID_BEEP,xLoRaRxJsonFlag.iBeep,ID_SERVO,xLoRaRxJsonFlag.iServo);	
 		size = strlen((char*)pubPayloadBuffer); // 获取字符占用的大小
 		delay_ms(1000);
 		ESP8266_Printf("AT+MQTTPUBRAW=0,\"%s\",%d,1,0\r\n",PUBLISHTOPIC,size);
@@ -175,18 +178,18 @@ void ESP8266_Publish_Topics_Actions(void)
 {
 	if(pubFanSwitch == 1)
 	{
-		jsonFan = 1;
+		xLoRaRxJsonFlag.iFan = 1;
 	}
 	else
 	{
-		jsonFan = 0;
+		xLoRaRxJsonFlag.iFan = 0;
 	}
 	if(pubHumidifierSwitch == 1)
 	{
-		jsonHumidifier = 1;
+		xLoRaRxJsonFlag.iHumidifier = 1;
 	}
 	else
 	{
-		jsonHumidifier = 0;
+		xLoRaRxJsonFlag.iHumidifier = 0;
 	}
 }

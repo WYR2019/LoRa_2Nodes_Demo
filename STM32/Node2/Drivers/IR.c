@@ -16,7 +16,7 @@
 
 void IR_Init(void)
 {
-	#if MODE
+	#if IR_MODE
 	{
 		GPIO_InitTypeDef GPIO_InitStructure;
 		
@@ -43,7 +43,7 @@ void IR_Init(void)
 	
 }
 
-#if MODE
+#if IR_MODE
 uint16_t IR_ADC_Read(void)
 {
 	//设置指定ADC的规则组通道，采样时间
@@ -54,7 +54,7 @@ uint16_t IR_ADC_Read(void)
 uint16_t IR_FireData(void)
 {
 	
-	#if MODE
+	#if IR_MODE
 	uint32_t  tempData = 0;
 	for (uint8_t i = 0; i < IR_READ_TIMES; i++)
 	{

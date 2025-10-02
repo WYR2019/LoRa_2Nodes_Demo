@@ -23,20 +23,20 @@
 //模式选择	
 //模拟AO:	1
 //数字DO:	0
-#define	MODE 	0
+#define	IR_MODE 	0
 
 /***************根据自己需求更改****************/
 // LDR GPIO宏定义
-#if MODE
+#if IR_MODE
 #define		IR_AO_GPIO_CLK								RCC_APB2Periph_GPIOA
 #define 	IR_AO_GPIO_PORT								GPIOA
-#define 	IR_AO_GPIO_PIN								GPIO_Pin_0
-#define   ADC_CHANNEL               		ADC_Channel_0	// ADC 通道宏定义
+#define 	IR_AO_GPIO_PIN								GPIO_Pin_2
+#define   ADC_CHANNEL               		ADC_Channel_2	// ADC 通道宏定义
 
 #else
 #define		IR_DO_GPIO_CLK								RCC_APB2Periph_GPIOA
 #define 	IR_DO_GPIO_PORT								GPIOA
-#define 	IR_DO_GPIO_PIN								GPIO_Pin_1			
+#define 	IR_DO_GPIO_PIN								GPIO_Pin_3			
 
 #endif
 /*********************END**********************/

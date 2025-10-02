@@ -3,10 +3,18 @@
 
 #include "stm32f10x.h"                  // Device header
 
-void SysTick_Init(uint8_t SYSCLK);
-void delay_ms(uint16_t nms);
-void delay_us(uint32_t nus);
+typedef struct {
+  uint8_t ucFacUs;
+  int16_t usFacMs;
+} UcFacInit_t;
 
+static UcFacInit_t xUcFacInit = {
+  .ucFacUs = 0,
+  .usFacMs = 0
+};
 
+void SysTick_Init(uint8_t ucSYSCLK);
+void delay_ms(uint16_t usNms);
+void delay_us(uint32_t ulNus);
 
 #endif
