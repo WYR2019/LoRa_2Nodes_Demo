@@ -22,6 +22,8 @@ typedef struct
     uint8_t ucIndex;
 }Usart3RecBuffer_t;
 
+extern QueueHandle_t xQueueUsart3ReHdlr;
+
 void vUsart3Init(uint32_t ulUsart3Baudrate);
 void vUsart3SendByte(uint8_t ucByte);
 void vUsart3SendArray(uint8_t *pucArray, uint16_t usLength);

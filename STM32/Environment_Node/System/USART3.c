@@ -128,12 +128,11 @@ void USART3_IRQHandler(void)
     if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
     {
         /* code */
-        uint32_t ulRxData = USART_ReceiveData(USART3);
-        while (ulRxData != 0xFF)
-        {
-            /* code */
-            ucRxBuffer[ucIndex++] = ulRxData;
-        }
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART3);
+        xQueueSendFromISR(xQueueUsart3ReHdlr, &ulRxData, &xHigherPriorityTaskWoken);
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+        /* 问题根源：请求上下文切换 */ 
+        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
     } 
 }

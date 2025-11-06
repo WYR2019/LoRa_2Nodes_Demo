@@ -34,6 +34,8 @@
 #define LORA_EXECUTOR_STATUS_ON                               0x01
 #define LORA_EXECUTOR_STATUS_OFF                              0x00
 
+/* LoRa“∆÷≤≤„ */
+
 typedef struct {
     uint8_t ucLoRaGateAddrHigh;
     uint8_t ucLoRaGateAddrLow;    
@@ -126,6 +128,7 @@ static LoRaUsart3Rx_t xLoRaUsart3Rx = { 0 };
 void vLoRaConnectionPkt(void);
 void vLoRaToGateIdPkt(uint8_t ucNodeId);
 void vLoRaToGateSenIdPkt(uint8_t ucSensorId);
-void vLoRToGateExeIdPkt(uint8_t ucExecutorId);
+void vLoRaToGateExeIdPkt(uint8_t ucExecutorId);
+void vLoRaReceivedMesg(void);
 
 #endif

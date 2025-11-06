@@ -45,7 +45,7 @@ void vLoRaToGateSenIdPkt(uint8_t ucSensorId)
     }
 }
 
-void vLoRToGateExeIdPkt(uint8_t ucExeId)
+void vLoRaToGateExeIdPkt(uint8_t ucExeId)
 {
     if (ucExeId == xLoRaExecutorID.ucIdLed)
     {
@@ -68,4 +68,9 @@ void vLoRToGateExeIdPkt(uint8_t ucExeId)
         /* code */
         vUsart3SendArray((uint8_t *)&xLoRaExecutorID.ucIdServo, 1);
     }
+}
+
+void vLoRaReceivedMesg(void)
+{
+    
 }
