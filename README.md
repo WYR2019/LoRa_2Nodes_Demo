@@ -1,0 +1,3 @@
+# FreeRTOS_LoRa_Environment_Assistant
+
+基于STM32F103C8T6最小系统板与正点原子ATK-LORA模块开发智能环境监测系统，构建双LoRa节点网络，通过RS485、I2C、SPI、单总线等常用协议采集温湿度等传感器数据；采用定点组网模式与LoRa网关通信，结合Wi-Fi模块将数据推送至基于MQTT协议的EMQX Broker服务器；采用FreeRTOS进行任务调度优化，保障多线程数据采集与传输；在每一个节点通过LVGL图形库添加可视化界面，通过OLED显示屏实时显示数据信息和可操控设备；通过开发Android App，集成实时数据可视化、远程设备控制、安全监控及异常报警等功能。

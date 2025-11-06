@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "stm32f10x_crc.h": "c",
+        "stm32f10x.h": "c",
+        "semaphore.h": "c"
+    }
+}
