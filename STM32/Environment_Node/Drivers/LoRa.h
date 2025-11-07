@@ -125,7 +125,7 @@ static LoRaExecutorFlag_t xLoRaExecutorStatus = {
 
 static LoRaUsart3Rx_t xLoRaUsart3Rx = { 0 };
 
-void vLoRaConnectionPkt(void);
+void vLoRaConnectionPkt(uint8_t ucNodeId);
 void vLoRaToGateIdPkt(uint8_t ucNodeId);
 void vLoRaToGateSenIdPkt(uint8_t ucSensorId);
 void vLoRaToGateExeIdPkt(uint8_t ucExecutorId);

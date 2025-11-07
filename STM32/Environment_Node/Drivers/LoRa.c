@@ -1,8 +1,22 @@
 #include "LoRa.h"
 
-void vLoRaConnectionPkt(void)
+void vLoRaConnectionPkt(uint8_t ucNodeId)
 {
-    vUsart3SendArray((uint8_t *)&xLoRaGateConfig, 3);
+    if (ucNodeId == xLoRaNode1Config.ucLoRaNode1Identifier)
+    {
+        /* code */
+        vUsart3SendArray((uint8_t *)&xLoRaNode1Config, 3);
+    }
+    else if (ucNodeId == xLoRaNode2Config.ucLoRaNode2Identifier)
+    {
+        /* code */
+        vUsart3SendArray((uint8_t *)&xLoRaNode2Config, 3);
+    }
+    else
+    {
+        /* code */
+        vUsart3SendArray((uint8_t *)&xLoRaGateConfig, 3);
+    }
 }
 
 /**

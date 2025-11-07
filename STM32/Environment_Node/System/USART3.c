@@ -133,6 +133,6 @@ void USART3_IRQHandler(void)
         xQueueSendFromISR(xQueueUsart3ReHdlr, &ulRxData, &xHigherPriorityTaskWoken);
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
         /* 问题根源：请求上下文切换 */ 
-        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     } 
 }

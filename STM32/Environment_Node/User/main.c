@@ -37,69 +37,65 @@ void vDht11Task(void *pvParameters)
 {
     DHT11Data_t xDHT11Data;
     /* 数据存储数组。要求与队列参数设置大小一一对应。 */
-    uint8_t ucSendTempBuffer[5] = {0};
-    uint8_t ucSendHumiBuffer[5] = {0};
+    uint8_t ucSendTempData = 0;
+    uint8_t ucSendHumiData = 0;
+    if (vDht11Init() != 0)
+    {
+        /* 初始化失败，进行错误处理 */ 
+        // vUsart3Printf("DHT11 Init Failed\r\n.");
+        ucSendTempData = ucSendHumiData = 0xAA;
+        xQueueSend(xQueueTempHdlr, &ucSendTempData, pdMS_TO_TICKS(10));
+        xQueueSend(xQueueHumiHdlr, &ucSendHumiData, pdMS_TO_TICKS(10));
+//        vTaskDelay(50);
+    } 
     while (1)
     {   
         /* code */
-        if (vDht11Init() != 0)
-        {
-            /* 初始化失败，进行错误处理 */ 
-            // vUsart3Printf("DHT11 Init Failed\r\n.");
-            for (int iIndex = 0; iIndex < 5; iIndex++) 
-            {
-                ucSendTempBuffer[iIndex] = 0xAA;
-                vTaskDelay(50);
-                ucSendHumiBuffer[iIndex] = 0xAA;
-                vTaskDelay(50);
-            }
-        } 
         if (vDht11ReadData(&xDHT11Data.ucTemp,&xDHT11Data.ucHumi) == 0)
         {
             /* code */
-            for (int iIndex = 0; iIndex < 5; iIndex++)
-            {
-                /* code */
-                ucSendTempBuffer[iIndex] = xDHT11Data.ucTemp;
-                vTaskDelay(50);
-                ucSendHumiBuffer[iIndex] = xDHT11Data.ucHumi;
-                vTaskDelay(50);
-            }
+            ucSendTempData = xDHT11Data.ucTemp;
+//            vTaskDelay(50);
+            ucSendHumiData = xDHT11Data.ucHumi;
+//            vTaskDelay(50);
             /* 写队列。第一个参数是队列句柄，第二个是写入队列的地址（如数组），第三个是因队列满造成阻塞时的等待时长，也就是无法写入数据时的等待时长，以操作系统默认时钟节拍为准。 */
-            xQueueSend(xQueueTempHdlr, ucSendTempBuffer, 0);
-            xQueueSend(xQueueHumiHdlr, ucSendHumiBuffer, 0);
+            xQueueSend(xQueueTempHdlr, &ucSendTempData, pdMS_TO_TICKS(10));
+            xQueueSend(xQueueHumiHdlr, &ucSendHumiData, pdMS_TO_TICKS(10));
         } else
         {
             // vUsart3Printf("DHT11 Read Data Failed\r\n.");
-            for (int iIndex = 0; iIndex < 5; iIndex++) 
-            {
-                ucSendTempBuffer[iIndex] = 0xAB;
-                vTaskDelay(50);
-                ucSendHumiBuffer[iIndex] = 0xAB;
-                vTaskDelay(50);
-            }
+            ucSendTempData = ucSendHumiData = 0xAB;
+//            vTaskDelay(50);
         }        
     }
 }
 
 void vLoRaRecMsgTask(void *pvParameters)
 {
-    uint8_t pucRecIsrBuffer[128] = {0};
+    uint8_t ucBufferRecFromIsr[128] = {0};
+    static uint32_t ulLastSendTime = 0;
+    
     while (1)
     {
-        /* code */
-        if (xQueueReceive(xQueueUsart3ReHdlr, pucRecIsrBuffer, 0) == pdTRUE)
+        if (xQueueReceive(xQueueUsart3ReHdlr, ucBufferRecFromIsr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
-            /* code */
-            vUsart3SendArray(pucRecIsrBuffer, 1);
+            // 只有超过一定时间没有发送数据时才发送连接包
+            if ((xTaskGetTickCount() - ulLastSendTime) > pdMS_TO_TICKS(1000))
+            {
+                vLoRaConnectionPkt(xLoRaGateConfig.ucLoRaGateChannel);
+                vTaskDelay(10);
+            }
+            
+            vUsart3SendArray(ucBufferRecFromIsr, 1);
+            ulLastSendTime = xTaskGetTickCount();
         }
     }
 }
 
 void vLoRaToGatePktTask(void *pvParameters)
 {
-    uint8_t ucRecTempBuffer[5] = {0};
-    uint8_t ucRecHumiBuffer[5] = {0};
+    uint8_t ucRecTempData = 0;
+    uint8_t ucRecHumiData = 0;
     /* 定义一个返回值判断是否接收成功 */
     BaseType_t xQueueTempRetval, xQueueHumiRetval;
     while (1)
@@ -108,27 +104,27 @@ void vLoRaToGatePktTask(void *pvParameters)
         /* 接收队列：队列句柄、给哪个接收数据缓冲区和未接收到数据的等待时长，分3种情况，分别为0、0~portMAX_DELAY和portMAX_DELAY三种，分别对应
          * 一点不等、等一点时间和等最大时间。在等待队列数据的情况下，该接收队列所在的任务会一直处于阻塞态。
          */
-        xQueueTempRetval = xQueueReceive(xQueueTempHdlr, ucRecTempBuffer, 0);
-        xQueueHumiRetval = xQueueReceive(xQueueHumiHdlr, ucRecHumiBuffer, 0);
+        xQueueTempRetval = xQueueReceive(xQueueTempHdlr, &ucRecTempData, pdMS_TO_TICKS(10));
+        xQueueHumiRetval = xQueueReceive(xQueueHumiHdlr, &ucRecHumiData, pdMS_TO_TICKS(10));
         /* 发送 */
-        vLoRaConnectionPkt();
+        vLoRaConnectionPkt(xLoRaGateConfig.ucLoRaGateChannel);
         vLoRaToGateIdPkt(xLoRaNode1Config.ucLoRaNode1Identifier);
         vLoRaToGateSenIdPkt(xLoRaSensorID.ucIdDht11);
         /* 检测接收队列是否成功 */
         if (xQueueTempRetval == pdTRUE && xQueueHumiRetval == pdTRUE)
         {
             /* code */
-            vUsart3SendArray(&ucRecTempBuffer[1], 1);
-            vUsart3SendArray(&ucRecHumiBuffer[1], 1);
+            vUsart3SendArray(&ucRecTempData, 1);
+            vUsart3SendArray(&ucRecHumiData, 1);
         }
-        vTaskDelay(1500);
+        vTaskDelay(1000);
     }
 }
 
 void vTasksList(void)
 {
     /* 进入临界区 */
-    taskENTER_CRITICAL();
+    // taskENTER_CRITICAL();
     /* 创建任务，参数分别为任务函数名称、任务名字、栈大小、返回参数值、优先级、任务句柄。 */
     xTaskCreate(
                (TaskFunction_t        ) vStateLedTask,
@@ -140,27 +136,26 @@ void vTasksList(void)
     xTaskCreate(
                (TaskFunction_t        ) vDht11Task,
                (char *                ) "TaskName_DHT11", 
-               (configSTACK_DEPTH_TYPE) 1024,
+               (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &xDht11TaskHdlr);
     xTaskCreate(
                (TaskFunction_t        ) vLoRaToGatePktTask,
                (char *                ) "TaskName_LoRaSendToGateway", 
-               (configSTACK_DEPTH_TYPE) 1024,
+               (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &xLoRaToGateTskHdlr);
     xTaskCreate(
                (TaskFunction_t        ) vLoRaRecMsgTask,
                (char *                ) "TaskName_LoRaReceivedMessage", 
-               (configSTACK_DEPTH_TYPE) 1024,
+               (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &xLoRaRecMsgTskHdlr);
-    
     /* 退出临界区 */
-    taskEXIT_CRITICAL();
+    // taskEXIT_CRITICAL();
 }
 
 void vMainQueuesList(void)
@@ -170,10 +165,10 @@ void vMainQueuesList(void)
      * 原函数的返回值就是队列句柄的结构体，所以需要在上面定义一个变量接收队列句柄。 */
     xQueueTempHdlr     = xQueueCreate(
                                      (UBaseType_t) 5,
-                                     (UBaseType_t) sizeof(uint8_t *));
+                                     (UBaseType_t) sizeof(uint8_t));
     xQueueHumiHdlr     = xQueueCreate(
                                      (UBaseType_t) 5,
-                                     (UBaseType_t) sizeof(uint8_t *));
+                                     (UBaseType_t) sizeof(uint8_t));
     xQueueUsart3ReHdlr = xQueueCreate(
                                      (UBaseType_t) 128,
                                      (UBaseType_t) sizeof(uint8_t *));
