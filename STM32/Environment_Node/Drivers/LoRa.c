@@ -84,7 +84,112 @@ void vLoRaToGateExeIdPkt(uint8_t ucExeId)
     }
 }
 
-void vLoRaReceivedMesg(void)
+eLoRaMsgRecStatus xLoRaMessageReceived(uint8_t *pucData)
 {
+    switch (*pucData)
+    {
+        case 0xD1:
+        /* code */
+        return statusNode1;
     
+        case 0xD2:
+        return statusNode2;
+
+        case 0xFA:
+        return statusExeLed;
+
+        case 0xFB:
+        return statusExeFan;
+
+        case 0xFC:
+        return statusExeHumidifier;
+
+        case 0xFD:
+        return statusExeBuzzer;
+
+        case 0xFE:
+        return statusExeServo;
+
+        case 0x01:
+        return statusExeOn;
+
+        case 0x00:
+        return statusExeOff;
+
+        default:
+        return statusNode1;
+    }
+}
+
+eLoRaMsgRecStatus xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeId, uint8_t ucDataRecExeSta)
+{
+    switch (xLoRaMessageReceived(&ucDataRecNodeId))
+    {
+        case statusNode1:
+        /* code */
+        while (xLoRaMessageReceived(&ucDataRecExeSta) == statusExeOn)
+        {
+            /* code */
+            if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeLed)
+            {
+                /* code */
+                return statusLedOn;
+            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeFan)
+            {
+                /* code */
+                return statusFanOn;
+            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeHumidifier)
+            {
+                /* code */
+                return statusHumidifierOn;
+            }
+        }
+        while (xLoRaMessageReceived(&ucDataRecExeSta) == statusExeOff)
+        {
+            /* code */
+            if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeLed)
+            {
+                /* code */
+                return statusLedOff;
+            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeFan)
+            {
+                /* code */
+                return statusFanOff;
+            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeHumidifier)
+            {
+                /* code */
+                return statusHumidifierOff;
+            }
+        }
+        
+        case statusNode2:
+        while (xLoRaMessageReceived(&ucDataRecExeSta) == statusExeOn)
+        {
+            /* code */
+            if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeBuzzer)
+            {
+                /* code */
+                return statusBuzzerOn;
+            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeServo)
+            {
+                /* code */
+                return statusServoOn;
+            }
+        }
+        while (xLoRaMessageReceived(&ucDataRecExeSta) == statusExeOff)
+        {
+            /* code */
+            if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeBuzzer)
+            {
+                /* code */
+                return statusBuzzerOff;
+            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeServo)
+            {
+                /* code */
+                return statusServoOff;
+            }
+        }
+        default:
+        return statusNode1;
+    }
 }

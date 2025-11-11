@@ -4,7 +4,6 @@
 #include "stm32f10x.h"                  // Device header
 #include "FreeRTOS.h"
 #include "queue.h"
-// #include "semphr.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -14,13 +13,6 @@
 #define USART3_GPIO_PIN_ATK_AUX                                 GPIO_Pin_4 // PA4
 #define USART3_GPIO_PIN_ATK_MD0                                 GPIO_Pin_3 // PB3
 #define USART3_QUEUE_LENGTH                                     256
-
-typedef struct 
-{
-    /* data */
-    uint8_t *ucRxBuffer;
-    uint8_t ucIndex;
-}Usart3RecBuffer_t;
 
 extern QueueHandle_t xQueueUsart3ReHdlr;
 

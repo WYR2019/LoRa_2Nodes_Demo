@@ -3,7 +3,7 @@
 
 #include "USART3.h"
 
-#define LORA_MODE
+// #define LORA_MODE
 
 /* LoRaµƒæ≤Ã¨…Ë÷√ */
 #define LORA_MODE_INIT                                        1
@@ -35,6 +35,29 @@
 #define LORA_EXECUTOR_STATUS_OFF                              0x00
 
 /* LoRa“∆÷≤≤„ */
+
+typedef enum {
+    statusGatawayNode = 1,
+    statusNode1,
+    statusNode2,
+    statusExeLed,
+    statusExeFan,
+    statusExeHumidifier,
+    statusExeBuzzer,
+    statusExeServo,
+    statusExeOn,
+    statusExeOff,
+    statusLedOn,
+    statusLedOff,
+    statusFanOn,
+    statusFanOff,
+    statusHumidifierOn,
+    statusHumidifierOff,
+    statusBuzzerOn,
+    statusBuzzerOff,
+    statusServoOn,
+    statusServoOff
+}eLoRaMsgRecStatus;
 
 typedef struct {
     uint8_t ucLoRaGateAddrHigh;
@@ -129,6 +152,8 @@ void vLoRaConnectionPkt(uint8_t ucNodeId);
 void vLoRaToGateIdPkt(uint8_t ucNodeId);
 void vLoRaToGateSenIdPkt(uint8_t ucSensorId);
 void vLoRaToGateExeIdPkt(uint8_t ucExecutorId);
-void vLoRaReceivedMesg(void);
+eLoRaMsgRecStatus xLoRaMessageReceived(uint8_t *pucData);
+eLoRaMsgRecStatus xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeId, uint8_t ucDataRecExeSta);
+
 
 #endif
