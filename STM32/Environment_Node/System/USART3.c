@@ -130,7 +130,7 @@ void USART3_IRQHandler(void)
         /* code */
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART3);
-        xQueueSendFromISR(xQueueUsart3ReHdlr, &ulRxData, &xHigherPriorityTaskWoken);
+        xQueueSendFromISR(xQueueUsart3IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
         /* 问题根源：请求上下文切换 */ 
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);

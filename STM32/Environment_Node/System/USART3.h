@@ -8,13 +8,15 @@
 #include <stdarg.h>
 #include <string.h>
 
+#define vLoRaIrqHandler                                         USART3_IRQHandler
+
 #define USART3_GPIO_PIN_TX                                      GPIO_Pin_10
 #define USART3_GPIO_PIN_RX                                      GPIO_Pin_11
 #define USART3_GPIO_PIN_ATK_AUX                                 GPIO_Pin_4 // PA4
 #define USART3_GPIO_PIN_ATK_MD0                                 GPIO_Pin_3 // PB3
 #define USART3_QUEUE_LENGTH                                     256
 
-extern QueueHandle_t xQueueUsart3ReHdlr;
+extern QueueHandle_t xQueueUsart3IrqHdlr;
 
 void vUsart3Init(uint32_t ulUsart3Baudrate);
 void vUsart3SendByte(uint8_t ucByte);

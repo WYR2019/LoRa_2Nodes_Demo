@@ -56,7 +56,8 @@ typedef enum {
     statusBuzzerOn,
     statusBuzzerOff,
     statusServoOn,
-    statusServoOff
+    statusServoOff,
+    null
 }eLoRaMsgRecStatus;
 
 typedef struct {

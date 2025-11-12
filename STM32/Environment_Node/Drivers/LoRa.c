@@ -117,7 +117,7 @@ eLoRaMsgRecStatus xLoRaMessageReceived(uint8_t *pucData)
         return statusExeOff;
 
         default:
-        return statusNode1;
+        return null;
     }
 }
 
@@ -190,6 +190,6 @@ eLoRaMsgRecStatus xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeI
             }
         }
         default:
-        return statusNode1;
+        return null;
     }
 }
