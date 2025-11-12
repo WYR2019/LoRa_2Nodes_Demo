@@ -26,7 +26,7 @@ void vDelayUs(uint32_t ulNus)
         ulTemp=SysTick->CTRL;
     } while((ulTemp&0x01)&&!(ulTemp&(1<<16)));		            //等待时间到达   
     SysTick->CTRL&=~SysTick_CTRL_ENABLE_Msk;	              //关闭计数器
-    SysTick->VAL =0X00;      					                      //清空计数器	 	
+    SysTick->VAL =0x00;      					                      //清空计数器	 	
 }
 
 //延时nms
@@ -60,7 +60,7 @@ void vDelayMs(uint16_t usNms)
             ulTemp = SysTick->CTRL;
         } while ((ulTemp & 0x01) && !(ulTemp & (1 << 16)));
         SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-        SysTick->VAL = 0X00;
+        SysTick->VAL = 0x00;
     }   
 }
 

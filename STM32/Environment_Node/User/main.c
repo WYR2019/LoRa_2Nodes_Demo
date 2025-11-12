@@ -10,11 +10,12 @@
 #include "Relay.h"
 
 /* 在创建任务前，需要创建一个任务句柄，每个任务句柄与任务一一对应。 */
-TaskHandle_t xStateLedTaskHdlr;
-TaskHandle_t xFanCtrlTaskHdlr;
-TaskHandle_t xDht11TaskHdlr;
-TaskHandle_t xLoRaToGateTskHdlr;
-TaskHandle_t xLoRaMsgRecTskHdlr;
+TaskHandle_t xTaskStateLedHdlr;
+TaskHandle_t xTaskLedCtrlHdlr;
+TaskHandle_t xTaskFanCtrlHdlr;
+TaskHandle_t xTaskDht11Hdlr;
+TaskHandle_t xTaskLoRaToGateHdlr;
+TaskHandle_t xTaskLoRaMsgRecHdlr;
 
 /* 创建队列句柄 */
 QueueHandle_t xQueueTempHdlr;
@@ -22,34 +23,42 @@ QueueHandle_t xQueueHumiHdlr;
 QueueHandle_t xQueueUsart3IrqHdlr;
 
 /* 创建二值信号量句柄 */
-SemaphoreHandle_t xSemLedOnHandler;
-SemaphoreHandle_t xSemLedOffHandler;
+SemaphoreHandle_t xSemLedOnHdlr;
+SemaphoreHandle_t xSemLedOffHdlr;
 SemaphoreHandle_t xSemFanOnHdlr;
 SemaphoreHandle_t xSemFanOffHdlr;
 
 /* 闪烁LED任务函数，参数为空指针，返回NULL。 */
-void vStateLedTask(void *pvParameters)
+void vTaskStateLed(void *pvParameters)
 {
     while(1)
     {
-        // vPc13LedOn();
-        // vTaskDelay(1000);
-        // vPc13LedOff();
-        // vTaskDelay(1000);
-        if (xSemaphoreTake(xSemLedOnHandler, pdMS_TO_TICKS(10)) == pdTRUE)
+        vPc13LedOn();
+        vTaskDelay(1000);
+        vPc13LedOff();
+        vTaskDelay(1000);
+    }
+}
+
+void vTaskLedControl(void *pvParameters)
+{
+    while (1)
+    {
+        /* code */
+        if (xSemaphoreTake(xSemLedOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
             vPc13LedOn();
-            xSemaphoreGive(xSemLedOnHandler);
-        } else if (xSemaphoreTake(xSemLedOffHandler, pdMS_TO_TICKS(10)) == pdTRUE)
+            xSemaphoreGive(xSemLedOnHdlr);
+        } else if (xSemaphoreTake(xSemLedOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
             /* code */
             vPc13LedOff();
-            xSemaphoreGive(xSemLedOffHandler);
+            xSemaphoreGive(xSemLedOffHdlr);
         }
     }
 }
 
-void vFanControlTask(void *pvParameters)
+void vTaskFanControl(void *pvParameters)
 {
     while (1)
     {
@@ -65,12 +74,11 @@ void vFanControlTask(void *pvParameters)
     }
 }
 
-void vDht11Task(void *pvParameters)
+void vTaskDht11(void *pvParameters)
 {
     DHT11Data_t xDHT11Data;
     /* 数据存储数组。要求与队列参数设置大小一一对应。 */
-    uint8_t ucSendTempData = 0;
-    uint8_t ucSendHumiData = 0;
+    uint8_t ucSendTempData = 0, ucSendHumiData = 0;
     if (vDht11Init() != 0)
     {
         /* 初始化失败，进行错误处理 */ 
@@ -96,12 +104,9 @@ void vDht11Task(void *pvParameters)
     }
 }
 
-void vLoRaToGatePktTask(void *pvParameters)
+void vTaskLoRaToGatePkt(void *pvParameters)
 {
-    uint8_t ucRecTempData = 0;
-    uint8_t ucRecHumiData = 0;
-    uint8_t testData      = 0xAC;
-    uint8_t ledOff        = 0xAD;
+    uint8_t ucRecTempData = 0, ucRecHumiData = 0;
     /* 定义一个返回值判断是否接收成功 */
     BaseType_t xQueueTempRetval, xQueueHumiRetval;
     while (1)
@@ -123,20 +128,22 @@ void vLoRaToGatePktTask(void *pvParameters)
             vUsart3SendArray(&ucRecTempData, 1);
             vUsart3SendArray(&ucRecHumiData, 1); 
         }
-        if (xSemaphoreTake(xSemLedOnHandler, pdMS_TO_TICKS(10)) == pdTRUE)
+        if (xSemaphoreTake(xSemLedOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
             /* code */
-            vUsart3SendArray(&testData, 1);
-        } else if (xSemaphoreTake(xSemLedOffHandler, pdMS_TO_TICKS(10)) == pdTRUE)
+            vUsart3SendArray(&xLoRaExecutorID.ucIdLed, 1);
+            vUsart3SendArray(&xLoRaExecutorCommand.ucCommandOn, 1);
+        } else if (xSemaphoreTake(xSemLedOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
             /* code */
-            vUsart3SendArray(&ledOff, 1);
+            vUsart3SendArray(&xLoRaExecutorID.ucIdLed, 1);
+            vUsart3SendArray(&xLoRaExecutorCommand.ucCommandOff, 1);
         }
-        vTaskDelay(1000);
+        vTaskDelay(500);
     }
 }
 
-void vLoRaMsgRecTask(void *pvParameters)
+void vTaskLoRaMsgRec(void *pvParameters)
 {
     uint8_t ucDataRecNodeId = 0, ucDataRecExeId = 0, ucDataRecExeSta = 0;
     uint8_t ucRetvalQueueNodeId = 0, ucRetvalQueueExeId = 0, ucRetvalQueueExeSta = 0;
@@ -151,11 +158,11 @@ void vLoRaMsgRecTask(void *pvParameters)
             if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusLedOn)
             {
                 /* code */
-                xSemaphoreGive(xSemLedOnHandler);
+                xSemaphoreGive(xSemLedOnHdlr);
             } else if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusLedOff)
             {
                 /* code */
-                xSemaphoreGive(xSemLedOffHandler);
+                xSemaphoreGive(xSemLedOffHdlr);
             } else if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusFanOn)
             {
                 /* code */
@@ -173,41 +180,48 @@ void vLoRaMsgRecTask(void *pvParameters)
 void vCreateTasksList(void)
 {
     /* 创建任务，参数分别为任务函数名称、任务名字、栈大小、返回参数值、优先级、任务句柄。 */
+    // xTaskCreate(
+    //            (TaskFunction_t        ) vTaskStateLed,
+    //            (char *                ) "TaskName_StateLed", 
+    //            (configSTACK_DEPTH_TYPE) 256,
+    //            (void *                ) NULL, 
+    //            (UBaseType_t           ) 2,
+    //            (TaskHandle_t *        ) &xTaskStateLedHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vStateLedTask,
-               (char *                ) "TaskName_StateLed", 
-               (configSTACK_DEPTH_TYPE) 512,
+               (TaskFunction_t        ) vTaskLedControl,
+               (char *                ) "TaskName_LedControl", 
+               (configSTACK_DEPTH_TYPE) 256,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xStateLedTaskHdlr);
+               (TaskHandle_t *        ) &xTaskLedCtrlHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vFanControlTask,
+               (TaskFunction_t        ) vTaskFanControl,
                (char *                ) "TaskName_FanControl", 
                (configSTACK_DEPTH_TYPE) 256,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xFanCtrlTaskHdlr);
+               (TaskHandle_t *        ) &xTaskFanCtrlHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vDht11Task,
+               (TaskFunction_t        ) vTaskDht11,
                (char *                ) "TaskName_DHT11", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xDht11TaskHdlr);
+               (TaskHandle_t *        ) &xTaskDht11Hdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vLoRaToGatePktTask,
+               (TaskFunction_t        ) vTaskLoRaToGatePkt,
                (char *                ) "TaskName_LoRaSendToGateway", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xLoRaToGateTskHdlr);
+               (TaskHandle_t *        ) &xTaskLoRaToGateHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vLoRaMsgRecTask,
+               (TaskFunction_t        ) vTaskLoRaMsgRec,
                (char *                ) "TaskName_LoRaReceivedMessage", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xLoRaMsgRecTskHdlr);
+               (TaskHandle_t *        ) &xTaskLoRaMsgRecHdlr);
 }
 
 void vCreateQueuesList(void)
@@ -231,10 +245,10 @@ void vCreateQueuesList(void)
     }
 }
 
-void vCreateSemaphoreList(void)
+void vCreateSemaphoresList(void)
 {
-    xSemLedOnHandler  = xSemaphoreCreateBinary();
-    xSemLedOffHandler = xSemaphoreCreateBinary();
+    xSemLedOnHdlr  = xSemaphoreCreateBinary();
+    xSemLedOffHdlr = xSemaphoreCreateBinary();
     xSemFanOnHdlr     = xSemaphoreCreateBinary();
     xSemFanOffHdlr    = xSemaphoreCreateBinary();
 }
@@ -246,7 +260,7 @@ int main(void)
     vPc13LedInit();
     vUsart3Init(115200);
     vCreateQueuesList();
-    vCreateSemaphoreList();
+    vCreateSemaphoresList();
     vCreateTasksList();
     vTaskStartScheduler();
     while(1)

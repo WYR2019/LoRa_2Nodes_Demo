@@ -31,8 +31,8 @@
 #define LORA_EXECUTOR_HUMIDIFIER                              0xFC
 #define LORA_EXECUTOR_BUZZER                                  0xFD
 #define LORA_EXECUTOR_SERVO                                   0xFE
-#define LORA_EXECUTOR_STATUS_ON                               0x01
-#define LORA_EXECUTOR_STATUS_OFF                              0x00
+#define LORA_EXECUTOR_COMMAND_ON                              0x01
+#define LORA_EXECUTOR_COMMAND_OFF                             0x00
 
 /* LoRa移植层 */
 
@@ -96,16 +96,9 @@ typedef struct {
 } LoRaExecutorID_t;
 
 typedef struct {
-    uint8_t ucStatusOn;
-    uint8_t ucStatusOff;
-} LoRaExecutorFlag_t;
-
-typedef struct {
-    uint8_t ucRxState;                                        //状态变量S=0
-    uint8_t ucRxReadIndex;                                      //指示接收到哪一个数据
-    uint8_t ucRxNodeIndex;
-    uint8_t ucRxExecutorIndex;
-} LoRaUsart3Rx_t;
+    uint8_t ucCommandOn;
+    uint8_t ucCommandOff;
+} LoRaExecutorCmd_t;
 
 static LoRaGateConfig_t xLoRaGateConfig = {
     .ucLoRaGateAddrHigh    = LORA_GATE_ADDR_HIGH,
@@ -142,12 +135,10 @@ static LoRaExecutorID_t xLoRaExecutorID = {
     .ucIdServo      = LORA_EXECUTOR_SERVO
 };
 
-static LoRaExecutorFlag_t xLoRaExecutorStatus = {
-    .ucStatusOn     = LORA_EXECUTOR_STATUS_ON,
-    .ucStatusOff    = LORA_EXECUTOR_STATUS_OFF,
+static LoRaExecutorCmd_t xLoRaExecutorCommand = {
+    .ucCommandOn     = LORA_EXECUTOR_COMMAND_ON,
+    .ucCommandOff    = LORA_EXECUTOR_COMMAND_OFF,
 };
-
-static LoRaUsart3Rx_t xLoRaUsart3Rx = { 0 };
 
 void vLoRaConnectionPkt(uint8_t ucNodeId);
 void vLoRaToGateIdPkt(uint8_t ucNodeId);
@@ -155,6 +146,5 @@ void vLoRaToGateSenIdPkt(uint8_t ucSensorId);
 void vLoRaToGateExeIdPkt(uint8_t ucExecutorId);
 eLoRaMsgRecStatus xLoRaMessageReceived(uint8_t *pucData);
 eLoRaMsgRecStatus xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeId, uint8_t ucDataRecExeSta);
-
 
 #endif

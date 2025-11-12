@@ -14,7 +14,6 @@
 #define USART3_GPIO_PIN_RX                                      GPIO_Pin_11
 #define USART3_GPIO_PIN_ATK_AUX                                 GPIO_Pin_4 // PA4
 #define USART3_GPIO_PIN_ATK_MD0                                 GPIO_Pin_3 // PB3
-#define USART3_QUEUE_LENGTH                                     256
 
 extern QueueHandle_t xQueueUsart3IrqHdlr;
 
