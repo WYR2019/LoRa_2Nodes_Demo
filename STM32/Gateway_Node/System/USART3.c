@@ -1,7 +1,7 @@
 #include "USART3.h"
 
 /**
-  * @brief  LoRa的初始化函数         
+  * @brief  串口3的初始化函数         
   * @note   使用USART3串口（PB10->LoRa_RX，PB11->LoRa_TX），波特率设置为115200。
   * @param  ulUsart3Baudrate
   * @retval None
@@ -15,7 +15,7 @@ void vUsart3Init(uint32_t ulUsart3Baudrate)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = USART3_GPIO_PIN_TX;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = USART3_GPIO_PIN_RX;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
@@ -47,7 +47,7 @@ void vUsart3Init(uint32_t ulUsart3Baudrate)
     GPIO_InitStructure.GPIO_Pin = USART3_GPIO_PIN_ATK_MD0;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;																											
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Pin = USART3_GPIO_PIN_ATK_AUX;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
@@ -69,11 +69,11 @@ void vUsart3SendByte(uint8_t ucByte)
 /**
   * @brief  串口发送数组函数
   * @note   一般用于16进制模式下。
-  * @note	  uint8_t的指针类型，指向待发送数组的首地址,由于数组无法判断是否结束，所以需要再传递一个Length进来。
+  * @note   uint8_t的指针类型，指向待发送数组的首地址,由于数组无法判断是否结束，所以需要再传递一个Length进来。
   * @param  *pucArray，usLength
   * @retval None
   */
-void vUsart3SendArray(uint8_t *pucArray, uint16_t usLength)																					
+void vUsart3SendArray(uint8_t *pucArray, uint16_t usLength)
 {
     for(uint16_t i = 0; i < usLength; i ++)                                                             // for循环执行Length次，可以对Array数据进行遍历，实际定义数组不要超出uint16_t的范围即可
     {
@@ -95,33 +95,33 @@ void vUsart3SendString(char *pcString)                                          
     }
 }
 
-/**
-  * @brief  printf重定向函数					
-  * @note   fputc是printf函数的底层，printf函数在打印的时候，就是不断调用fputc函数打印。
-  * @param  ch,*f
-  * @retval ch
-  */
-int fputc(int ch, FILE *f)																																						
-{
-    vUsart3SendByte(ch);
-    return ch;
-}
+///**
+//  * @brief  printf重定向函数
+//  * @note   fputc是printf函数的底层，printf函数在打印的时候，就是不断调用fputc函数打印。
+//  * @param  ch,*f
+//  * @retval ch
+//  */
+//int fputc(int ch, FILE *f)
+//{
+//    vUsart3SendByte(ch);
+//    return ch;
+//}
 
-/**
-  * @brief  printf封装函数					
-  * @note   第一个参数是接收字符串，第二个是接收可变参数列表。
-  * @param  *format,...
-  * @retval None
-  */
-void vUsart3Printf(char *format, ...)                        																												
-{
-    char String[100];
-    va_list arg;                                                                                        // arg是定义一个参数列表变量
-    va_start(arg, format);                                                                              // 从format位置开始接收参数表，放在arg里面
-    vsprintf(String, format, arg);                                                                      // 封装格式要用vsprintf，因为sprintf只能接收直接写的参数；打印字符串格式是format，参数表是arg，
-    va_end(arg);                                                                                        // 释放参数表
-    vUsart3SendString(String);
-}
+///**
+//  * @brief  printf封装函数
+//  * @note   第一个参数是接收字符串，第二个是接收可变参数列表。
+//  * @param  *format,...
+//  * @retval None
+//  */
+//void vUsart3Printf(char *format, ...)
+//{
+//    char String[100];
+//    va_list arg;                                                                                        // arg是定义一个参数列表变量
+//    va_start(arg, format);                                                                              // 从format位置开始接收参数表，放在arg里面
+//    vsprintf(String, format, arg);                                                                      // 封装格式要用vsprintf，因为sprintf只能接收直接写的参数；打印字符串格式是format，参数表是arg，
+//    va_end(arg);                                                                                        // 释放参数表
+//    vUsart3SendString(String);
+//}
 
 void USART3_IRQHandler(void)
 {

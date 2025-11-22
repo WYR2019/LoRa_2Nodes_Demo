@@ -1,11 +1,13 @@
-#include "SysTick.h"
+#include "Delay.h"
 
-#if SYSTEM == SYSTEM_NONE
+#if MODE == USE_SYS_TICK
+
 //初始化延迟函数
 //SYSTICK的时钟固定为AHB时钟的1/8
 //SYSCLK:系统时钟频率
-void vSysTickInit(uint8_t ucSYSCLK)
+void vDelayInit(void)
 {
+    uint8_t ucSYSCLK;
     SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8); 
     xUcFacInit.ucFacUs=ucSYSCLK/8;					
     xUcFacInit.usFacMs=(uint16_t)xUcFacInit.ucFacUs*1000;				   
@@ -24,7 +26,7 @@ void vDelayUs(uint32_t ulNus)
         ulTemp=SysTick->CTRL;
     } while((ulTemp&0x01)&&!(ulTemp&(1<<16)));		            //等待时间到达   
     SysTick->CTRL&=~SysTick_CTRL_ENABLE_Msk;	              //关闭计数器
-    SysTick->VAL =0X00;      					                      //清空计数器	 	
+    SysTick->VAL =0x00;      					                      //清空计数器	 	
 }
 
 //延时nms
@@ -58,7 +60,71 @@ void vDelayMs(uint16_t usNms)
             ulTemp = SysTick->CTRL;
         } while ((ulTemp & 0x01) && !(ulTemp & (1 << 16)));
         SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-        SysTick->VAL = 0X00;
+        SysTick->VAL = 0x00;
     }   
 }
+
+#elif MODE == USE_DWT
+
+void vDelayInit(void)
+{
+    //使能DWT外设
+    DEMCR |= (uint32_t)TRCENA;
+
+    //DWT CYCCNT寄存器计数清0
+    DWT_CYCCNT = (uint32_t)0u;
+
+    //使能Cortex-M3 DWT CYCCNT寄存器
+    DWT_CTRL |= (uint32_t)DWT_CTRL_CYCCNTENA;
+}
+
+// 微秒延时
+void vDelayUs(uint32_t ulNus)
+{
+    if(ulNus > 10000) ulNus = 10000;
+
+    uint32_t ulTicksStart, ulTicksEnd, ulTicksDelay;
+
+    ulTicksStart = DWT_CYCCNT;
+    ulTicksDelay = ( ulNus * ( SystemCoreClock / (1000000) ) ); // 将微秒数换算成滴答数
+    ulTicksEnd = ulTicksStart + ulTicksDelay;
+
+    // ulTicksEnd没有溢出
+    if ( ulTicksEnd >= ulTicksStart )
+    {
+        // DWT_CYCCNT在上述计算的这段时间中没有溢出
+        if(DWT_CYCCNT > ulTicksStart)
+        {
+            while( DWT_CYCCNT < ulTicksEnd );
+        }
+        // DWT_CYCCNT溢出
+        else
+        {
+            // 已经超时，直接退出
+            return;
+        }
+    }
+    else // ulTicksEnd溢出
+    {
+        // DWT_CYCCNT在上述计算的这段时间中没有溢出
+        if(DWT_CYCCNT > ulTicksStart)
+        {
+            // 等待DWT_CYCCNT的值溢出
+            while( DWT_CYCCNT > ulTicksEnd );
+        }
+        // 等待溢出后的DWT_CYCCNT到达ulTicksEnd
+        while( DWT_CYCCNT < ulTicksEnd );
+    }
+}
+
+void vDelayMs(uint16_t usNms)
+{
+    for(uint16_t i = 0; i < usNms; i++)
+    {
+        // delay 1 ms
+        vDelayUs(1000);
+    }
+}
+
+#else
 #endif

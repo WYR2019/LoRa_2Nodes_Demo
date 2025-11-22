@@ -108,21 +108,21 @@ void vTaskLoRaToGatePkt(void *pvParameters)
 {
     uint8_t ucRecTempData = 0, ucRecHumiData = 0;
     /* 定义一个返回值判断是否接收成功 */
-    BaseType_t xQueueTempRetval, xQueueHumiRetval;
+    BaseType_t xRetvalQueueTemp, xRetvalQueueHumi;
     while (1)
     {
         /* code */
         /* 接收队列：队列句柄、传输转存的目标变量或数组和未接收到数据的等待时长，分3种情况，分别为0、0~portMAX_DELAY和portMAX_DELAY三种，分别对应
          * 一点不等、等一点时间和等最大时间。在等待队列数据的情况下，该接收队列所在的任务会一直处于阻塞态。
          */
-        xQueueTempRetval = xQueueReceive(xQueueTempHdlr, &ucRecTempData, pdMS_TO_TICKS(10));
-        xQueueHumiRetval = xQueueReceive(xQueueHumiHdlr, &ucRecHumiData, pdMS_TO_TICKS(10));
+        xRetvalQueueTemp = xQueueReceive(xQueueTempHdlr, &ucRecTempData, pdMS_TO_TICKS(10));
+        xRetvalQueueHumi = xQueueReceive(xQueueHumiHdlr, &ucRecHumiData, pdMS_TO_TICKS(10));
         /* 发送 */
         vLoRaConnectionPkt(xLoRaGateConfig.ucLoRaGateChannel);
         vLoRaToGateIdPkt(xLoRaNode1Config.ucLoRaNode1Identifier);
         vLoRaToGateSenIdPkt(xLoRaSensorID.ucIdDht11);
         /* 检测接收队列是否成功 */
-        if (xQueueTempRetval == pdTRUE && xQueueHumiRetval == pdTRUE)
+        if (xRetvalQueueTemp == pdTRUE && xRetvalQueueHumi == pdTRUE)
         {
             /* code */
             vUsart3SendArray(&ucRecTempData, 1);
@@ -179,49 +179,60 @@ void vTaskLoRaMsgRec(void *pvParameters)
 
 void vCreateTasksList(void)
 {
+    #if defined __LED_H__
+    #if LED_PC13_WORK_MODE == LED_PC13_STM32_STATE_MODE
     /* 创建任务，参数分别为任务函数名称、任务名字、栈大小、返回参数值、优先级、任务句柄。 */
-    // xTaskCreate(
-    //            (TaskFunction_t        ) vTaskStateLed,
-    //            (char *                ) "TaskName_StateLed", 
-    //            (configSTACK_DEPTH_TYPE) 256,
-    //            (void *                ) NULL, 
-    //            (UBaseType_t           ) 2,
-    //            (TaskHandle_t *        ) &xTaskStateLedHdlr);
-    xTaskCreate(
-               (TaskFunction_t        ) vTaskLedControl,
-               (char *                ) "TaskName_LedControl", 
-               (configSTACK_DEPTH_TYPE) 256,
-               (void *                ) NULL, 
-               (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskLedCtrlHdlr);
-    xTaskCreate(
-               (TaskFunction_t        ) vTaskFanControl,
-               (char *                ) "TaskName_FanControl", 
-               (configSTACK_DEPTH_TYPE) 256,
-               (void *                ) NULL, 
-               (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskFanCtrlHdlr);
-    xTaskCreate(
-               (TaskFunction_t        ) vTaskDht11,
-               (char *                ) "TaskName_DHT11", 
-               (configSTACK_DEPTH_TYPE) 512,
-               (void *                ) NULL, 
-               (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskDht11Hdlr);
-    xTaskCreate(
-               (TaskFunction_t        ) vTaskLoRaToGatePkt,
-               (char *                ) "TaskName_LoRaSendToGateway", 
-               (configSTACK_DEPTH_TYPE) 512,
-               (void *                ) NULL, 
-               (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskLoRaToGateHdlr);
-    xTaskCreate(
-               (TaskFunction_t        ) vTaskLoRaMsgRec,
-               (char *                ) "TaskName_LoRaReceivedMessage", 
-               (configSTACK_DEPTH_TYPE) 512,
-               (void *                ) NULL, 
-               (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskLoRaMsgRecHdlr);
+        xTaskCreate(
+                   (TaskFunction_t        ) vTaskStateLed,
+                   (char *                ) "TaskName_StateLed", 
+                   (configSTACK_DEPTH_TYPE) 256,
+                   (void *                ) NULL, 
+                   (UBaseType_t           ) 2,
+                   (TaskHandle_t *        ) &xTaskStateLedHdlr);
+    #else
+        xTaskCreate(
+                   (TaskFunction_t        ) vTaskLedControl,
+                   (char *                ) "TaskName_LedControl", 
+                   (configSTACK_DEPTH_TYPE) 256,
+                   (void *                ) NULL, 
+                   (UBaseType_t           ) 2,
+                   (TaskHandle_t *        ) &xTaskLedCtrlHdlr);
+    #endif
+    #endif
+    #if defined __RELAY_H__
+        xTaskCreate(
+                   (TaskFunction_t        ) vTaskFanControl,
+                   (char *                ) "TaskName_FanControl", 
+                   (configSTACK_DEPTH_TYPE) 256,
+                   (void *                ) NULL, 
+                   (UBaseType_t           ) 2,
+                   (TaskHandle_t *        ) &xTaskFanCtrlHdlr);
+    #endif
+    #if defined __DHT11_H__
+        xTaskCreate(
+                   (TaskFunction_t        ) vTaskDht11,
+                   (char *                ) "TaskName_DHT11", 
+                   (configSTACK_DEPTH_TYPE) 512,
+                   (void *                ) NULL, 
+                   (UBaseType_t           ) 2,
+                   (TaskHandle_t *        ) &xTaskDht11Hdlr);
+    #endif
+    #if defined __LORA_H__
+        xTaskCreate(
+                   (TaskFunction_t        ) vTaskLoRaToGatePkt,
+                   (char *                ) "TaskName_LoRaSendToGateway", 
+                   (configSTACK_DEPTH_TYPE) 512,
+                   (void *                ) NULL, 
+                   (UBaseType_t           ) 2,
+                   (TaskHandle_t *        ) &xTaskLoRaToGateHdlr);
+        xTaskCreate(
+                   (TaskFunction_t        ) vTaskLoRaMsgRec,
+                   (char *                ) "TaskName_LoRaReceivedMessage", 
+                   (configSTACK_DEPTH_TYPE) 512,
+                   (void *                ) NULL, 
+                   (UBaseType_t           ) 2,
+                   (TaskHandle_t *        ) &xTaskLoRaMsgRecHdlr);
+    #endif
 }
 
 void vCreateQueuesList(void)
@@ -249,8 +260,8 @@ void vCreateSemaphoresList(void)
 {
     xSemLedOnHdlr  = xSemaphoreCreateBinary();
     xSemLedOffHdlr = xSemaphoreCreateBinary();
-    xSemFanOnHdlr     = xSemaphoreCreateBinary();
-    xSemFanOffHdlr    = xSemaphoreCreateBinary();
+    xSemFanOnHdlr  = xSemaphoreCreateBinary();
+    xSemFanOffHdlr = xSemaphoreCreateBinary();
 }
 
 int main(void)

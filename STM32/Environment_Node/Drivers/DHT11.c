@@ -5,7 +5,7 @@ void vDht11Rst(void)
 {                 
   vDht11Mode(OUT); 	//SET OUTPUT
   DHT11_Low; 	      //拉低DQ
-  vTaskDelay(20);    	//主机拉低18~30ms
+  vDelayMs(20);    	//主机拉低18~30ms
   DHT11_High; 			//DQ=1 
   vDelayUs(13);     	//主机拉高10~35us
 }

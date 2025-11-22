@@ -1,10 +1,8 @@
-#ifndef __DHT11_H
-#define __DHT11_H
+#ifndef __DHT11_H__
+#define __DHT11_H__
 
 #include "stm32f10x.h"                  // Device header
 #include "Delay.h"
-#include "FreeRTOS.h"
-#include "task.h"
 
 /* DHT11µƒ…Ë÷√ */
 #define DHT11_GPIO_CLK                                        RCC_APB2Periph_GPIOB

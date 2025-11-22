@@ -1,9 +1,13 @@
 #ifndef __LORA_H__
 #define __LORA_H__
 
+//#include "USART3.h"
+#include "USART.h"
+
+// #define LORA_MODE
+
 /* LoRaµƒæ≤Ã¨…Ë÷√ */
 #define LORA_MODE_INIT                                        1
-#define LORA_IS_GATEWAY_NODE                                  0
 #define LORA_GPIO_PIN_TX                                      GPIO_Pin_10
 #define LORA_GPIO_PIN_RX                                      GPIO_Pin_11
 #define LORA_GPIO_PIN_ATK_AUX                                 GPIO_Pin_4 //PA4
@@ -30,8 +34,6 @@
 #define LORA_EXECUTOR_SERVO                                   0xFE
 #define LORA_EXECUTOR_COMMAND_ON                              0x01
 #define LORA_EXECUTOR_COMMAND_OFF                             0x00
-
-#include "USART3.h"
 
 /* LoRa“∆÷≤≤„ */
 
@@ -140,14 +142,10 @@ static LoRaExecutorCmd_t xLoRaExecutorCommand = {
 };
 
 void vLoRaConnectionPkt(uint8_t ucNodeId);
-
-#if(LORA_IS_GATEWAY_NODE == 1)
-#elif(LORA_IS_GATEWAY_NODE == 0)
-    void vLoRaToGateIdPkt(uint8_t ucNodeId);
-    void vLoRaToGateSenIdPkt(uint8_t ucSensorId);
-    void vLoRaToGateExeIdPkt(uint8_t ucExecutorId);
-    eLoRaMsgRecStatus xLoRaMessageReceived(uint8_t *pucData);
-    eLoRaMsgRecStatus xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeId, uint8_t ucDataRecExeStatus);
-#endif
+void vLoRaToGateIdPkt(uint8_t ucNodeId);
+void vLoRaToGateSenIdPkt(uint8_t ucSensorId);
+void vLoRaToGateExeIdPkt(uint8_t ucExecutorId);
+eLoRaMsgRecStatus xLoRaMessageReceived(uint8_t *pucData);
+eLoRaMsgRecStatus xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeId, uint8_t ucDataRecExeSta);
 
 #endif

@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "stm32f10x.h": "c",
+        "core_cm3.h": "c"
+    }
+}

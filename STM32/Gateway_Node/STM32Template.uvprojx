@@ -679,9 +679,63 @@
         </Group>
         <Group>
           <GroupName>System</GroupName>
+          <Files>
+            <File>
+              <FileName>Delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\System\Delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>Delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\System\Delay.h</FilePath>
+            </File>
+            <File>
+              <FileName>USART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\System\USART.c</FilePath>
+            </File>
+            <File>
+              <FileName>USART.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\System\USART.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Drivers</GroupName>
+          <Files>
+            <File>
+              <FileName>LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\LED.c</FilePath>
+            </File>
+            <File>
+              <FileName>LED.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\LED.h</FilePath>
+            </File>
+            <File>
+              <FileName>LoRa.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\LoRa.c</FilePath>
+            </File>
+            <File>
+              <FileName>LoRa.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\LoRa.h</FilePath>
+            </File>
+            <File>
+              <FileName>ESP8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\ESP8266.c</FilePath>
+            </File>
+            <File>
+              <FileName>ESP8266.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\ESP8266.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>FreeRTOS/inc</GroupName>
