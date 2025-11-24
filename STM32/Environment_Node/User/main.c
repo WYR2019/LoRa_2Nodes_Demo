@@ -179,8 +179,8 @@ void vTaskLoRaMsgRec(void *pvParameters)
 
 void vCreateTasksList(void)
 {
-    #if defined __LED_H__
-    #if LED_PC13_WORK_MODE == LED_PC13_STM32_STATE_MODE
+    // #if defined __LED_H__
+    // #if LED_PC13_WORK_MODE == LED_PC13_STM32_STATE_MODE
     /* 创建任务，参数分别为任务函数名称、任务名字、栈大小、返回参数值、优先级、任务句柄。 */
         xTaskCreate(
                    (TaskFunction_t        ) vTaskStateLed,
@@ -189,7 +189,7 @@ void vCreateTasksList(void)
                    (void *                ) NULL, 
                    (UBaseType_t           ) 2,
                    (TaskHandle_t *        ) &xTaskStateLedHdlr);
-    #else
+    // #else
         xTaskCreate(
                    (TaskFunction_t        ) vTaskLedControl,
                    (char *                ) "TaskName_LedControl", 
@@ -197,9 +197,9 @@ void vCreateTasksList(void)
                    (void *                ) NULL, 
                    (UBaseType_t           ) 2,
                    (TaskHandle_t *        ) &xTaskLedCtrlHdlr);
-    #endif
-    #endif
-    #if defined __RELAY_H__
+    // #endif
+    // #endif
+    // #if defined __RELAY_H__
         xTaskCreate(
                    (TaskFunction_t        ) vTaskFanControl,
                    (char *                ) "TaskName_FanControl", 
@@ -207,8 +207,8 @@ void vCreateTasksList(void)
                    (void *                ) NULL, 
                    (UBaseType_t           ) 2,
                    (TaskHandle_t *        ) &xTaskFanCtrlHdlr);
-    #endif
-    #if defined __DHT11_H__
+    // #endif
+    // #if defined __DHT11_H__
         xTaskCreate(
                    (TaskFunction_t        ) vTaskDht11,
                    (char *                ) "TaskName_DHT11", 
@@ -216,8 +216,8 @@ void vCreateTasksList(void)
                    (void *                ) NULL, 
                    (UBaseType_t           ) 2,
                    (TaskHandle_t *        ) &xTaskDht11Hdlr);
-    #endif
-    #if defined __LORA_H__
+    // #endif
+    // #if defined __LORA_H__
         xTaskCreate(
                    (TaskFunction_t        ) vTaskLoRaToGatePkt,
                    (char *                ) "TaskName_LoRaSendToGateway", 
@@ -232,7 +232,7 @@ void vCreateTasksList(void)
                    (void *                ) NULL, 
                    (UBaseType_t           ) 2,
                    (TaskHandle_t *        ) &xTaskLoRaMsgRecHdlr);
-    #endif
+    // #endif
 }
 
 void vCreateQueuesList(void)

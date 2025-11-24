@@ -133,7 +133,7 @@ void vUsartSendByte(USART_TypeDef *xUsartId, uint8_t ucByte)
 
 /**
   * @brief  串口发送数组函数
-  * @note	  一般用于16进制模式下。uint8_t的指针类型，指向待发送数组的首地址,由于数组无法判断是否结束，所以需要再传递一个Length进来。
+  * @note   一般用于16进制模式下。uint8_t的指针类型，指向待发送数组的首地址,由于数组无法判断是否结束，所以需要再传递一个Length进来。
   * @param  *xUsartId 选择串口号
   * @param  *pucArray 要发送的十六进制数字
   * @param  usLength  发送长度

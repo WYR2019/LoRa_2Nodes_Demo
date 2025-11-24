@@ -28,7 +28,7 @@ void vTaskStateLed(void *pvParameters)
     {
         vPc13LedOn();
         vTaskDelay(1000);
-        vUsartPrintf(USART3, "USART3 Printf Test\r%d\n", 123);
+        vUsartPrintf(USART3, "USART3 Printf Test %d\r\n", 123);
         vPc13LedOff();
         vTaskDelay(1000);
     }
@@ -40,15 +40,16 @@ void vTaskWifiConnection(void *pvParameters)
     uint8_t ucBufferQueueRec = 0;
     while (1)
     {
-        vUsartSendString(USART2, "AT\r\n");
+        vUsartPrintf(USART2, "AT+RST\r\n");
         vTaskDelay(1000);
         ucRetvalQueueWifiSt = xQueueReceive(xQueueUsart2IrqHdlr, &ucBufferQueueRec, pdMS_TO_TICKS(30));
         /* code */
         if (ucRetvalQueueWifiSt == pdTRUE)
         {
             /* code */
-            vUsartSendString(USART3, (char *)&ucBufferQueueRec);
-        } else
+            vUsartPrintf(USART3, (char *)&ucBufferQueueRec);
+        } 
+        else
         {
             vUsartSendString(USART3, "Queue Receive failed!\r\n");
             vTaskDelay(300);
@@ -95,8 +96,8 @@ void vCreateSemaphoresList(void)
 
 int main(void)
 {
-    vUsartInit(USART1, 115200);
     vUsartInit(USART2, 115200);
+    vUsartInit(USART3, 115200);
     vDelayInit();
     vPc13LedInit();
     vCreateTasksList();
