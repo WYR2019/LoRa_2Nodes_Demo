@@ -38,10 +38,15 @@ void vTaskWifiConnection(void *pvParameters)
 {
     uint8_t ucRetvalQueueWifiSt = 0;
     uint8_t ucBufferQueueRec = 0;
+    vUsartPrintf(USART2, "AT+RST\r\n");
+    vTaskDelay(1000);
+    vUsartPrintf(USART2, "AT+CWMODE=1\r\n");
+    vTaskDelay(1000);
+    /* Ìí¼Ó×ªÒå×Ö·û */
+    vUsartPrintf(USART2, "AT+CWJAP=\"Exploration\",\"IPSK25em.\"\r\n");
     while (1)
     {
-        vUsartPrintf(USART2, "AT+RST\r\n");
-        vTaskDelay(1000);
+        
         ucRetvalQueueWifiSt = xQueueReceive(xQueueUsart2IrqHdlr, &ucBufferQueueRec, pdMS_TO_TICKS(30));
         /* code */
         if (ucRetvalQueueWifiSt == pdTRUE)

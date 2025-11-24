@@ -11,17 +11,17 @@ void vLoRaConnectionPkt(uint8_t ucNodeId)
     if (ucNodeId == xLoRaNode1Config.ucLoRaNode1Identifier)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaNode1Config, 3);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode1Config, 3);
     }
     else if (ucNodeId == xLoRaNode2Config.ucLoRaNode2Identifier)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaNode2Config, 3);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode2Config, 3);
     }
     else
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaGateConfig, 3);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaGateConfig, 3);
     }
 }
 
@@ -36,11 +36,11 @@ void vLoRaToGateIdPkt(uint8_t ucNodeId)
     if (ucNodeId == xLoRaNode1Config.ucLoRaNode1Identifier)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaNode1Config.ucLoRaNode1Identifier, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode1Config.ucLoRaNode1Identifier, 1);
     } else if (ucNodeId == xLoRaNode2Config.ucLoRaNode2Identifier)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaNode2Config.ucLoRaNode2Identifier, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode2Config.ucLoRaNode2Identifier, 1);
     }
 }
 
@@ -55,19 +55,19 @@ void vLoRaToGateSenIdPkt(uint8_t ucSensorId)
     if (ucSensorId == xLoRaSensorID.ucIdDht11)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaSensorID.ucIdDht11, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdDht11, 1);
     } else if (ucSensorId == xLoRaSensorID.ucIdMq2)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaSensorID.ucIdMq2, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdMq2, 1);
     } else if (ucSensorId == xLoRaSensorID.ucIdFire)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaSensorID.ucIdFire, 1);  
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdFire, 1);  
     } else if (ucSensorId == xLoRaSensorID.ucIdLight)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaSensorID.ucIdLight, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdLight, 1);
     }
 }
 
@@ -82,23 +82,23 @@ void vLoRaToGateExeIdPkt(uint8_t ucExeId)
     if (ucExeId == xLoRaExecutorID.ucIdLed)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaExecutorID.ucIdLed, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdLed, 1);
     } else if (ucExeId == xLoRaExecutorID.ucIdFan)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaExecutorID.ucIdFan, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdFan, 1);
     } else if (ucExeId == xLoRaExecutorID.ucIdHumidifier)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaExecutorID.ucIdHumidifier, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdHumidifier, 1);
     } else if (ucExeId == xLoRaExecutorID.ucIdBuzzer)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaExecutorID.ucIdBuzzer, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdBuzzer, 1);
     } else if (ucExeId == xLoRaExecutorID.ucIdServo)
     {
         /* code */
-        vUsart3SendArray((uint8_t *)&xLoRaExecutorID.ucIdServo, 1);
+        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdServo, 1);
     }
 }
 

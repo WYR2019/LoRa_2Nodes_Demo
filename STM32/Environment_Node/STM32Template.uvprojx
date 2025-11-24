@@ -681,16 +681,6 @@
           <GroupName>System</GroupName>
           <Files>
             <File>
-              <FileName>USART3.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\System\USART3.c</FilePath>
-            </File>
-            <File>
-              <FileName>USART3.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\System\USART3.h</FilePath>
-            </File>
-            <File>
               <FileName>Delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\System\Delay.c</FilePath>
@@ -709,6 +699,16 @@
               <FileName>CRC32.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\System\CRC32.h</FilePath>
+            </File>
+            <File>
+              <FileName>USART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\System\USART.c</FilePath>
+            </File>
+            <File>
+              <FileName>USART.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\System\USART.h</FilePath>
             </File>
           </Files>
         </Group>

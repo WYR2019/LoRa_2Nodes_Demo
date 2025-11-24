@@ -5,7 +5,8 @@
 #include "semphr.h"
 #include "LED.h"
 #include "DHT11.h"
-#include "USART3.h"
+// #include "USART3.h"
+#include "USART.h"
 #include "LoRa.h"
 #include "Relay.h"
 
@@ -20,6 +21,8 @@ TaskHandle_t xTaskLoRaMsgRecHdlr;
 /* 创建队列句柄 */
 QueueHandle_t xQueueTempHdlr;
 QueueHandle_t xQueueHumiHdlr;
+QueueHandle_t xQueueUsart1IrqHdlr;
+QueueHandle_t xQueueUsart2IrqHdlr;
 QueueHandle_t xQueueUsart3IrqHdlr;
 
 /* 创建二值信号量句柄 */
@@ -125,19 +128,19 @@ void vTaskLoRaToGatePkt(void *pvParameters)
         if (xRetvalQueueTemp == pdTRUE && xRetvalQueueHumi == pdTRUE)
         {
             /* code */
-            vUsart3SendArray(&ucRecTempData, 1);
-            vUsart3SendArray(&ucRecHumiData, 1); 
+            vUsartSendArray(USART3, &ucRecTempData, 1);
+            vUsartSendArray(USART3, &ucRecHumiData, 1); 
         }
         if (xSemaphoreTake(xSemLedOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
             /* code */
-            vUsart3SendArray(&xLoRaExecutorID.ucIdLed, 1);
-            vUsart3SendArray(&xLoRaExecutorCommand.ucCommandOn, 1);
+            vUsartSendArray(USART3, &xLoRaExecutorID.ucIdLed, 1);
+            vUsartSendArray(USART3, &xLoRaExecutorCommand.ucCommandOn, 1);
         } else if (xSemaphoreTake(xSemLedOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
             /* code */
-            vUsart3SendArray(&xLoRaExecutorID.ucIdLed, 1);
-            vUsart3SendArray(&xLoRaExecutorCommand.ucCommandOff, 1);
+            vUsartSendArray(USART3, &xLoRaExecutorID.ucIdLed, 1);
+            vUsartSendArray(USART3, &xLoRaExecutorCommand.ucCommandOff, 1);
         }
         vTaskDelay(500);
     }
@@ -180,7 +183,7 @@ void vTaskLoRaMsgRec(void *pvParameters)
 void vCreateTasksList(void)
 {
     // #if defined __LED_H__
-    // #if LED_PC13_WORK_MODE == LED_PC13_STM32_STATE_MODE
+    #if LED_PC13_WORK_MODE == LED_PC13_STM32_STATE_MODE
     /* 创建任务，参数分别为任务函数名称、任务名字、栈大小、返回参数值、优先级、任务句柄。 */
         xTaskCreate(
                    (TaskFunction_t        ) vTaskStateLed,
@@ -189,7 +192,7 @@ void vCreateTasksList(void)
                    (void *                ) NULL, 
                    (UBaseType_t           ) 2,
                    (TaskHandle_t *        ) &xTaskStateLedHdlr);
-    // #else
+    #else
         xTaskCreate(
                    (TaskFunction_t        ) vTaskLedControl,
                    (char *                ) "TaskName_LedControl", 
@@ -197,7 +200,7 @@ void vCreateTasksList(void)
                    (void *                ) NULL, 
                    (UBaseType_t           ) 2,
                    (TaskHandle_t *        ) &xTaskLedCtrlHdlr);
-    // #endif
+    #endif
     // #endif
     // #if defined __RELAY_H__
         xTaskCreate(
@@ -252,7 +255,7 @@ void vCreateQueuesList(void)
     if (xQueueTempHdlr == NULL || xQueueHumiHdlr == NULL || xQueueUsart3IrqHdlr == NULL)
     {
         /* code */
-        vUsart3Printf("Queue Init Failed.\r\n");
+        vUsartPrintf(USART3, "Queue Init Failed.\r\n");
     }
 }
 
@@ -269,7 +272,7 @@ int main(void)
     vFanRelayInit();
     vDelayInit();
     vPc13LedInit();
-    vUsart3Init(115200);
+    vUsartInit(USART3, 115200);
     vCreateQueuesList();
     vCreateSemaphoresList();
     vCreateTasksList();

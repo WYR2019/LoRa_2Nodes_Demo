@@ -31,7 +31,7 @@
 #define LORA_EXECUTOR_COMMAND_ON                              0x01
 #define LORA_EXECUTOR_COMMAND_OFF                             0x00
 
-#include "USART3.h"
+#include "USART.h"
 
 /* LoRa“∆÷≤≤„ */
 

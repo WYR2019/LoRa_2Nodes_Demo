@@ -81,5 +81,5 @@ xSemaphoreGive(xSemaphoreHandler);
 ```
 - 接收信号量：（接收句柄、等待时长）
 ```c
-if (xSemaphoreTake(xSemLedOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE);
+if (xSemaphoreTake(xSemaphoreHandler, pdMS_TO_TICKS(10)) == pdTRUE);
 ```
