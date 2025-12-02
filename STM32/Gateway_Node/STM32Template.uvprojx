@@ -341,7 +341,7 @@
               <MiscControls>--no-multibyte-chars</MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\SystemFiles;.\Libraries\inc;.\User;.\System;.\Drivers;.\FreeRTOS\inc;.\FreeRTOS\portable\RVDS\ARM_CM3;.\FreeRTOS\config</IncludePath>
+              <IncludePath>.\SystemFiles;.\Libraries\inc;.\User;.\System;.\Drivers;.\FreeRTOS\inc;.\FreeRTOS\portable\RVDS\ARM_CM3;.\FreeRTOS\config;.\Application\NetFIFO</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -899,6 +899,21 @@
               <FileName>FreeRTOSConfig.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\FreeRTOS\config\FreeRTOSConfig.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/NetFIFO</GroupName>
+          <Files>
+            <File>
+              <FileName>NetFIFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\NetFIFO\NetFIFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>NetFIFO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Application\NetFIFO\NetFIFO.h</FilePath>
             </File>
           </Files>
         </Group>

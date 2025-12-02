@@ -12,17 +12,17 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
     if (xUsartId == USART1)
     {
         /* code */
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
+        RCC_APB2PeriphClockCmd(USART1_GPIO_CLOCK,ENABLE);
 
         GPIO_InitTypeDef GPIO_InitStructure;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_InitStructure.GPIO_Pin = USART1_GPIO_PIN_TX;
-        GPIO_Init(GPIOA, &GPIO_InitStructure);
+        GPIO_Init(USART1_GPIO_PORT, &GPIO_InitStructure);
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_InitStructure.GPIO_Pin = USART1_GPIO_PIN_RX;
-        GPIO_Init(GPIOA, &GPIO_InitStructure);
+        GPIO_Init(USART1_GPIO_PORT, &GPIO_InitStructure);
 
         USART_InitTypeDef USART_InitStructure;
         USART_InitStructure.USART_BaudRate = ulBaudrate;                                                    // 设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
@@ -48,15 +48,15 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
     } else if (xUsartId == USART2)
     {
         /* code */
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
+        RCC_APB2PeriphClockCmd(USART2_GPIO_CLOCK,ENABLE);
         GPIO_InitTypeDef GPIO_InitStructure;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_InitStructure.GPIO_Pin = USART2_GPIO_PIN_TX;
-        GPIO_Init(GPIOB, &GPIO_InitStructure);
+        GPIO_Init(USART2_GPIO_PORT, &GPIO_InitStructure);
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
         GPIO_InitStructure.GPIO_Pin = USART2_GPIO_PIN_RX;
-        GPIO_Init(GPIOB, &GPIO_InitStructure);
+        GPIO_Init(USART2_GPIO_PORT, &GPIO_InitStructure);
 
         USART_InitTypeDef USART_InitStructure;
         USART_InitStructure.USART_BaudRate = ulBaudrate;                                                    // 设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
@@ -82,16 +82,16 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
     } else if (xUsartId == USART3)
     {
         /* code */
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
+        RCC_APB2PeriphClockCmd(USART3_GPIO_CLOCK,ENABLE);
 
         GPIO_InitTypeDef GPIO_InitStructure;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_InitStructure.GPIO_Pin = USART3_GPIO_PIN_TX;
-        GPIO_Init(GPIOB, &GPIO_InitStructure);
+        GPIO_Init(USART3_GPIO_PORT, &GPIO_InitStructure);
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
         GPIO_InitStructure.GPIO_Pin = USART3_GPIO_PIN_RX;
-        GPIO_Init(GPIOB, &GPIO_InitStructure);
+        GPIO_Init(USART3_GPIO_PORT, &GPIO_InitStructure);
 
         USART_InitTypeDef USART_InitStructure;
         USART_InitStructure.USART_BaudRate = ulBaudrate;                                                    // 设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
@@ -220,13 +220,13 @@ void USART1_IRQHandler(void)
     {
         /* code */
         uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART1);
-        #if (USE_NONE_SYSTEM == 1)
-        #elif (USE_FREERTOS == 1)
+        #if (USE_SYSTEM == NONE)
+        #elif (USE_SYSTEM == FREERTOS)
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             xQueueSendFromISR(xQueueUsart1IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
             /* 问题根源：请求上下文切换 */ 
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        #elif (USE_OSAL == 1)
+        #elif (USE_SYSTEM == OSAL)
         #endif
         USART_ClearITPendingBit(USART1, USART_IT_RXNE);
     } 
@@ -244,13 +244,13 @@ void USART2_IRQHandler(void)
     {
         /* code */
         uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART2);
-        #if (USE_NONE_SYSTEM == 1)
-        #elif (USE_FREERTOS == 1)
+        #if (USE_SYSTEM == NONE)
+        #elif (USE_SYSTEM == FREERTOS)
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             xQueueSendFromISR(xQueueUsart2IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
             /* 问题根源：请求上下文切换 */ 
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        #elif (USE_OSAL == 1)
+        #elif (USE_SYSTEM == OSAL)
         #endif
         USART_ClearITPendingBit(USART2, USART_IT_RXNE);
     } 
@@ -268,13 +268,13 @@ void USART3_IRQHandler(void)
     {
         /* code */
         uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART3);
-        #if (USE_NONE_SYSTEM == 1)
-        #elif (USE_FREERTOS == 1)
+        #if (USE_SYSTEM == NONE)
+        #elif (USE_SYSTEM == FREERTOS)
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             xQueueSendFromISR(xQueueUsart3IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
             /* 问题根源：请求上下文切换 */ 
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        #elif (USE_OSAL == 1)
+        #elif (USE_SYSTEM == OSAL)
         #endif
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
     } 

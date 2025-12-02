@@ -39,20 +39,20 @@
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
 
-#define configUSE_PREEMPTION		  1
-#define configUSE_IDLE_HOOK			  0
-#define configUSE_TICK_HOOK			  0
-#define configCPU_CLOCK_HZ			  ( ( unsigned long ) 72000000 )	
-#define configTICK_RATE_HZ			  ( ( TickType_t ) 1000 )
-#define configMAX_PRIORITIES		  ( 5 )
-#define configMINIMAL_STACK_SIZE	( ( unsigned short ) 128 )
-#define configTOTAL_HEAP_SIZE		  ( ( size_t ) ( 17 * 1024 ) )
-#define configMAX_TASK_NAME_LEN		( 16 )
-#define configUSE_TRACE_FACILITY	0
+#define configUSE_PREEMPTION		                     1
+#define configUSE_IDLE_HOOK		                       0
+#define configUSE_TICK_HOOK		                       0
+#define configCPU_CLOCK_HZ		                       ( ( unsigned long ) 72000000 )	
+#define configTICK_RATE_HZ		                       ( ( TickType_t ) 1000 )
+#define configMAX_PRIORITIES		                     ( 5 )
+#define configMINIMAL_STACK_SIZE		                 ( ( unsigned short ) 128 )
+#define configTOTAL_HEAP_SIZE		                     ( ( size_t ) ( 17 * 1024 ) )
+#define configMAX_TASK_NAME_LEN		                   ( 16 )
+#define configUSE_TRACE_FACILITY		                 0
 /* 系统节拍计数器变量数据类型，1表示为16位无符号整形，0表示为32位无符号整形 */
-#define configUSE_16_BIT_TICKS		0
+#define configUSE_16_BIT_TICKS		                   0
 /* 1、空闲任务放弃CPU使用权,给其他同优先级的用户任务 2、空闲优先级和其他优先级相同。避免2，多使用1 */
-#define configIDLE_SHOULD_YIELD		1
+#define configIDLE_SHOULD_YIELD		                   1
 /* 后加的部分 */
 /* 时间片调度，当优先级相同时执行 */
 #define configUSE_TIME_SLICING                       1

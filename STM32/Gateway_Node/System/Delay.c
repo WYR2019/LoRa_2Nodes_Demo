@@ -29,17 +29,10 @@ void vDelayUs(uint32_t ulNus)
     SysTick->VAL =0x00;      					                      //清空计数器	 	
 }
 
-//延时nms
-//注意nms的范围
-//SysTick->LOAD为24位寄存器,所以,最大延时为:
-//nms<=0xffffff*8*1000/SYSCLK
-//SYSCLK单位为Hz,nms单位为ms
-//对72M条件下,nms<=1864
-
 /**
   * @brief  毫秒级延时函数
-  * @note   由于Systick定时器为24位定时器，其装载的最大值为0xFFFFFF，也就是16777215，如果加载的值超过0xFFFFFF，则实际加载的值是取模后的值，导致延时时间缩短。
-  *         所以超过1.864s的延时会导致计数器溢出，从而导致定时为xms-16777215的结果。
+  * @note   由于Systick定时器为24位定时器，其装载的最大值为0xFFFFFF，也就是16777215，如果加载的值超过0xFFFFFF，则实际加载的值是取模后的值，导致延时时间缩短，
+  *         usNms<=0xFFFFFF*8*1000/SYSCLK。所以在72M条件下，超过1.864s的延时会导致计数器溢出，从而导致定时为xms-16777215的结果。
   * @note   如下函数会判断延时是否超过最大延时，若超过则分成多次1000ms处理。
   * @param  None
   * @retval None
@@ -68,14 +61,9 @@ void vDelayMs(uint16_t usNms)
 
 void vDelayInit(void)
 {
-    //使能DWT外设
-    DEMCR |= (uint32_t)TRCENA;
-
-    //DWT CYCCNT寄存器计数清0
-    DWT_CYCCNT = (uint32_t)0u;
-
-    //使能Cortex-M3 DWT CYCCNT寄存器
-    DWT_CTRL |= (uint32_t)DWT_CTRL_CYCCNTENA;
+    DEMCR |= (uint32_t)TRCENA;                // 使能DWT外设
+    DWT_CYCCNT = (uint32_t)0u;                // DWT CYCCNT寄存器计数清0
+    DWT_CTRL |= (uint32_t)DWT_CTRL_CYCCNTENA; // 使能Cortex-M3 DWT CYCCNT寄存器
 }
 
 // 微秒延时
@@ -89,19 +77,16 @@ void vDelayUs(uint32_t ulNus)
     ulTicksDelay = ( ulNus * ( SystemCoreClock / (1000000) ) ); // 将微秒数换算成滴答数
     ulTicksEnd = ulTicksStart + ulTicksDelay;
 
-    // ulTicksEnd没有溢出
-    if ( ulTicksEnd >= ulTicksStart )
+    if ( ulTicksEnd >= ulTicksStart )                           // ulTicksEnd没有溢出
     {
-        // DWT_CYCCNT在上述计算的这段时间中没有溢出
-        if(DWT_CYCCNT > ulTicksStart)
+        if(DWT_CYCCNT > ulTicksStart)                           // DWT_CYCCNT在上述计算的这段时间中没有溢出
         {
             while( DWT_CYCCNT < ulTicksEnd );
         }
         // DWT_CYCCNT溢出
         else
         {
-            // 已经超时，直接退出
-            return;
+            return;                                             // 已经超时，直接退出
         }
     }
     else // ulTicksEnd溢出

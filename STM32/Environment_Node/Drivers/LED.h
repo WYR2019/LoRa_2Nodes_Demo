@@ -4,15 +4,15 @@
 
 #include "stm32f10x.h"                            // Device header
 
-#define LED_PC13_WORK_MODE  LED_PC13_LIGHT_MODE
+#define LED_PC13_WORK_MODE                           LIGHT_MODE
 
-#define LED_PC13_STM32_STATE_MODE                             0
-#define LED_PC13_LIGHT_MODE                                   1
+#define STM32_STATE_MODE                             0
+#define LIGHT_MODE                                   1
 
 /* PC13LED的设置 */
-#define LED_PC13_GPIO_CLOCK                                   RCC_APB2Periph_GPIOC
-#define LED_PC13_GPIO_PORT                                    GPIOC
-#define LED_PC13_GPIO_PIN                                     GPIO_Pin_13
+#define LED_PC13_GPIO_CLOCK                          RCC_APB2Periph_GPIOC
+#define LED_PC13_GPIO_PORT                           GPIOC
+#define LED_PC13_GPIO_PIN                            GPIO_Pin_13
 
 /* 变量声明 */
 void vPc13LedInit(void);

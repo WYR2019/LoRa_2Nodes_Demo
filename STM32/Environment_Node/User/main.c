@@ -5,7 +5,6 @@
 #include "semphr.h"
 #include "LED.h"
 #include "DHT11.h"
-// #include "USART3.h"
 #include "USART.h"
 #include "LoRa.h"
 #include "Relay.h"
@@ -183,7 +182,7 @@ void vTaskLoRaMsgRec(void *pvParameters)
 void vCreateTasksList(void)
 {
     // #if defined __LED_H__
-    #if LED_PC13_WORK_MODE == LED_PC13_STM32_STATE_MODE
+    #if LED_PC13_WORK_MODE == STM32_STATE_MODE
     /* 创建任务，参数分别为任务函数名称、任务名字、栈大小、返回参数值、优先级、任务句柄。 */
         xTaskCreate(
                    (TaskFunction_t        ) vTaskStateLed,
