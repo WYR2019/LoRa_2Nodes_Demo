@@ -1,10 +1,11 @@
 #ifndef __USART_H__
 #define __USART_H__
 
-#define USE_RTOS                                              FREERTOS
+/* 是否使用RTOS，若需要使用RTOS，则将下面对应的操作系统的预编译设置需要使用到的RTOS名称，反之则设置为NONE。 */
+#define USE_RTOS                                                FREERTOS
 #define NONE                                                    0
 #define FREERTOS                                                1
-#define OSAL                                                    2
+
 #define vUsart1IrqHandler                                       USART1_IRQHandler
 #define vEsp8266IrqHandler                                      USART2_IRQHandler
 #define vLoRaIrqHandler                                         USART3_IRQHandler

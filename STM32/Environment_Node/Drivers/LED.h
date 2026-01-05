@@ -5,7 +5,6 @@
 #include "stm32f10x.h"                            // Device header
 
 #define LED_PC13_WORK_MODE                           LIGHT_MODE
-
 #define STM32_STATE_MODE                             0
 #define LIGHT_MODE                                   1
 

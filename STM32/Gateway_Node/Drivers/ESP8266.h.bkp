@@ -1,0 +1,30 @@
+#ifndef __ESP8266_H__
+#define __ESP8266_H__
+
+#include "string.h"
+#include "stdbool.h"
+#include "USART.h"
+#include "NetFIFO.h"
+
+typedef enum {
+    ESP8266_MODE_STATION = 0,
+    ESP8266_MODE_SOFTAP,
+    INVALID_MODE
+} eEsp8266Mode_t;
+
+typedef enum {
+    ESP8266_RESPONSE_READY = 0,
+    ESP8266_RESPONSE_OK,
+    ESP8266_RESPONSE_ERROR,
+    ESP8266_RESPONSE_BUSY,
+    ESP8266_RESPONSE_TIMEOUT
+} eEsp8266Status_t;
+
+void vEsp8266Restore(NetFifoBuffer_t *pxEspBuffer);
+void vEsp8266Reset(void);
+eEsp8266Mode_t ucEsp8266SetMode(uint8_t ucMode);
+void vEsp8266JoinAp(const char *pcSsid, const char *pcPassword);
+eEsp8266Status_t ucEsp8266ResHandler(NetFifoBuffer_t *pxEspBuffer);
+void ucEsp8266Log(NetFifoBuffer_t *pxEspBuffer);
+
+#endif

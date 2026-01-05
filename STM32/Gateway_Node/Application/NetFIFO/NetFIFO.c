@@ -8,7 +8,7 @@
 void vNetBufferInit(NetFifoBuffer_t *pxBuffer)
 {
     if (pxBuffer == NULL) return;
-    memset(pxBuffer->cResponseBuffer, 0, sizeof(pxBuffer->cResponseBuffer));
+    memset(pxBuffer->cNetFifoBuffer, 0, sizeof(pxBuffer->cNetFifoBuffer));
     pxBuffer->ucBufferIndex = 0;
 }
 
@@ -21,10 +21,10 @@ void vNetBufferInit(NetFifoBuffer_t *pxBuffer)
 void vNetBufferWrite(NetFifoBuffer_t *pxBuffer, char cData)
 {
     if (pxBuffer == NULL) return;
-    if (pxBuffer->ucBufferIndex < sizeof(pxBuffer->cResponseBuffer) - 1)
+    if (pxBuffer->ucBufferIndex < sizeof(pxBuffer->cNetFifoBuffer) - 1)
     {
-        pxBuffer->cResponseBuffer[pxBuffer->ucBufferIndex++] = cData;
-        pxBuffer->cResponseBuffer[pxBuffer->ucBufferIndex] = '\0'; // È·±£×Ö·û´®ÖÕÖ¹
+        pxBuffer->cNetFifoBuffer[pxBuffer->ucBufferIndex++] = cData;
+        pxBuffer->cNetFifoBuffer[pxBuffer->ucBufferIndex] = '\0'; // È·±£×Ö·û´®ÖÕÖ¹
     }
 }
 
@@ -41,7 +41,7 @@ char cNetBufferReadByte(NetFifoBuffer_t *pxBuffer, int index)
     {
         return '\0'; // Ë÷ÒýÎÞÐ§
     }
-    return pxBuffer->cResponseBuffer[index];
+    return pxBuffer->cNetFifoBuffer[index];
 }
 
 /**
@@ -50,10 +50,10 @@ char cNetBufferReadByte(NetFifoBuffer_t *pxBuffer, int index)
   * @param  pcStr:    Òª±È½ÏµÄ×Ö·û´®
   * @retval true: Æ¥Åä³É¹¦, false: Æ¥ÅäÊ§°Ü
   */
-bool bNetBufferCompareStr(NetFifoBuffer_t *pxBuffer, const char *pcStr)
+bool bNetBufferReadString(NetFifoBuffer_t *pxBuffer, const char *pcStr)
 {
     if (pxBuffer == NULL || pcStr == NULL) return false;
-    return (strstr(pxBuffer->cResponseBuffer, pcStr) != NULL);
+    return (strstr(pxBuffer->cNetFifoBuffer, pcStr) != NULL);
 }
 
 /**
@@ -75,6 +75,6 @@ int iNetBufferGetLength(NetFifoBuffer_t *pxBuffer)
 void vNetBufferClear(NetFifoBuffer_t *pxBuffer)
 {
     if (pxBuffer == NULL) return;
-    memset(pxBuffer->cResponseBuffer, 0, sizeof(pxBuffer->cResponseBuffer));
+    memset(pxBuffer->cNetFifoBuffer, 0, sizeof(pxBuffer->cNetFifoBuffer));
     pxBuffer->ucBufferIndex = 0;
 }

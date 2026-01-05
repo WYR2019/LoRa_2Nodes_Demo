@@ -2,39 +2,39 @@
 
 #if MODE == USE_SYS_TICK
 
-//初始化延迟函数
-//SYSTICK的时钟固定为AHB时钟的1/8
-//SYSCLK:系统时钟频率
+/**
+ * @brief  初始化延迟函数
+ * @note   延时函数初始化。SYSTICK的时钟固定为AHB时钟的1/8。SYSCLK:系统时钟频率
+ * @param  None
+ * @retval None
+ */
 void vDelayInit(void)
 {
     uint8_t ucSYSCLK;
-    SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8); 
-    xUcFacInit.ucFacUs=ucSYSCLK/8;					
-    xUcFacInit.usFacMs=(uint16_t)xUcFacInit.ucFacUs*1000;				   
-}								    
+    SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
+    xUcFacInit.ucFacUs=ucSYSCLK/8;
+    xUcFacInit.usFacMs=(uint16_t)xUcFacInit.ucFacUs*1000;
+}
 
-//延时nus
-//nus为要延时的us数.		    								   
+/**
+  * @brief  微秒级延时函数
+  * @note   最大延时16777215us
+  * @param  ulNus: 延时的微秒数
+  * @retval None
+  */
 void vDelayUs(uint32_t ulNus)
 {
     uint32_t ulTemp;	    	 
-    SysTick->LOAD=ulNus*xUcFacInit.ucFacUs; 					      //时间加载	  		 
-    SysTick->VAL=0x00;        					                    //清空计数器
-    SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk ;                //开始倒数	  
+    SysTick->LOAD=ulNus*xUcFacInit.ucFacUs;                     // 时间加载
+    SysTick->VAL=0x00;                                          // 清空计数器
+    SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk ;                    // 开始倒数	  
     do
     {
         ulTemp=SysTick->CTRL;
-    } while((ulTemp&0x01)&&!(ulTemp&(1<<16)));		            //等待时间到达   
-    SysTick->CTRL&=~SysTick_CTRL_ENABLE_Msk;	              //关闭计数器
-    SysTick->VAL =0x00;      					                      //清空计数器	 	
+    } while((ulTemp&0x01)&&!(ulTemp&(1<<16)));                  // 等待时间到达   
+    SysTick->CTRL&=~SysTick_CTRL_ENABLE_Msk;                    // 关闭计数器
+    SysTick->VAL =0x00;                                         // 清空计数器	 	
 }
-
-//延时nms
-//注意nms的范围
-//SysTick->LOAD为24位寄存器,所以,最大延时为:
-//nms<=0xffffff*8*1000/SYSCLK
-//SYSCLK单位为Hz,nms单位为ms
-//对72M条件下,nms<=1864
 
 /**
   * @brief  毫秒级延时函数
@@ -66,62 +66,67 @@ void vDelayMs(uint16_t usNms)
 
 #elif MODE == USE_DWT
 
+/**
+  * @brief  DWT延时函数初始化
+  * @note   DWT延时精度高，适合短时间延时
+  * @param  None
+  * @retval None
+  */
 void vDelayInit(void)
 {
-    //使能DWT外设
-    DEMCR |= (uint32_t)TRCENA;
-
-    //DWT CYCCNT寄存器计数清0
-    DWT_CYCCNT = (uint32_t)0u;
-
-    //使能Cortex-M3 DWT CYCCNT寄存器
-    DWT_CTRL |= (uint32_t)DWT_CTRL_CYCCNTENA;
+    DEMCR |= (uint32_t)TRCENA;                                  // 使能DWT外设
+    DWT_CYCCNT = (uint32_t)0u;                                  // CYCCNT计数器清零
+    DWT_CTRL |= (uint32_t)DWT_CTRL_CYCCNTENA;                   // 使能CYCCNT计数器    
 }
 
-// 微秒延时
+/**
+  * @brief  微秒级延时函数
+  * @note   最大延时10000us
+  * @param  ulNus: 延时的微秒数
+  * @retval None
+  */
 void vDelayUs(uint32_t ulNus)
 {
     if(ulNus > 10000) ulNus = 10000;
-
     uint32_t ulTicksStart, ulTicksEnd, ulTicksDelay;
-
     ulTicksStart = DWT_CYCCNT;
     ulTicksDelay = ( ulNus * ( SystemCoreClock / (1000000) ) ); // 将微秒数换算成滴答数
     ulTicksEnd = ulTicksStart + ulTicksDelay;
-
-    // ulTicksEnd没有溢出
-    if ( ulTicksEnd >= ulTicksStart )
+    /* 当ulTicksEnd没有溢出时 */
+    if ( ulTicksEnd >= ulTicksStart )                            
     {
-        // DWT_CYCCNT在上述计算的这段时间中没有溢出
-        if(DWT_CYCCNT > ulTicksStart)
+        if(DWT_CYCCNT > ulTicksStart)                           // DWT_CYCCNT在上述计算的这段时间中没有溢出               
         {
             while( DWT_CYCCNT < ulTicksEnd );
         }
-        // DWT_CYCCNT溢出
-        else
+        /* DWT_CYCCNT溢出时 */
+        else                                                    
         {
-            // 已经超时，直接退出
-            return;
+            return;                                             // 已经超时，直接退出
         }
     }
-    else // ulTicksEnd溢出
+    /* 当ulTicksEnd溢出时 */
+    else                                                        
     {
-        // DWT_CYCCNT在上述计算的这段时间中没有溢出
-        if(DWT_CYCCNT > ulTicksStart)
+        /* DWT_CYCCNT在上述计算的这段时间中没有溢出时 */
+        if(DWT_CYCCNT > ulTicksStart)                           
         {
-            // 等待DWT_CYCCNT的值溢出
-            while( DWT_CYCCNT > ulTicksEnd );
+            while( DWT_CYCCNT > ulTicksEnd );                   // 等待DWT_CYCCNT溢出
         }
-        // 等待溢出后的DWT_CYCCNT到达ulTicksEnd
-        while( DWT_CYCCNT < ulTicksEnd );
+        while( DWT_CYCCNT < ulTicksEnd );                       // 等待溢出后的DWT_CYCCNT到达ulTicksEnd
     }
 }
 
+/**
+  * @brief  毫秒级延时函数
+  * @note   最大延时65535ms
+  * @param  usNms: 延时的毫秒数
+  * @retval None
+  */
 void vDelayMs(uint16_t usNms)
 {
     for(uint16_t i = 0; i < usNms; i++)
     {
-        // delay 1 ms
         vDelayUs(1000);
     }
 }

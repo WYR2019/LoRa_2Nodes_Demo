@@ -24,7 +24,7 @@ void vLoRaConnectionPkt(uint8_t ucNodeId)
         vUsartSendArray(USART3, (uint8_t *)&xLoRaGateConfig, 3);
     }
 }
-
+    
 /**
   * @brief  LoRa发送节点ID数据包封装函数。				
   * @note   通过发送节点ID以声明自己是什么节点。

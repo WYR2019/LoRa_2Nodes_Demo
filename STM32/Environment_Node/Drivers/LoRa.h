@@ -6,8 +6,8 @@
 #define LORA_IS_GATEWAY_NODE                                  0
 #define LORA_GPIO_PIN_TX                                      GPIO_Pin_10
 #define LORA_GPIO_PIN_RX                                      GPIO_Pin_11
-#define LORA_GPIO_PIN_ATK_AUX                                 GPIO_Pin_4 //PA4
-#define LORA_GPIO_PIN_ATK_MD0                                 GPIO_Pin_3 //PB3
+#define LORA_GPIO_PIN_ATK_AUX                                 GPIO_Pin_4  //PA4
+#define LORA_GPIO_PIN_ATK_MD0                                 GPIO_Pin_3  //PB3
 #define LORA_GATE_ADDR_HIGH                                   0x03
 #define LORA_GATE_ADDR_LOW                                    0xE9
 #define LORA_GATE_CHANNEL                                     0x17

@@ -30,7 +30,12 @@ SemaphoreHandle_t xSemLedOffHdlr;
 SemaphoreHandle_t xSemFanOnHdlr;
 SemaphoreHandle_t xSemFanOffHdlr;
 
-/* 闪烁LED任务函数，参数为空指针，返回NULL。 */
+/**
+  * @brief  LED状态指示任务函数
+  * @note   通过LED的闪烁状态指示系统运行状态。
+  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @retval None
+  */
 void vTaskStateLed(void *pvParameters)
 {
     while(1)
@@ -42,6 +47,12 @@ void vTaskStateLed(void *pvParameters)
     }
 }
 
+/**
+  * @brief  LED控制任务函数
+  * @note   根据信号量控制LED的开关状态。
+  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @retval None
+  */
 void vTaskLedControl(void *pvParameters)
 {
     while (1)
@@ -60,6 +71,12 @@ void vTaskLedControl(void *pvParameters)
     }
 }
 
+/**
+  * @brief  风扇控制任务函数
+  * @note   根据信号量控制风扇的开关状态。
+  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @retval None
+  */
 void vTaskFanControl(void *pvParameters)
 {
     while (1)
@@ -76,6 +93,12 @@ void vTaskFanControl(void *pvParameters)
     }
 }
 
+/**
+  * @brief  DHT11数据读取任务函数
+  * @note   定期读取DHT11传感器的数据，并将温度和湿度数据发送到相应的队列。
+  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @retval None
+  */
 void vTaskDht11(void *pvParameters)
 {
     DHT11Data_t xDHT11Data;
@@ -106,6 +129,12 @@ void vTaskDht11(void *pvParameters)
     }
 }
 
+/**
+  * @brief  LoRa数据发送任务函数
+  * @note   从温湿度队列接收数据，并通过LoRa模块发送到网关。同时处理执行器的控制信号。
+  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @retval None
+  */
 void vTaskLoRaToGatePkt(void *pvParameters)
 {
     uint8_t ucRecTempData = 0, ucRecHumiData = 0;
@@ -145,6 +174,12 @@ void vTaskLoRaToGatePkt(void *pvParameters)
     }
 }
 
+/**
+  * @brief  LoRa消息接收任务函数
+  * @note   从USART3接收LoRa模块传输的执行器控制消息，并根据信号量控制相应的执行器状态。
+  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @retval None
+  */
 void vTaskLoRaMsgRec(void *pvParameters)
 {
     uint8_t ucDataRecNodeId = 0, ucDataRecExeId = 0, ucDataRecExeSta = 0;
@@ -179,6 +214,12 @@ void vTaskLoRaMsgRec(void *pvParameters)
     }
 }
 
+/**
+  * @brief  创建任务列表函数
+  * @note   创建所有需要的FreeRTOS任务。
+  * @param  None
+  * @retval None
+  */
 void vCreateTasksList(void)
 {
     // #if defined __LED_H__
@@ -237,6 +278,12 @@ void vCreateTasksList(void)
     // #endif
 }
 
+/**
+  * @brief  创建队列列表函数
+  * @note   创建所有需要的FreeRTOS队列。
+  * @param  None
+  * @retval None
+  */
 void vCreateQueuesList(void)
 {
     /* 创建队列有两个参数，第一个是队列的长度,也就是这个队列能存放多少个数据；
@@ -258,6 +305,12 @@ void vCreateQueuesList(void)
     }
 }
 
+/**
+  * @brief  创建信号量列表函数
+  * @note   创建所有需要的FreeRTOS信号量。
+  * @param  None
+  * @retval None
+  */
 void vCreateSemaphoresList(void)
 {
     xSemLedOnHdlr  = xSemaphoreCreateBinary();
@@ -266,6 +319,12 @@ void vCreateSemaphoresList(void)
     xSemFanOffHdlr = xSemaphoreCreateBinary();
 }
 
+/**
+  * @brief  主函数
+  * @note   初始化系统各模块，创建队列、信号量和任务，并启动调度器。
+  * @param  None
+  * @retval None
+  */
 int main(void)
 {
     vFanRelayInit();

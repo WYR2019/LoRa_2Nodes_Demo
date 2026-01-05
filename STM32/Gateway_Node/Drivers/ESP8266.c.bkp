@@ -1,0 +1,267 @@
+#include "ESP8266.h"
+
+/**
+  * @brief  恢复ESP8266到出厂设置
+  * @param  None
+  * @retval None
+  */
+void vEsp8266Restore(NetFifoBuffer_t *pxEspBuffer)
+{
+    vUsartPrintf(USART2, "AT+RESTORE\r\n");
+    // if (ucEsp8266ResHandler(pxEspBuffer) == ESP8266_RESPONSE_READY)
+    // {
+    //     /* code */
+    //     ucEsp8266Log(pxEspBuffer);
+    // } else
+    // {
+    //     ucEsp8266Log(pxEspBuffer);
+    // }
+}
+
+/**
+  * @brief  重置ESP8266模块
+  * @param  None
+  * @retval None
+  */
+void vEsp8266Reset(void)
+{
+    vUsartPrintf(USART2, "AT+RST\r\n");
+    // if (ucEsp8266ResHandler(pxEspBuffer) == ESP8266_RESPONSE_READY)
+    // {
+    //     /* code */
+    //     ucEsp8266Log(pxEspBuffer);
+    // } else
+    // {
+    //     ucEsp8266Log(pxEspBuffer);
+    // }
+}
+
+/**
+  * @brief  设置ESP8266工作模式
+  * @param  ucMode: 工作模式（0：SoftAP模式，1：Station模式）
+  * @retval 设置后的工作模式
+  */
+eEsp8266Mode_t ucEsp8266SetMode(uint8_t ucMode)
+{
+    vUsartPrintf(USART2, "AT+CWMODE=%d\r\n", ucMode);
+    if (ucMode == 1)
+    {
+        /* code */
+        return ESP8266_MODE_STATION;
+    } else if (ucMode == 0)
+    {
+        /* code */
+        return ESP8266_MODE_SOFTAP;
+    } else
+    {
+        return INVALID_MODE; // 无效模式
+    }
+}
+
+/**
+  * @brief  连接到指定的WiFi热点
+  * @param  *pcSsid:     WiFi名称
+  * @param  *pcPassword: WiFi密码
+  * @retval None
+  */
+void vEsp8266JoinAp(const char *pcSsid, const char *pcPassword)
+{
+    vUsartPrintf(USART2, "AT+CWJAP=\"%s\",\"%s\"\r\n", pcSsid, pcPassword);
+}
+
+/**
+  * @brief  处理ESP8266响应
+  * @param  *pxEspBuffer ESP8266缓冲区指针
+  * @retval 0: 继续等待, 1: 成功, 2: 失败
+  */
+eEsp8266Status_t ucEsp8266ResHandler(NetFifoBuffer_t *pxEspBuffer)
+{
+    // 检查是否收到完整响应
+    if (strstr(pxEspBuffer->cNetFifoBuffer, "ready") != NULL)
+    {
+        vNetBufferClear(pxEspBuffer);
+        return ESP8266_RESPONSE_READY; // 成功
+    } else if (strstr(pxEspBuffer->cNetFifoBuffer, "OK") != NULL)
+    {
+        vNetBufferClear(pxEspBuffer);
+        return ESP8266_RESPONSE_OK; // 成功
+    } else if (strstr(pxEspBuffer->cNetFifoBuffer, "ERROR") != NULL || 
+             strstr(pxEspBuffer->cNetFifoBuffer, "FAIL") != NULL)
+    {
+        vNetBufferClear(pxEspBuffer);
+        return ESP8266_RESPONSE_ERROR; // 失败
+    } else
+    {
+        /* code */
+        vNetBufferClear(pxEspBuffer);
+        return ESP8266_RESPONSE_TIMEOUT; // 继续等待
+    }
+}
+
+// /**
+//   * @brief  等待ESP8266响应
+//   * @param  *pxEspBuffer ESP8266缓冲区指针
+//   * @param  xTimeout    超时时间（以TickType_t为单位）
+//   * @retval 响应状态
+//   */
+// eEsp8266Status_t xEsp8266WaitForResponse(NetFifoBuffer_t *pxEspBuffer, TickType_t xTimeout)
+// {
+//     TickType_t startTime = xTaskGetTickCount();
+//     while ((xTaskGetTickCount() - startTime) < xTimeout)
+//     {
+//         // 检查响应
+//         eEsp8266Status_t status = ucEsp8266ResHandler(pxEspBuffer);
+//         if (status != ESP8266_RESPONSE_READY)
+//         {
+//             return status; // 返回响应状态
+//         }
+//     }
+//     return ESP8266_RESPONSE_TIMEOUT; // 超时，继续等待
+// }
+
+/**
+  * @brief  记录ESP8266响应日志
+  * @param  *pxEspBuffer ESP8266缓冲区指针
+  * @retval None
+  */
+void ucEsp8266Log(NetFifoBuffer_t *pxEspBuffer)
+{
+    if (ucEsp8266ResHandler(pxEspBuffer) == ESP8266_RESPONSE_READY)
+    {
+        /* code */
+        vUsartSendString(USART3, "WiFi Reset Successfully!\r\n");
+        vUsartSendString(USART3, pxEspBuffer->cNetFifoBuffer);
+        vUsartSendString(USART3, "\r\n");
+    } else if (ucEsp8266ResHandler(pxEspBuffer) == ESP8266_RESPONSE_OK)
+    {
+        /* code */
+        vUsartSendString(USART3, "Set WiFi Mode Successfully!\r\n");
+        vUsartSendString(USART3, pxEspBuffer->cNetFifoBuffer);
+        vUsartSendString(USART3, "\r\n");
+    } else if (ucEsp8266ResHandler(pxEspBuffer) == ESP8266_RESPONSE_ERROR)
+    {
+        vUsartSendString(USART3, "Error!\r\n");
+        vUsartSendString(USART3, pxEspBuffer->cNetFifoBuffer);
+        vUsartSendString(USART3, "\r\n");
+    } else
+    {
+        vUsartSendString(USART3, "Other Error!\r\n");
+        vUsartSendString(USART3, pxEspBuffer->cNetFifoBuffer);
+        vUsartSendString(USART3, "\r\n");
+    }
+}
+
+/**
+  * @brief  连接WiFi任务         
+  * @note   利用FreeRTOS中断消息队列机制，接收ESP8266的响应数据，并将响应数据存到内置的FIFO缓冲区内。
+  * @note   问题：将接收消息队列函数和处理响应数据函数混到一块了，造成了代码的冗余。
+  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @retval None
+  */
+void vTaskWifiConnection(void *pvParameters)
+{
+    NetFifoBuffer_t espBuffer;
+    vNetBufferInit(&espBuffer);
+    uint8_t ucRetvalQueueWifiSta = 0;
+    uint8_t ucRetvalQueueByte = 0;
+    while (1)
+    {
+       /* code */
+       vEsp8266Reset();
+       TickType_t startTime = xTaskGetTickCount();
+       while ((xTaskGetTickCount() - startTime) < pdMS_TO_TICKS(3000))
+       {
+            ucRetvalQueueWifiSta = xQueueReceive(xQueueUsart2IrqHdlr, 
+                                             &ucRetvalQueueByte, 
+                                             pdMS_TO_TICKS(100));
+            if (ucRetvalQueueWifiSta == pdTRUE)
+            {
+                // 将接收到的字节处理到缓冲区
+                vNetBufferWrite(&espBuffer, (char)ucRetvalQueueByte);
+                // 处理响应数据
+                uint8_t ucResponseStatus = ucEsp8266ResHandler(&espBuffer);
+                if (strstr(espBuffer.cNetFifoBuffer, "ready") != NULL)
+                {
+                    vUsartSendString(USART3, "WiFi Reset Successfully!\r\n");
+                    vUsartSendString(USART3, espBuffer.cNetFifoBuffer);
+                    vTaskDelay(1000);
+                    break;
+                } else if (strstr(espBuffer.cNetFifoBuffer, "OK") != NULL)
+                {
+                    /* code */
+                    vUsartSendString(USART3, "Set WiFi Mode Successfully!\r\n");
+                    vUsartSendString(USART3, espBuffer.cNetFifoBuffer);
+                } else if (strstr(espBuffer.cNetFifoBuffer, "ERROR") != NULL || 
+                         strstr(espBuffer.cNetFifoBuffer, "FAIL") != NULL)
+                {
+                    vUsartSendString(USART3, "Error!\r\n");
+                    vUsartSendString(USART3, espBuffer.cNetFifoBuffer);
+                    vUsartSendString(USART3, "\r\n");
+                    break;
+                }
+            }
+        }
+        vTaskDelete(NULL);
+    }
+}
+void vTaskBufferRx(void *pvParameters)
+{
+    NetFifoBuffer_t espBuffer;
+    vNetBufferInit(&espBuffer);
+    uint8_t ucRetvalQueueWifiSta = 0;
+    uint8_t ucRetvalQueueByte = 0;
+    while (1)
+    {
+       /* code */
+       TickType_t startTime = xTaskGetTickCount();
+       while ((xTaskGetTickCount() - startTime) < pdMS_TO_TICKS(3000))
+       {
+            ucRetvalQueueWifiSta = xQueueReceive(xQueueUsart2IrqHdlr, 
+                                             &ucRetvalQueueByte, 
+                                             pdMS_TO_TICKS(100));
+            if (ucRetvalQueueWifiSta == pdTRUE)
+            {
+                // 将接收到的字节处理到缓冲区
+                vNetBufferWrite(&espBuffer, (char)ucRetvalQueueByte);
+
+            }
+       }
+       vTaskDelay(100);
+    }
+}
+
+/**
+  * @brief  连接WiFi任务         
+  * @note   重置ESP8266模块。
+  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @retval None
+  */
+void vTaskWifiConnection(void *pvParameters)
+{
+    NetFifoBuffer_t espBuffer;
+    while (1)
+    {
+        /* code */
+        vEsp8266Reset();
+        if (strstr(espBuffer.cNetFifoBuffer, "ready") != NULL)
+        {
+            vUsartSendString(USART3, "WiFi Reset Successfully!\r\n");
+            vUsartSendString(USART3, espBuffer.cNetFifoBuffer);
+            vTaskDelay(1000);
+            break;
+        } else if (strstr(espBuffer.cNetFifoBuffer, "OK") != NULL)
+        {
+            /* code */
+            vUsartSendString(USART3, "Set WiFi Mode Successfully!\r\n");
+            vUsartSendString(USART3, espBuffer.cNetFifoBuffer);
+        } else if (strstr(espBuffer.cNetFifoBuffer, "ERROR") != NULL || 
+                    strstr(espBuffer.cNetFifoBuffer, "FAIL") != NULL)
+        {
+            vUsartSendString(USART3, "Error!\r\n");
+            vUsartSendString(USART3, espBuffer.cNetFifoBuffer);
+            vUsartSendString(USART3, "\r\n");
+            break;
+        }
+        vTaskDelete(NULL);
+    }
+}

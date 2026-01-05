@@ -9,10 +9,10 @@
 #include "ESP8266.h"
 #include "NetFIFO.h"
 
-/* 待验证的改动：合并串口。 */
 /* 创建一个新任务，需要创建任务句柄,任务句柄与任务函数一一对应。 */
 TaskHandle_t xTaskStateLedHdlr;
-TaskHandle_t xTaskWifiConnectHdlr;
+TaskHandle_t xTaskBufferRxHdlr;
+TaskHandle_t xTaskApConnectHdlr;
 
 /* 创建队列句柄 */
 QueueHandle_t xQueueUsart1IrqHdlr;
@@ -41,60 +41,26 @@ void vTaskStateLed(void *pvParameters)
     }
 }
 
-/**
-  * @brief  连接WiFi任务         
-  * @note   利用FreeRTOS中断消息队列机制，接收ESP8266的响应数据，并将响应数据存到内置的FIFO缓冲区内。在再判断数据是否符合要求。
-  * @note   问题：将接收消息队列函数和处理响应数据函数混到一块了，造成了代码的冗余。
-  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
-  * @retval None
-  */
-void vTaskWifiConnection(void *pvParameters)
+
+void vTaskApConnection(void *pvParameters)
 {
-   NetFifoBuffer_t espBuffer;
-   vNetBufferInit(&espBuffer);
-   uint8_t ucRetvalQueueWifiSta = 0;
-   uint8_t ucRetvalQueueByte = 0;
-   while (1)
-   {
-       /* code */
-       ucEsp8266SetMode(1);
-       TickType_t startTime = xTaskGetTickCount();
-       while ((xTaskGetTickCount() - startTime) < pdMS_TO_TICKS(3000))
-       {
-            ucRetvalQueueWifiSta = xQueueReceive(xQueueUsart2IrqHdlr, 
-                                             &ucRetvalQueueByte, 
-                                             pdMS_TO_TICKS(100));
-            if (ucRetvalQueueWifiSta == pdTRUE)
-            {
-                // 将接收到的字节处理到缓冲区
-                vNetBufferWrite(&espBuffer, (char)ucRetvalQueueByte);
-                // 处理响应数据
-                uint8_t ucResponseStatus = ucEsp8266ResponseHandler(&espBuffer);
-                if (strstr(espBuffer.cResponseBuffer, "ready") != NULL)
-                {
-                    vUsartSendString(USART3, "WiFi Reset Successfully!\r\n");
-                    vUsartSendString(USART3, espBuffer.cResponseBuffer);
-                    vTaskDelay(1000);
-                    break;
-                } else if (strstr(espBuffer.cResponseBuffer, "OK") != NULL)
-                {
-                    /* code */
-                    vUsartSendString(USART3, "Set WiFi Mode Successfully!\r\n");
-                    vUsartSendString(USART3, espBuffer.cResponseBuffer);
-                } else if (strstr(espBuffer.cResponseBuffer, "ERROR") != NULL || 
-                         strstr(espBuffer.cResponseBuffer, "FAIL") != NULL)
-                {
-                    vUsartSendString(USART3, "Error!\r\n");
-                    vUsartSendString(USART3, espBuffer.cResponseBuffer);
-                    vUsartSendString(USART3, "\r\n");
-                    break;
-                }
-            }
-        }
+    while (1)
+    {
+        macESP8266_CH_ENABLE ();
+        vEsp8266AtTest ();
+        bEsp8266NetModeChoose ( STA );
+        while ( ! bEsp8266JoinAp ( macUser_ESP8266_ApSsid, macUser_ESP8266_ApPwd ) );
         vTaskDelete(NULL);
     }
 }
 
+
+/**
+  * @brief  创建所有任务列表         
+  * @note   在此函数中创建所有需要的任务，并为每个任务分配适当的堆栈大小和优先级。
+  * @param  None
+  * @retval None
+  */
 void vCreateTasksList(void)
 {
     xTaskCreate(
@@ -105,39 +71,58 @@ void vCreateTasksList(void)
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &xTaskStateLedHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskWifiConnection,
+               (TaskFunction_t        ) vTaskApConnection,
                (char *                ) "TaskName_WifiConnectToAP", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskWifiConnectHdlr);
+               (TaskHandle_t *        ) &xTaskApConnectHdlr);
 }
 
+/**
+  * @brief  创建所有队列列表         
+  * @note   在此函数中创建所有需要的队列，并为每个队列分配适当的长度和项大小。
+  * @param  None
+  * @retval None
+  */
 void vCreateQueuesList(void)
 {
-    xQueueUsart1IrqHdlr = xQueueCreate(
+    #if (ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
+        xQueueUsart1IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t *));
-    xQueueUsart2IrqHdlr = xQueueCreate(
+    #endif
+    #if (ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 1)
+        xQueueUsart2IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 1024,
                                       (UBaseType_t) sizeof(char *));
-    xQueueUsart3IrqHdlr = xQueueCreate(
+    #endif
+    #if (ENABLE_FREERTOS_API_QUEUE_USART3_IRQ == 1)
+        xQueueUsart3IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t *));
-    if (xQueueUsart2IrqHdlr == NULL)
-    {
-        /* code */
-        vUsartSendString(USART1, "Queue Init Failed.\r\n");
-        vTaskDelay(1000);
-    }
+    #endif
+    
 }
 
+/**
+  * @brief  创建所有信号量列表         
+  * @note   在此函数中创建所有需要的信号量。
+  * @param  None
+  * @retval None
+  */
 void vCreateSemaphoresList(void)
 {
     xSemWifiRetOkHdlr  = xSemaphoreCreateBinary();
     xSemWifiRetErrHdlr = xSemaphoreCreateBinary();
 }
 
+/**
+  * @brief  主函数         
+  * @note   初始化系统各个模块，创建任务、队列和信号量，并启动调度器。
+  * @param  None
+  * @retval int
+  */
 int main(void)
 {
     vUsartInit(USART2, 115200);
