@@ -46,10 +46,10 @@ void vTaskApConnection(void *pvParameters)
 {
     while (1)
     {
-        macESP8266_CH_ENABLE ();
-        vEsp8266AtTest ();
-        bEsp8266NetModeChoose ( STA );
-        while ( ! bEsp8266JoinAp ( macUser_ESP8266_ApSsid, macUser_ESP8266_ApPwd ) );
+        macESP8266_CH_ENABLE();
+        vEsp8266AtTest();
+        bEsp8266NetModeChoose(STA);
+        while(!bEsp8266JoinAp(ESP8266_APSSID, ESP8266_APPWD));
         vTaskDelete(NULL);
     }
 }

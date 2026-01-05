@@ -106,8 +106,8 @@ bool                    bEsp8266SendString                  ( FunctionalState en
 char *                  pcEsp8266ReceiveString              ( FunctionalState enumEnUnvarnishTx );
 
 /* 用户需要设置的参数 */
-#define                 macUser_ESP8266_ApSsid              "TESTAP666"                                                                                         // 要连接的热点的名称
-#define                 macUser_ESP8266_ApPwd               "123345567"                                                                                         // 要连接的热点的密钥
+#define                 ESP8266_APSSID                      "TESTAP666"                                                                                         // 要连接的热点的名称
+#define                 ESP8266_APPWD                       "123345567"                                                                                         // 要连接的热点的密钥
 
 /* 外部全局变量 */
 
