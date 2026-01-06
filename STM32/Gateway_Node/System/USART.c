@@ -40,7 +40,7 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
         NVIC_InitTypeDef NVIC_InitStructure;                                                                // 初始化NVIC的USART1通道
         NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;                                                   // 中断通道
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;                                           // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;                                           // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
         // NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;                                               // 响应优先级配置，用不上了
         NVIC_Init(&NVIC_InitStructure);                                                                     // 指向NVIC_InitStructure的地址
 
@@ -221,6 +221,7 @@ void USART1_IRQHandler(void)
     {
         /* code */
         #if (USE_RTOS == NONE)
+        
         #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
             uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART1);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -244,17 +245,17 @@ void USART2_IRQHandler(void)
 {
     #if (USE_RTOS == NONE && defined __ESP8266_SAMPLE_H__)
         uint8_t ulRxData;
-        if ( USART_GetITStatus ( macESP8266_USART, USART_IT_RXNE ) != RESET )
+        if ( USART_GetITStatus ( USART2, USART_IT_RXNE ) != RESET )
         {
-            ulRxData = USART_ReceiveData( macESP8266_USART );
-            if ( strEsp8266_Fram_Record .InfBit .FramLength < ( RX_BUF_MAX_LEN - 1 ) )                       //预留1个字节写结束符
-                strEsp8266_Fram_Record .Data_RX_BUF [ strEsp8266_Fram_Record .InfBit .FramLength ++ ]  = ulRxData;
+            ulRxData = USART_ReceiveData( USART2 );
+            if ( xSerialFrameRecord .Bits_t .usFrameLength < ( BUFFER_MAX_LENGTH - 1 ) )                       //预留1个字节写结束符
+                xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ++ ]  = ulRxData;
         }
-        if ( USART_GetITStatus( macESP8266_USART, USART_IT_IDLE ) == SET )                                         //数据帧接收完毕
+        if ( USART_GetITStatus( USART2, USART_IT_IDLE ) == SET )                                         //数据帧接收完毕
         {
-            strEsp8266_Fram_Record .InfBit .FramFinishFlag = 1;
-            ulRxData = USART_ReceiveData( macESP8266_USART );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
-            ucTcpClosedFlag = strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "CLOSED\r\n" ) ? 1 : 0;
+            xSerialFrameRecord .Bits_t .usFrameFinishFlag = 1;
+            ulRxData = USART_ReceiveData( USART2 );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+            ucTcpClosedFlag = strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "CLOSED\r\n" ) ? 1 : 0;
         }
     #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 1)
         if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
@@ -269,17 +270,17 @@ void USART2_IRQHandler(void)
         }
     #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 0)
         uint8_t ulRxData;
-        if ( USART_GetITStatus ( macESP8266_USART, USART_IT_RXNE ) != RESET )
+        if ( USART_GetITStatus ( USART2, USART_IT_RXNE ) != RESET )
         {
-            ulRxData = USART_ReceiveData( macESP8266_USART );
-            if ( strEsp8266_Fram_Record .InfBit .FramLength < ( RX_BUF_MAX_LEN - 1 ) )                       //预留1个字节写结束符
-                strEsp8266_Fram_Record .Data_RX_BUF [ strEsp8266_Fram_Record .InfBit .FramLength ++ ]  = ulRxData;
+            ulRxData = USART_ReceiveData( USART2 );
+            if ( xSerialFrameRecord .Bits_t .usFrameLength < ( BUFFER_MAX_LENGTH - 1 ) )                       //预留1个字节写结束符
+                xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ++ ]  = ulRxData;
         }
-        if ( USART_GetITStatus( macESP8266_USART, USART_IT_IDLE ) == SET )                                         //数据帧接收完毕
+        if ( USART_GetITStatus( USART2, USART_IT_IDLE ) == SET )                                         //数据帧接收完毕
         {
-            strEsp8266_Fram_Record .InfBit .FramFinishFlag = 1;
-            ulRxData = USART_ReceiveData( macESP8266_USART );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
-            ucTcpClosedFlag = strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "CLOSED\r\n" ) ? 1 : 0;
+            xSerialFrameRecord .Bits_t .usFrameFinishFlag = 1;
+            ulRxData = USART_ReceiveData( USART2 );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+            ucTcpClosedFlag = strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "CLOSED\r\n" ) ? 1 : 0;
         }
     #endif
 }
@@ -293,6 +294,7 @@ void USART2_IRQHandler(void)
 void USART3_IRQHandler(void)
 {
     #if (USE_RTOS == NONE)
+    
     #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART3_IRQ == 1)
         if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
         {

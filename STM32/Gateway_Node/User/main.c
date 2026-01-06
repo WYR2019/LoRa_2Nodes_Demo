@@ -12,7 +12,8 @@
 /* 创建一个新任务，需要创建任务句柄,任务句柄与任务函数一一对应。 */
 TaskHandle_t xTaskStateLedHdlr;
 TaskHandle_t xTaskBufferRxHdlr;
-TaskHandle_t xTaskApConnectHdlr;
+TaskHandle_t xTaskWifiJoinApHdlr;
+TaskHandle_t xTaskWifiMqttInitHdlr;
 
 /* 创建队列句柄 */
 QueueHandle_t xQueueUsart1IrqHdlr;
@@ -42,7 +43,7 @@ void vTaskStateLed(void *pvParameters)
 }
 
 
-void vTaskApConnection(void *pvParameters)
+void vTaskWifiJoinAp(void *pvParameters)
 {
     while (1)
     {
@@ -50,10 +51,43 @@ void vTaskApConnection(void *pvParameters)
         vEsp8266AtTest();
         bEsp8266NetModeChoose(STA);
         while(!bEsp8266JoinAp(ESP8266_APSSID, ESP8266_APPWD));
+        vUsartPrintf(USART1, "Wifi Join To AP Success\r\n");
         vTaskDelete(NULL);
     }
 }
 
+void vTaskWifiMqttInit(void *pvParameters)
+{
+    // bool bMqttUserCfgInit = false, bMqttCliIdInit = false, bMqttConnectResult = false;
+    BaseType_t bMqttConnectResult = pdFALSE;
+    while (1)
+    {
+        // MQTT初始化代码
+        // bMqttUserCfgInit = bEsp8266Command("AT+MQTTUSERCFG=0,1,\"NULL\",\"stm32\",\"IPSK25em.\",0,0,\"\"", "OK", NULL, 1500);
+        // bMqttCliIdInit = bEsp8266Command("AT+MQTTCLIENTID=0,\"TestServer&stm32\"", "OK", NULL, 1500);
+        // bMqttConnectResult = bEsp8266Command("AT+MQTTCONN=0,\"121.36.104.9\",1883,1", "OK", NULL, 2000);
+        // if (bMqttUserCfgInit == true && bMqttCliIdInit == true && bMqttConnectResult == true)
+        // {
+        //     /* code */
+        //     vUsartPrintf(USART1, "MQTT Init Success\r\n");
+        //     break;
+        // } else
+        // {
+        //     /* code */
+        //     vUsartPrintf(USART1, "MQTT Init Failed, Retry...\r\n");
+        //     vDelayMs(2000);
+        // }
+        bMqttConnectResult = bEsp8266MqttInit(ESP8266_MQTT_USERNAME, ESP8266_MQTT_PASSWORD, ESP8266_MQTT_CLIENT_ID, ESP8266_MQTT_SERVER_IP, ESP8266_MQTT_SERVER_PORT);
+        if (bMqttConnectResult == pdFALSE)
+        {
+            vUsartPrintf(USART1, "MQTT Init Failed, Retry...\r\n");
+            vDelayMs(2000);
+            continue;
+        }
+        vUsartPrintf(USART1, "MQTT Init Success\r\n");
+        vTaskDelete(NULL);
+    }
+}
 
 /**
   * @brief  创建所有任务列表         
@@ -71,12 +105,19 @@ void vCreateTasksList(void)
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &xTaskStateLedHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskApConnection,
+               (TaskFunction_t        ) vTaskWifiJoinAp,
                (char *                ) "TaskName_WifiConnectToAP", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskApConnectHdlr);
+               (TaskHandle_t *        ) &xTaskWifiJoinApHdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) vTaskWifiMqttInit,
+               (char *                ) "TaskName_WifiInitMQTTProtocol", 
+               (configSTACK_DEPTH_TYPE) 512,
+               (void *                ) NULL, 
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &xTaskWifiMqttInitHdlr);
 }
 
 /**
@@ -125,6 +166,7 @@ void vCreateSemaphoresList(void)
   */
 int main(void)
 {
+    vUsartInit(USART1, 115200);
     vUsartInit(USART2, 115200);
     vUsartInit(USART3, 115200);
     vDelayInit();

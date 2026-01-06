@@ -27,7 +27,7 @@
 #elif (USE_RTOS == FREERTOS)
     #include "FreeRTOS.h"
     #include "queue.h"
-    #define ENABLE_FREERTOS_API_QUEUE_USART1_IRQ                1
+    #define ENABLE_FREERTOS_API_QUEUE_USART1_IRQ                0
     #define ENABLE_FREERTOS_API_QUEUE_USART2_IRQ                0
     #define ENABLE_FREERTOS_API_QUEUE_USART3_IRQ                1
 #endif
@@ -36,7 +36,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#include "ESP8266.h"
 
 #if (ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
     extern QueueHandle_t xQueueUsart1IrqHdlr;
@@ -47,6 +46,21 @@
 #if (ENABLE_FREERTOS_API_QUEUE_USART3_IRQ == 1)
     extern QueueHandle_t xQueueUsart3IrqHdlr;
 #endif
+
+extern volatile uint8_t ucTcpClosedFlag;
+
+#define                 BUFFER_MAX_LENGTH                      1024                                                                                                // 最大接收缓存字节数
+extern struct SerialFrame_t                                                                                                                                // 串口数据帧的处理结构体
+{
+    char  cSerialReceivedBuffer [ BUFFER_MAX_LENGTH ];
+    union {
+    __IO uint16_t usInfoAll;
+    struct {
+            __IO uint16_t usFrameLength       :15;                                                                                                                 // 14:0
+            __IO uint16_t usFrameFinishFlag   :1;                                                                                                                  // 15
+        } Bits_t;
+    }; 
+} xSerialFrameRecord;
 
 void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate);
 void vUsartSendByte(USART_TypeDef *xUsartId, uint8_t ucByte);

@@ -1,9 +1,8 @@
 #include "esp8266.h"
 
 volatile uint8_t ucTcpClosedFlag = 0;
-
 char cStr [ 1500 ] = { 0 };
-struct STRUCT_USARTx_Fram strEsp8266_Fram_Record = { 0 };
+struct SerialFrame_t xSerialFrameRecord = { 0 };
 
 /**
   * @brief  vEsp8266GpioConfig
@@ -61,28 +60,28 @@ void vEsp8266Rst ( void )
 /**
  * @brief  bEsp8266Command
  * @note   对ESP8266模块发送AT指令,并等待响应。该函数被外部调用。
- * @param  cCmd：待发送的指令
- * @param  cReply1，cReply2：期待的响应，为NULL表不需响应，两者为或逻辑关系。
+ * @param  pcCmd：待发送的指令
+ * @param  pcReply1，pcReply2：期待的响应，为NULL表不需响应，两者为或逻辑关系。
  * @param  ulWaittime：等待响应的时间
  * @retval true：指令发送成功
  * @retval false：指令发送失败
  */
-bool bEsp8266Command ( char * cCmd, char * cReply1, char * cReply2, uint32_t ulWaittime )
+bool bEsp8266Command ( char * pcCmd, char * pcAck1, char * pcAck2, uint32_t ulWaittime )
 {    
-    strEsp8266_Fram_Record .InfBit .FramLength = 0;                                             //从新开始接收新的数据包
-    vUsartPrintf ( USART2, "%s\r\n", cCmd );
-    if ( ( cReply1 == 0 ) && ( cReply2 == 0 ) )                                                 //不需要接收数据
+    xSerialFrameRecord .Bits_t .usFrameLength = 0;                                             //从新开始接收新的数据包
+    vUsartPrintf ( USART2, "%s\r\n", pcCmd );
+    if ( ( pcAck1 == 0 ) && ( pcAck2 == 0 ) )                                                 //不需要接收数据
         return true;
     vDelayMs( ulWaittime );                                                                     //延时
-    strEsp8266_Fram_Record .Data_RX_BUF [ strEsp8266_Fram_Record .InfBit .FramLength ]  = '\0';
-    // macPC_Usart ( "%s", strEsp8266_Fram_Record .Data_RX_BUF );
-    if ( ( cReply1 != 0 ) && ( cReply2 != 0 ) )
-        return ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, cReply1 ) || 
-                            ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, cReply2 ) );
-    else if ( cReply1 != 0 )
-        return ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, cReply1 ) );
+    xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ]  = '\0';
+    // macPC_Usart ( "%s", xSerialFrameRecord .cSerialReceivedBuffer );
+    if ( ( pcAck1 != 0 ) && ( pcAck2 != 0 ) )
+        return ( ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck1 ) || 
+                            ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck2 ) );
+    else if ( pcAck1 != 0 )
+        return ( ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck1 ) );
     else
-        return ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, cReply2 ) );
+        return ( ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck2 ) );
 }
 
 /**
@@ -107,13 +106,13 @@ void vEsp8266AtTest ( void )
 /** 
   * @brief  bEsp8266NetModeChoose
   * @note   选择ESP8266模块的工作模式,该函数被外部调用。
-  * @param  enumMode，工作模式
+  * @param  xMode，工作模式
   * @retval 1，选择成功
   * @retval 0，选择失败
   */
-bool bEsp8266NetModeChoose ( ENUM_Net_ModeTypeDef enumMode )
+bool bEsp8266NetModeChoose ( eNetMode_t xMode )
 {
-    switch ( enumMode )
+    switch ( xMode )
     {
         case STA:
             return bEsp8266Command ( "AT+CWMODE=1", "OK", "no change", 2500 );
@@ -129,42 +128,68 @@ bool bEsp8266NetModeChoose ( ENUM_Net_ModeTypeDef enumMode )
 /**
   * @brief  bEsp8266JoinAp
   * @note   ESP8266模块连接外部WiFi，该函数被外部调用。
-  * @param  pSSID，WiFi名称字符串
-  * @param  pPassWord，WiFi密码字符串
+  * @param  pcSsid，WiFi名称字符串
+  * @param  pcPassWord，WiFi密码字符串
   * @retval 1，连接成功
   * @retval 0，连接失败
   */
-bool bEsp8266JoinAp ( char * pSSID, char * pPassWord )
+bool bEsp8266JoinAp ( char * pcSsid, char * pcPassWord )
 {
     char cCmd [120];
-    sprintf ( cCmd, "AT+CWJAP=\"%s\",\"%s\"", pSSID, pPassWord );
+    sprintf ( cCmd, "AT+CWJAP=\"%s\",\"%s\"", pcSsid, pcPassWord );
     return bEsp8266Command ( cCmd, "OK", NULL, 5000 );
+}
+
+/**
+  * @brief  bEsp8266MqttInit
+  * @note   ESP8266模块MQTT初始化，该函数被外部调用。
+  * @param  pcMqttUser，MQTT用户名字符串
+  * @param  pcMqttPwd，MQTT密码字符串
+  * @param  pcMqttCliId，MQTT客户端ID字符串
+  * @param  pcMqttServerIp，MQTT服务器IP地址字符串
+  * @param  usMqttServerPort，MQTT服务器端口号
+  * @retval 1，初始化成功
+  * @retval 0，初始化失败
+  */
+bool bEsp8266MqttInit ( char * pcMqttUser, char * pcMqttPwd, char * pcMqttCliId, char * pcMqttServerIp, char * usMqttServerPort )
+{
+    char cCmd [200];
+    sprintf ( cCmd, "AT+MQTTUSERCFG=0,1,\"NULL\",\"%s\",\"%s\",0,0,\"\"", pcMqttUser, pcMqttPwd );
+    if ( ! bEsp8266Command ( cCmd, "OK", NULL, 1500 ) )
+        return false;
+    sprintf ( cCmd, "AT+MQTTCLIENTID=0,\"%s\"", pcMqttCliId );
+    if ( ! bEsp8266Command ( cCmd, "OK", NULL, 1500 ) )
+        return false;
+    sprintf ( cCmd, "AT+MQTTCONN=0,\"%s\",%s,1", pcMqttServerIp, usMqttServerPort );
+    if ( ! bEsp8266Command ( cCmd, "OK", NULL, 2000 ) )
+        return false;
+    return true;
 }
 
 /**
   * @brief  bEsp8266BuildAp
   * @note   ESP8266模块创建AP热点，该函数被外部调用。
-  * @param  pSSID，AP名称字符串
-  * @param  pPassWord，AP密码字符串
-  * @param  enunPsdMode，AP加密方式
+  * @param  pcSsid，AP名称字符串
+  * @param  pcPassWord，AP密码字符串
+  * @param  xPsdMode，AP加密方式
   * @retval 1，创建成功
   * @retval 0，创建失败
   */
-bool bEsp8266BuildAp ( char * pSSID, char * pPassWord, ENUM_AP_PsdMode_TypeDef enunPsdMode )
+bool bEsp8266BuildAp ( char * pcSsid, char * pcPassWord, eApPsdMode_t xPsdMode )
 {
     char cCmd [120];
-    sprintf ( cCmd, "AT+CWSAP=\"%s\",\"%s\",1,%d", pSSID, pPassWord, enunPsdMode );
+    sprintf ( cCmd, "AT+CWSAP=\"%s\",\"%s\",1,%d", pcSsid, pcPassWord, xPsdMode );
     return bEsp8266Command ( cCmd, "OK", 0, 1000 );
 }
 
 /**
   * @brief  bEsp8266EnableMultipleId
   * @note   ESP8266模块使能/禁止多连接，该函数被外部调用。
-  * @param  enumEnUnvarnishTx，ENABLE：使能多连接；DISABLE：禁止多连接
+  * @param  xEnumEnUnvarnishTx，ENABLE：使能多连接；DISABLE：禁止多连接
   * @retval 1，操作成功
   * @retval 0，操作失败
   */
-bool bEsp8266EnableMultipleId ( FunctionalState enumEnUnvarnishTx )
+bool bEsp8266EnableMultipleId ( FunctionalState xEnumEnUnvarnishTx )
 {
     return bEsp8266Command ( "AT+CIPMUX=%d", "OK", 0, 500 );
 }
@@ -173,28 +198,28 @@ bool bEsp8266EnableMultipleId ( FunctionalState enumEnUnvarnishTx )
   * @brief  bEsp8266LinkServer
   * @note   ESP8266模块连接服务器，该函数被外部调用。
   * @param  enumE，连接协议类型
-  * @param  ip，服务器IP地址字符串
-  * @param  ComNum，服务器端口号字符串
-  * @param  id，连接ID号
+  * @param  pcIp，服务器IP地址字符串
+  * @param  pcComNum，服务器端口号字符串
+  * @param  xId，连接ID号
   * @retval 1，连接成功
   * @retval 0，连接失败
   */
-bool bEsp8266LinkServer ( ENUM_NetPro_TypeDef enumE, char * ip, char * ComNum, ENUM_ID_NO_TypeDef id)
+bool bEsp8266LinkServer ( eNetPro_t enumE, char * pcIp, char * pcComNum, eIdNo_t xId)
 {
     char cStr [100] = { 0 }, cCmd [120];
     switch (  enumE )
     {
         case enumTCP:
-            sprintf ( cStr, "\"%s\",\"%s\",%s", "TCP", ip, ComNum );
+            sprintf ( cStr, "\"%s\",\"%s\",%s", "TCP", pcIp, pcComNum );
             break;
         case enumUDP:
-            sprintf ( cStr, "\"%s\",\"%s\",%s", "UDP", ip, ComNum );
+            sprintf ( cStr, "\"%s\",\"%s\",%s", "UDP", pcIp, pcComNum );
             break;
         default:
             break;
     }
-    if ( id < 5 )
-    sprintf ( cCmd, "AT+CIPSTART=%d,%s", id, cStr);
+    if ( xId < 5 )
+    sprintf ( cCmd, "AT+CIPSTART=%d,%s", xId, cStr);
     else
         sprintf ( cCmd, "AT+CIPSTART=%s", cStr );
     return bEsp8266Command ( cCmd, "OK", "ALREAY CONNECT", 4000 );
@@ -203,25 +228,25 @@ bool bEsp8266LinkServer ( ENUM_NetPro_TypeDef enumE, char * ip, char * ComNum, E
 /**
   * @brief  bEsp8266StartOrShutServer
   * @note   ESP8266模块启动/关闭服务器，该函数被外部调用。
-  * @param  enumMode，ENABLE：启动服务器；DISABLE：关闭服务器
-  * @param  pPortNum，服务器端口号字符串
-  * @param  pTimeOver，服务器超时时间字符串
+  * @param  xMode，ENABLE：启动服务器；DISABLE：关闭服务器
+  * @param  pcPortNum，服务器端口号字符串
+  * @param  pcTimeOver，服务器超时时间字符串
   * @retval 1，操作成功
   * @retval 0，操作失败
   */
-bool bEsp8266StartOrShutServer ( FunctionalState enumMode, char * pPortNum, char * pTimeOver )
+bool bEsp8266StartOrShutServer ( FunctionalState xMode, char * pcPortNum, char * pcTimeOver )
 {
     char cCmd1 [120], cCmd2 [120];
-    if ( enumMode )
+    if ( xMode )
     {
-        sprintf ( cCmd1, "AT+CIPSERVER=%d,%s", 1, pPortNum );
-        sprintf ( cCmd2, "AT+CIPSTO=%s", pTimeOver );
+        sprintf ( cCmd1, "AT+CIPSERVER=%d,%s", 1, pcPortNum );
+        sprintf ( cCmd2, "AT+CIPSTO=%s", pcTimeOver );
         return ( bEsp8266Command ( cCmd1, "OK", 0, 500 ) &&
                             bEsp8266Command ( cCmd2, "OK", 0, 500 ) );
     }
     else
     {
-        sprintf ( cCmd1, "AT+CIPSERVER=%d,%s", 0, pPortNum );
+        sprintf ( cCmd1, "AT+CIPSERVER=%d,%s", 0, pcPortNum );
         return bEsp8266Command ( cCmd1, "OK", 0, 500 );
     }
 }
@@ -239,12 +264,12 @@ uint8_t ucEsp8266GetLinkStatus ( void )
 {
     if ( bEsp8266Command ( "AT+CIPSTATUS", "OK", 0, 500 ) )
     {
-        if ( strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "STATUS:2\r\n" ) )
+        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "STATUS:2\r\n" ) )
             return 2;
-        else if ( strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "STATUS:3\r\n" ) )
+        else if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "STATUS:3\r\n" ) )
             return 3;
         
-        else if ( strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "STATUS:4\r\n" ) )
+        else if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "STATUS:4\r\n" ) )
             return 4;
     }
     return 0;
@@ -261,23 +286,23 @@ uint8_t ucEsp8266GetIdLinkStatus ( void )
     uint8_t ucIdLinkStatus = 0x00;
     if ( bEsp8266Command ( "AT+CIPSTATUS", "OK", 0, 500 ) )
     {
-        if ( strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "+CIPSTATUS:0," ) )
+        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:0," ) )
             ucIdLinkStatus |= 0x01;
         else 
             ucIdLinkStatus &= ~ 0x01;
-        if ( strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "+CIPSTATUS:1," ) )
+        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:1," ) )
             ucIdLinkStatus |= 0x02;
         else 
             ucIdLinkStatus &= ~ 0x02;
-        if ( strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "+CIPSTATUS:2," ) )
+        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:2," ) )
             ucIdLinkStatus |= 0x04;
         else 
             ucIdLinkStatus &= ~ 0x04;
-        if ( strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "+CIPSTATUS:3," ) )
+        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:3," ) )
             ucIdLinkStatus |= 0x08;
         else 
             ucIdLinkStatus &= ~ 0x08;
-        if ( strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "+CIPSTATUS:4," ) )
+        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:4," ) )
             ucIdLinkStatus |= 0x10;
         else 
             ucIdLinkStatus &= ~ 0x10;
@@ -288,27 +313,27 @@ uint8_t ucEsp8266GetIdLinkStatus ( void )
 /**
   * @brief  ucEsp8266InquireApIp
   * @note   获取ESP8266的AP IP，该函数被外部调用。
-  * @param  pApIp，存放 AP IP 的数组的首地址
+  * @param  pcApIp，存放 AP IP 的数组的首地址
   * @param  ucArrayLength，存放 AP IP 的数组的长度
   * @retval 0，获取失败
   * @retval 1，获取成功
   */
-uint8_t ucEsp8266InquireApIp ( char * pApIp, uint8_t ucArrayLength )
+uint8_t ucEsp8266InquireApIp ( char * pcApIp, uint8_t ucArrayLength )
 {
     char uc;
     char * pCh;
     bEsp8266Command ( "AT+CIFSR", "OK", 0, 500 );
-    pCh = strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "APIP,\"" );
+    pCh = strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "APIP,\"" );
     if ( pCh )
         pCh += 6;
     else
         return 0;
     for ( uc = 0; uc < ucArrayLength; uc ++ )
     {
-        pApIp [ uc ] = * ( pCh + uc);
-        if ( pApIp [ uc ] == '\"' )
+        pcApIp [ uc ] = * ( pCh + uc);
+        if ( pcApIp [ uc ] == '\"' )
         {
-            pApIp [ uc ] = '\0';
+            pcApIp [ uc ] = '\0';
             break;
         }
     }
@@ -343,30 +368,30 @@ void vEsp8266ExitUnvarnishSend ( void )
 /**
   * @brief  bEsp8266SendString
   * @note   ESP8266模块发送字符串，该函数被外部调用。
-  * @param  enumEnUnvarnishTx，声明是否已使能了透传模式
-  * @param  pStr，待发送的字符串首地址
+  * @param  xEnumEnUnvarnishTx，声明是否已使能了透传模式
+  * @param  pcStr，待发送的字符串首地址
   * @param  ulStrLength，待发送的字符串长度
   * @param  ucId，连接ID号
   * @retval 1，发送成功
   * @retval 0，发送失败
   */
-bool bEsp8266SendString ( FunctionalState enumEnUnvarnishTx, char * pStr, uint32_t ulStrLength, ENUM_ID_NO_TypeDef ucId )
+bool bEsp8266SendString ( FunctionalState xEnumEnUnvarnishTx, char * pcStr, uint32_t ulStrLength, eIdNo_t xId )
 {
     char cStr [20];
     bool bRet = false;
-    if ( enumEnUnvarnishTx )
+    if ( xEnumEnUnvarnishTx )
     {
-        vUsartPrintf ( USART2, "%s", pStr );
+        vUsartPrintf ( USART2, "%s", pcStr );
         bRet = true;
     }
     else
     {
-        if ( ucId < 5 )
-            sprintf ( cStr, "AT+CIPSEND=%d,%d", ucId, ulStrLength + 2 );
+        if ( xId < 5 )
+            sprintf ( cStr, "AT+CIPSEND=%d,%d", xId, ulStrLength + 2 );
         else
             sprintf ( cStr, "AT+CIPSEND=%d", ulStrLength + 2 );
         bEsp8266Command ( cStr, "> ", 0, 1000 );
-        bRet = bEsp8266Command ( pStr, "SEND OK", 0, 1000 );
+        bRet = bEsp8266Command ( pcStr, "SEND OK", 0, 1000 );
     }
     return bRet;
 }
@@ -374,22 +399,22 @@ bool bEsp8266SendString ( FunctionalState enumEnUnvarnishTx, char * pStr, uint32
 /**
   * @brief  pcEsp8266ReceiveString
   * @note   ESP8266模块接收字符串，该函数被外部调用。
-  * @param  enumEnUnvarnishTx，声明是否已使能了透传模式
+  * @param  xEnumEnUnvarnishTx，声明是否已使能了透传模式
   * @retval 接收到的字符串首地址，未接收到返回0
   */
-char * pcEsp8266ReceiveString ( FunctionalState enumEnUnvarnishTx )
+char * pcEsp8266ReceiveString ( FunctionalState xEnumEnUnvarnishTx )
 {
     char * pRecStr = 0;
-    strEsp8266_Fram_Record .InfBit .FramLength = 0;
-    strEsp8266_Fram_Record .InfBit .FramFinishFlag = 0;
-    while ( ! strEsp8266_Fram_Record .InfBit .FramFinishFlag );
-    strEsp8266_Fram_Record .Data_RX_BUF [ strEsp8266_Fram_Record .InfBit .FramLength ] = '\0';
-    if ( enumEnUnvarnishTx )
-        pRecStr = strEsp8266_Fram_Record .Data_RX_BUF;
+    xSerialFrameRecord .Bits_t .usFrameLength = 0;
+    xSerialFrameRecord .Bits_t .usFrameFinishFlag = 0;
+    while ( ! xSerialFrameRecord .Bits_t .usFrameFinishFlag );
+    xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ] = '\0';
+    if ( xEnumEnUnvarnishTx )
+        pRecStr = xSerialFrameRecord .cSerialReceivedBuffer;
     else 
     {
-        if ( strstr ( strEsp8266_Fram_Record .Data_RX_BUF, "+IPD" ) )
-            pRecStr = strEsp8266_Fram_Record .Data_RX_BUF;
+        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+IPD" ) )
+            pRecStr = xSerialFrameRecord .cSerialReceivedBuffer;
     }
     return pRecStr;
 }
