@@ -7,7 +7,6 @@
 #include "USART.h"
 #include "LED.h"
 #include "ESP8266.h"
-#include "NetFIFO.h"
 
 /* 创建一个新任务，需要创建任务句柄,任务句柄与任务函数一一对应。 */
 TaskHandle_t xTaskStateLedHdlr;
@@ -42,7 +41,12 @@ void vTaskStateLed(void *pvParameters)
     }
 }
 
-
+/**
+  * @brief  连接WiFi任务         
+  * @note   通过ESP8266模块连接指定的WiFi热点。
+  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @retval None
+  */
 void vTaskWifiJoinAp(void *pvParameters)
 {
     while (1)
@@ -56,36 +60,52 @@ void vTaskWifiJoinAp(void *pvParameters)
     }
 }
 
+/**
+  * @brief  初始化MQTT协议任务         
+  * @note   通过ESP8266模块初始化MQTT协议连接。
+  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @retval None
+  */
 void vTaskWifiMqttInit(void *pvParameters)
 {
-    // bool bMqttUserCfgInit = false, bMqttCliIdInit = false, bMqttConnectResult = false;
-    BaseType_t bMqttConnectResult = pdFALSE;
     while (1)
     {
-        // MQTT初始化代码
-        // bMqttUserCfgInit = bEsp8266Command("AT+MQTTUSERCFG=0,1,\"NULL\",\"stm32\",\"IPSK25em.\",0,0,\"\"", "OK", NULL, 1500);
-        // bMqttCliIdInit = bEsp8266Command("AT+MQTTCLIENTID=0,\"TestServer&stm32\"", "OK", NULL, 1500);
-        // bMqttConnectResult = bEsp8266Command("AT+MQTTCONN=0,\"121.36.104.9\",1883,1", "OK", NULL, 2000);
-        // if (bMqttUserCfgInit == true && bMqttCliIdInit == true && bMqttConnectResult == true)
+        // if (*ucMqttMode == ALIYUN)
+        // {
+        //     /* code */
+        //     if (bEsp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENT_ID, 
+        //         ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == true)
+        //     {
+        //         /* code */
+        //         vUsartPrintf(USART1, "MQTT Init Success\r\n");
+        //         vTaskDelete(NULL);
+        //     }
+        // }
+        // else if (*ucMqttMode == EMQX)
+        // {
+        //     /* code */
+        //     if (bEsp8266MqttInit(ESP8266_MQTT_USERNAME, ESP8266_MQTT_PASSWORD, ESP8266_MQTT_CLIENT_ID, 
+        //         ESP8266_MQTT_SERVER_IP, ESP8266_MQTT_SERVER_PORT, NULL) == true)
+        //     {
+        //         /* code */
+        //         vUsartPrintf(USART1, "MQTT Init Success\r\n");
+        //         vTaskDelete(NULL);
+        //     }
+        // }
+        if (bEsp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENT_ID, 
+            ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == true)
+        {
+            /* code */
+            vUsartPrintf(USART1, "MQTT Init Success\r\n");
+            vTaskDelete(NULL);
+        }
+        // if (bEsp8266MqttInit(ESP8266_MQTT_USERNAME, ESP8266_MQTT_PASSWORD, ESP8266_MQTT_CLIENT_ID, 
+        //     ESP8266_MQTT_SERVER_IP, ESP8266_MQTT_SERVER_PORT, NULL) == true)
         // {
         //     /* code */
         //     vUsartPrintf(USART1, "MQTT Init Success\r\n");
-        //     break;
-        // } else
-        // {
-        //     /* code */
-        //     vUsartPrintf(USART1, "MQTT Init Failed, Retry...\r\n");
-        //     vDelayMs(2000);
+        //     vTaskDelete(NULL);
         // }
-        bMqttConnectResult = bEsp8266MqttInit(ESP8266_MQTT_USERNAME, ESP8266_MQTT_PASSWORD, ESP8266_MQTT_CLIENT_ID, ESP8266_MQTT_SERVER_IP, ESP8266_MQTT_SERVER_PORT);
-        if (bMqttConnectResult == pdFALSE)
-        {
-            vUsartPrintf(USART1, "MQTT Init Failed, Retry...\r\n");
-            vDelayMs(2000);
-            continue;
-        }
-        vUsartPrintf(USART1, "MQTT Init Success\r\n");
-        vTaskDelete(NULL);
     }
 }
 
@@ -115,7 +135,7 @@ void vCreateTasksList(void)
                (TaskFunction_t        ) vTaskWifiMqttInit,
                (char *                ) "TaskName_WifiInitMQTTProtocol", 
                (configSTACK_DEPTH_TYPE) 512,
-               (void *                ) NULL, 
+               (void *                ) NULL,
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &xTaskWifiMqttInitHdlr);
 }

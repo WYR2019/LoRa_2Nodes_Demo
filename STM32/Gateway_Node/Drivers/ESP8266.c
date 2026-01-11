@@ -143,26 +143,45 @@ bool bEsp8266JoinAp ( char * pcSsid, char * pcPassWord )
 /**
   * @brief  bEsp8266MqttInit
   * @note   ESP8266模块MQTT初始化，该函数被外部调用。
-  * @param  pcMqttUser，MQTT用户名字符串
-  * @param  pcMqttPwd，MQTT密码字符串
-  * @param  pcMqttCliId，MQTT客户端ID字符串
+  * @param  pcMqttUserName，MQTT用户名字符串
+  * @param  pcMqttPassword，MQTT密码字符串
+  * @param  pcMqttClientId，MQTT客户端ID字符串
   * @param  pcMqttServerIp，MQTT服务器IP地址字符串
   * @param  usMqttServerPort，MQTT服务器端口号
   * @retval 1，初始化成功
   * @retval 0，初始化失败
   */
-bool bEsp8266MqttInit ( char * pcMqttUser, char * pcMqttPwd, char * pcMqttCliId, char * pcMqttServerIp, char * usMqttServerPort )
+bool bEsp8266MqttInit ( char * pcMqttUserName, char * pcMqttPassword, char * pcMqttClientId, 
+                       char * pcMqttServerIp, uint16_t usMqttServerPort, 
+                       char * pcMqttSubscribeTopic )
 {
-    char cCmd [200];
-    sprintf ( cCmd, "AT+MQTTUSERCFG=0,1,\"NULL\",\"%s\",\"%s\",0,0,\"\"", pcMqttUser, pcMqttPwd );
-    if ( ! bEsp8266Command ( cCmd, "OK", NULL, 1500 ) )
+    char cCmd[512] = {0};
+    
+    // 1. 配置MQTT用户信息
+    snprintf(cCmd, sizeof(cCmd), "AT+MQTTUSERCFG=0,1,\"NULL\",\"%s\",\"%s\",0,0,\"\"", 
+             pcMqttUserName, pcMqttPassword);
+    if (!bEsp8266Command(cCmd, "OK", NULL, 2000))
         return false;
-    sprintf ( cCmd, "AT+MQTTCLIENTID=0,\"%s\"", pcMqttCliId );
-    if ( ! bEsp8266Command ( cCmd, "OK", NULL, 1500 ) )
+    
+    // 2. 设置客户端ID
+    memset(cCmd, 0, sizeof(cCmd));
+    snprintf(cCmd, sizeof(cCmd), "AT+MQTTCLIENTID=0,\"%s\"", pcMqttClientId);
+    if (!bEsp8266Command(cCmd, "OK", NULL, 2000))
         return false;
-    sprintf ( cCmd, "AT+MQTTCONN=0,\"%s\",%s,1", pcMqttServerIp, usMqttServerPort );
-    if ( ! bEsp8266Command ( cCmd, "OK", NULL, 2000 ) )
+    
+    // 3. 连接到MQTT服务器
+    memset(cCmd, 0, sizeof(cCmd));
+    snprintf(cCmd, sizeof(cCmd), "AT+MQTTCONN=0,\"%s\",%u,1", 
+             pcMqttServerIp, usMqttServerPort);
+    if (!bEsp8266Command(cCmd, "OK", NULL, 5000))
         return false;
+    
+    // 4. 订阅主题
+    memset(cCmd, 0, sizeof(cCmd));
+    snprintf(cCmd, sizeof(cCmd), "AT+MQTTSUB=0,\"%s\",1", pcMqttSubscribeTopic);
+    if (!bEsp8266Command(cCmd, "OK", NULL, 2000))
+        return false;
+    
     return true;
 }
 
@@ -349,7 +368,7 @@ uint8_t ucEsp8266InquireApIp ( char * pcApIp, uint8_t ucArrayLength )
   */
 bool bEsp8266UnvarnishSend ( void )
 {
-    bEsp8266Command ( "AT+CIPMODE=1", "OK", 0, 500 );
+    return ( bEsp8266Command ( "AT+CIPMODE=1", "OK", 0, 500 ) );
 }
 
 /**

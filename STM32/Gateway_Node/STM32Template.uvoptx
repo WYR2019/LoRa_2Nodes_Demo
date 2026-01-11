@@ -153,17 +153,17 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>cNetFifoBuffer</ItemText>
+          <ItemText>bMqttUserCfgInit</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ucEsp8266ResHandler,0x0A</ItemText>
+          <ItemText>bMqttCliIdInit</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ucEsp8266Log,0x0A</ItemText>
+          <ItemText>bMqttConnectResult</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -184,7 +184,7 @@
         <AscS1>0</AscS1>
         <AscS2>0</AscS2>
         <AscS3>0</AscS3>
-        <aSer3>1</aSer3>
+        <aSer3>0</aSer3>
         <eProf>0</eProf>
         <aLa>0</aLa>
         <aPa1>0</aPa1>

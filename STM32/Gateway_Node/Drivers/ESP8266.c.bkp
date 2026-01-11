@@ -265,3 +265,21 @@ void vTaskWifiConnection(void *pvParameters)
         vTaskDelete(NULL);
     }
 }
+
+        // bool bMqttConnectResult = false;
+        // bEsp8266Command("AT+MQTTUSERCFG=0,1,\"NULL\",\"GATEWAY_STM32_ESP8266&k11ilqnf8mF\",\"8457286184495376a925f47ca284bb46a2fe8f6a6b76b0479ddb066038fe0d26\",0,0,\"\"", "OK", NULL, 1500);
+        // bEsp8266Command("AT+MQTTCLIENTID=0,\"k11ilqnf8mF.GATEWAY_STM32_ESP8266|securemode=2\\,signmethod=hmacsha256\\,timestamp=1768114890602|\"", "OK", NULL, 1500);
+        // bEsp8266Command("AT+MQTTCONN=0,\"iot-06z00by9al78fmz.mqtt.iothub.aliyuncs.com\",1883,1", "OK", NULL, 5000);
+        // bMqttConnectResult = bEsp8266Command("AT+MQTTSUB=0,\"/k11ilqnf8mF/GATEWAY_STM32_ESP8266/user/get\",1", "OK", NULL, 1500);
+        // if (bMqttConnectResult == true)
+        // {
+        //     /* code */
+        //     vUsartPrintf(USART1, "MQTT Init Success\r\n");
+        //     vTaskDelete(NULL);
+        // }
+        // if (bEsp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENT_ID, ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == true)
+        // {
+        //     /* code */
+        //     vUsartPrintf(USART1, "MQTT Init Success\r\n");
+        //     vTaskDelete(NULL);
+        // }
