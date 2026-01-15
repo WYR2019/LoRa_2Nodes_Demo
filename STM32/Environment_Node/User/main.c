@@ -112,7 +112,7 @@ void vTaskDht11(void *pvParameters)
         xQueueSend(xQueueHumiHdlr, &ucSendHumiData, pdMS_TO_TICKS(10));
     } 
     while (1)
-    {   
+    {
         /* code */
         if (vDht11ReadData(&xDHT11Data.ucTemp,&xDHT11Data.ucHumi) == 0)
         {
@@ -137,6 +137,7 @@ void vTaskDht11(void *pvParameters)
   */
 void vTaskLoRaToGatePkt(void *pvParameters)
 {
+    char cBuffer[50];
     uint8_t ucRecTempData = 0, ucRecHumiData = 0;
     /* 定义一个返回值判断是否接收成功 */
     BaseType_t xRetvalQueueTemp, xRetvalQueueHumi;
@@ -158,6 +159,9 @@ void vTaskLoRaToGatePkt(void *pvParameters)
             /* code */
             vUsartSendArray(USART3, &ucRecTempData, 1);
             vUsartSendArray(USART3, &ucRecHumiData, 1); 
+            snprintf(cBuffer, sizeof(cBuffer), "Temp=%d, Humi=%d\r\n", ucRecTempData, ucRecHumiData);
+            vUsartSendString(USART1, cBuffer);
+            vTaskDelay(1000);
         }
         if (xSemaphoreTake(xSemLedOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
@@ -301,7 +305,7 @@ void vCreateQueuesList(void)
     if (xQueueTempHdlr == NULL || xQueueHumiHdlr == NULL || xQueueUsart3IrqHdlr == NULL)
     {
         /* code */
-        vUsartPrintf(USART3, "Queue Init Failed.\r\n");
+        vUsartPrintf(USART1, "Queue Init Failed.\r\n");
     }
 }
 
@@ -330,6 +334,7 @@ int main(void)
     vFanRelayInit();
     vDelayInit();
     vPc13LedInit();
+    vUsartInit(USART1, 115200);
     vUsartInit(USART3, 115200);
     vCreateQueuesList();
     vCreateSemaphoresList();

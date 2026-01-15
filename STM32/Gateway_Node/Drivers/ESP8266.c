@@ -10,9 +10,9 @@ struct SerialFrame_t xSerialFrameRecord = { 0 };
   * @param  无
   * @retval 无
   */
-static void vEsp8266GpioConfig ( void )
+void vEsp8266GpioConfig ( void )
 {
-    /*定义一个GPIO_InitTypeDef类型的结构体*/
+    /* 定义一个GPIO_InitTypeDef类型的结构体 */
     GPIO_InitTypeDef GPIO_InitStructure;
     /* 配置 CH_PD 引脚*/
     RCC_APB2PeriphClockCmd ( macESP8266_CH_PD_CLK, ENABLE );
@@ -24,20 +24,6 @@ static void vEsp8266GpioConfig ( void )
     RCC_APB2PeriphClockCmd ( macESP8266_RST_CLK, ENABLE );
     GPIO_InitStructure.GPIO_Pin = macESP8266_RST_PIN;
     GPIO_Init ( macESP8266_RST_PORT, & GPIO_InitStructure );
-}
-
-
-/**
-  * @brief  vEsp8266Init
-  * @note   ESP8266模块初始化函数，该函数被外部调用。
-  * @param  无
-  * @retval 无
-  */
-void vEsp8266Init ( void )
-{
-    vEsp8266GpioConfig ();
-    macESP8266_RST_HIGH_LEVEL();
-    macESP8266_CH_DISABLE();
 }
 
 /**
@@ -157,26 +143,26 @@ bool bEsp8266MqttInit ( char * pcMqttUserName, char * pcMqttPassword, char * pcM
 {
     char cCmd[512] = {0};
     
-    // 1. 配置MQTT用户信息
+    /* 1. 配置MQTT用户信息 */
     snprintf(cCmd, sizeof(cCmd), "AT+MQTTUSERCFG=0,1,\"NULL\",\"%s\",\"%s\",0,0,\"\"", 
              pcMqttUserName, pcMqttPassword);
     if (!bEsp8266Command(cCmd, "OK", NULL, 2000))
         return false;
     
-    // 2. 设置客户端ID
+    /* 2. 设置客户端ID */
     memset(cCmd, 0, sizeof(cCmd));
     snprintf(cCmd, sizeof(cCmd), "AT+MQTTCLIENTID=0,\"%s\"", pcMqttClientId);
     if (!bEsp8266Command(cCmd, "OK", NULL, 2000))
         return false;
     
-    // 3. 连接到MQTT服务器
+    /* 3. 连接到MQTT服务器 */
     memset(cCmd, 0, sizeof(cCmd));
     snprintf(cCmd, sizeof(cCmd), "AT+MQTTCONN=0,\"%s\",%u,1", 
              pcMqttServerIp, usMqttServerPort);
-    if (!bEsp8266Command(cCmd, "OK", NULL, 5000))
+    if (!bEsp8266Command(cCmd, "OK", NULL, 5000) && !bEsp8266Command(cCmd, "+MQTTCONN", NULL, 5000))
         return false;
     
-    // 4. 订阅主题
+    /* 4. 订阅主题 */
     memset(cCmd, 0, sizeof(cCmd));
     snprintf(cCmd, sizeof(cCmd), "AT+MQTTSUB=0,\"%s\",1", pcMqttSubscribeTopic);
     if (!bEsp8266Command(cCmd, "OK", NULL, 2000))
@@ -216,17 +202,17 @@ bool bEsp8266EnableMultipleId ( FunctionalState xEnumEnUnvarnishTx )
 /**
   * @brief  bEsp8266LinkServer
   * @note   ESP8266模块连接服务器，该函数被外部调用。
-  * @param  enumE，连接协议类型
+  * @param  xNetProtocol，连接协议类型
   * @param  pcIp，服务器IP地址字符串
   * @param  pcComNum，服务器端口号字符串
   * @param  xId，连接ID号
   * @retval 1，连接成功
   * @retval 0，连接失败
   */
-bool bEsp8266LinkServer ( eNetPro_t enumE, char * pcIp, char * pcComNum, eIdNo_t xId)
+bool bEsp8266LinkServer ( eNetPro_t xNetProtocol, char * pcIp, char * pcComNum, eIdNo_t xId)
 {
     char cStr [100] = { 0 }, cCmd [120];
-    switch (  enumE )
+    switch (  xNetProtocol )
     {
         case enumTCP:
             sprintf ( cStr, "\"%s\",\"%s\",%s", "TCP", pcIp, pcComNum );
@@ -241,7 +227,7 @@ bool bEsp8266LinkServer ( eNetPro_t enumE, char * pcIp, char * pcComNum, eIdNo_t
     sprintf ( cCmd, "AT+CIPSTART=%d,%s", xId, cStr);
     else
         sprintf ( cCmd, "AT+CIPSTART=%s", cStr );
-    return bEsp8266Command ( cCmd, "OK", "ALREAY CONNECT", 4000 );
+    return bEsp8266Command ( cCmd, "OK", "ALREADY CONNECT", 4000 );
 }
 
 /**
@@ -368,7 +354,7 @@ uint8_t ucEsp8266InquireApIp ( char * pcApIp, uint8_t ucArrayLength )
   */
 bool bEsp8266UnvarnishSend ( void )
 {
-    return ( bEsp8266Command ( "AT+CIPMODE=1", "OK", 0, 500 ) );
+    return bEsp8266Command ( "AT+CIPMODE=1", "OK", 0, 500 );
 }
 
 /**

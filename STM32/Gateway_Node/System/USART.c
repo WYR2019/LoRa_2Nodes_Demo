@@ -26,7 +26,7 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
 
         USART_InitTypeDef USART_InitStructure;
         USART_InitStructure.USART_BaudRate = ulBaudrate;                                                    // 设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
-        RCC_APB1PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
         USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;                     // 硬件流控制,不使用流控
         USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;                                       // 串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
         USART_InitStructure.USART_Parity = USART_Parity_No;                                                 // 无校验位
@@ -217,22 +217,32 @@ void vUsartPrintf(USART_TypeDef *xUsartId, char *format, ...)
   */
 void USART1_IRQHandler(void)
 {
-    if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
-    {
-        /* code */
-        #if (USE_RTOS == NONE)
-        
-        #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
-            uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART1);
+    /* code */
+    #if (USE_RTOS == NONE)
+        uint8_t ucRxData;
+        if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
+        {
+            ucRxData = USART_ReceiveData(USART1);
+            USART_SendData(USART1, ucRxData);
+        }
+    #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
+        if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
+        {
+            uint8_t ucRxData = (uint8_t)USART_ReceiveData(USART1);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xQueueSendFromISR(xQueueUsart1IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
+            xQueueSendFromISR(xQueueUsart1IrqHdlr, &ucRxData, &xHigherPriorityTaskWoken);
             /* 问题根源：请求上下文切换 */ 
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
             USART_ClearITPendingBit(USART1, USART_IT_RXNE);
-        #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 0)
-
-        #endif
-    } 
+        }
+    #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 0)
+        // uint8_t ucRxData;
+        // if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
+        // {
+        //     ucRxData = USART_ReceiveData(USART1);
+        //     USART_SendData(USART1, ucRxData);
+        // }
+    #endif
 }
 
 /**
@@ -244,44 +254,45 @@ void USART1_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
     #if (USE_RTOS == NONE && defined __ESP8266_SAMPLE_H__)
-        uint8_t ulRxData;
+        uint8_t ucRxData;
         if ( USART_GetITStatus ( USART2, USART_IT_RXNE ) != RESET )
         {
-            ulRxData = USART_ReceiveData( USART2 );
+            ucRxData = USART_ReceiveData( USART2 );
             if ( xSerialFrameRecord .Bits_t .usFrameLength < ( BUFFER_MAX_LENGTH - 1 ) )                       //预留1个字节写结束符
-                xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ++ ]  = ulRxData;
+                xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ++ ]  = ucRxData;
         }
         if ( USART_GetITStatus( USART2, USART_IT_IDLE ) == SET )                                         //数据帧接收完毕
         {
             xSerialFrameRecord .Bits_t .usFrameFinishFlag = 1;
-            ulRxData = USART_ReceiveData( USART2 );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+            ucRxData = USART_ReceiveData( USART2 );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
             ucTcpClosedFlag = strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "CLOSED\r\n" ) ? 1 : 0;
         }
     #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 1)
         if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
         {
             /* code */
-            uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART2);
+            uint8_t ucRxData = (uint8_t)USART_ReceiveData(USART2);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xQueueSendFromISR(xQueueUsart2IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
+            xQueueSendFromISR(xQueueUsart2IrqHdlr, &ucRxData, &xHigherPriorityTaskWoken);
             /* 问题根源：请求上下文切换 */ 
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
             USART_ClearITPendingBit(USART2, USART_IT_RXNE);
         }
     #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 0)
-        uint8_t ulRxData;
+        uint8_t ucRxData;
         if ( USART_GetITStatus ( USART2, USART_IT_RXNE ) != RESET )
         {
-            ulRxData = USART_ReceiveData( USART2 );
+            ucRxData = USART_ReceiveData( USART2 );
             if ( xSerialFrameRecord .Bits_t .usFrameLength < ( BUFFER_MAX_LENGTH - 1 ) )                       //预留1个字节写结束符
-                xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ++ ]  = ulRxData;
+                xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ++ ]  = ucRxData;
         }
         if ( USART_GetITStatus( USART2, USART_IT_IDLE ) == SET )                                         //数据帧接收完毕
         {
             xSerialFrameRecord .Bits_t .usFrameFinishFlag = 1;
-            ulRxData = USART_ReceiveData( USART2 );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+            ucRxData = USART_ReceiveData( USART2 );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
             ucTcpClosedFlag = strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "CLOSED\r\n" ) ? 1 : 0;
         }
+        USART_SendData(USART1, ucRxData);
     #endif
 }
 
@@ -299,9 +310,9 @@ void USART3_IRQHandler(void)
         if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
         {
             /* code */
-            uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART3);
+            uint8_t ucRxData = (uint8_t)USART_ReceiveData(USART3);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xQueueSendFromISR(xQueueUsart3IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
+            xQueueSendFromISR(xQueueUsart3IrqHdlr, &ucRxData, &xHigherPriorityTaskWoken);
             /* 问题根源：请求上下文切换 */ 
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         }

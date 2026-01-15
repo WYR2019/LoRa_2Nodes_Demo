@@ -26,7 +26,7 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
 
         USART_InitTypeDef USART_InitStructure;
         USART_InitStructure.USART_BaudRate = ulBaudrate;                                                    // 设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
-        RCC_APB1PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
         USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;                     // 硬件流控制,不使用流控
         USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;                                       // 串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
         USART_InitStructure.USART_Parity = USART_Parity_No;                                                 // 无校验位
@@ -34,13 +34,13 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
         USART_InitStructure.USART_WordLength = USART_WordLength_8b;                                         // 字长，不需要校验，字长就选择8位
         USART_Init(USART1, &USART_InitStructure);
                                                                                                             // 上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
-        USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);                                                        // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
-
+        USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);                                                      // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
+        USART_ITConfig(USART1, USART_IT_IDLE, ENABLE);                                                      // 使能串口总线空闲中断
         NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);                                                     // 分组，分组4为4bit抢占优先级和0bit响应优先级，抢占优先级可设置为0-15。由于FreeRTOS没有响应优先级，而优先级分组4相当于4位抢占优先级和0位响应优先级。
         NVIC_InitTypeDef NVIC_InitStructure;                                                                // 初始化NVIC的USART1通道
         NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;                                                   // 中断通道
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;                                           // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;                                           // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
         // NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;                                               // 响应优先级配置，用不上了
         NVIC_Init(&NVIC_InitStructure);                                                                     // 指向NVIC_InitStructure的地址
 
@@ -68,7 +68,8 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
         USART_InitStructure.USART_WordLength = USART_WordLength_8b;                                         // 字长，不需要校验，字长就选择8位
         USART_Init(USART2, &USART_InitStructure);
                                                                                                             // 上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
-        USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);                                                        // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
+        USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);                                                      // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
+        USART_ITConfig(USART2, USART_IT_IDLE, ENABLE);                                                      // 使能串口总线空闲中断
 
         NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);                                                     // 分组，分组4为4bit抢占优先级和0bit响应优先级，抢占优先级可设置为0-15。由于FreeRTOS没有响应优先级，而优先级分组4相当于4位抢占优先级和0位响应优先级。
         NVIC_InitTypeDef NVIC_InitStructure;                                                                // 初始化NVIC的USART1通道
@@ -103,8 +104,8 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
         USART_InitStructure.USART_WordLength = USART_WordLength_8b;                                         // 字长，不需要校验，字长就选择8位
         USART_Init(USART3, &USART_InitStructure);
                                                                                                             // 上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
-        USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);                                                        // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
-
+        USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);                                                      // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
+        USART_ITConfig(USART3, USART_IT_IDLE, ENABLE);                                                      // 使能串口总线空闲中断    
         NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);                                                     // 分组，分组4为4bit抢占优先级和0bit响应优先级，抢占优先级可设置为0-15。由于FreeRTOS没有响应优先级，而优先级分组4相当于4位抢占优先级和0位响应优先级。
         NVIC_InitTypeDef NVIC_InitStructure;                                                                // 初始化NVIC的USART1通道
         NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;                                                   // 中断通道
@@ -172,7 +173,7 @@ void vUsartSendString(USART_TypeDef *xUsartId, char *pcString)                  
   */
 void vUsartPrintf(USART_TypeDef *xUsartId, char *format, ...)
 {
-    char cBuffer[100];
+    char cBuffer[1024];
     va_list arg;                                                                                            // arg是定义一个参数列表变量
     va_start(arg, format);                                                                                  // 从format位置开始接收参数表，放在arg里面
     vsprintf(cBuffer, format, arg);                                                                         // 封装格式要用vsprintf，因为sprintf只能接收直接写的参数；打印字符串格式是format，参数表是arg，
@@ -216,19 +217,22 @@ void vUsartPrintf(USART_TypeDef *xUsartId, char *format, ...)
   */
 void USART1_IRQHandler(void)
 {
-    if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
-    {
-        /* code */
-        uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART1);
-        #if (USE_RTOS == NONE)
-        #elif (USE_RTOS == FREERTOS)
+    /* code */
+    #if (USE_RTOS == NONE)
+    
+    #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
+        if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
+        {
+            uint8_t ucRxData = (uint8_t)USART_ReceiveData(USART1);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xQueueSendFromISR(xQueueUsart1IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
+            xQueueSendFromISR(xQueueUsart1IrqHdlr, &ucRxData, &xHigherPriorityTaskWoken);
             /* 问题根源：请求上下文切换 */ 
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        #endif
-        USART_ClearITPendingBit(USART1, USART_IT_RXNE);
-    } 
+            USART_ClearITPendingBit(USART1, USART_IT_RXNE);
+        }
+    #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 0)
+
+    #endif
 }
 
 /**
@@ -239,19 +243,22 @@ void USART1_IRQHandler(void)
   */
 void USART2_IRQHandler(void)
 {
-    if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
-    {
-        /* code */
-        uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART2);
-        #if (USE_RTOS == NONE)
-        #elif (USE_RTOS == FREERTOS)
+    #if (USE_RTOS == NONE && defined __ESP8266_SAMPLE_H__)
+    
+    #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 1)
+        if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
+        {
+            /* code */
+            uint8_t ucRxData = (uint8_t)USART_ReceiveData(USART2);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xQueueSendFromISR(xQueueUsart2IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
+            xQueueSendFromISR(xQueueUsart2IrqHdlr, &ucRxData, &xHigherPriorityTaskWoken);
             /* 问题根源：请求上下文切换 */ 
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        #endif
-        USART_ClearITPendingBit(USART2, USART_IT_RXNE);
-    } 
+            USART_ClearITPendingBit(USART2, USART_IT_RXNE);
+        }
+    #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 0)
+    
+    #endif
 }
 
 /**
@@ -262,17 +269,19 @@ void USART2_IRQHandler(void)
   */
 void USART3_IRQHandler(void)
 {
-    if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
-    {
-        /* code */
-        uint8_t ulRxData = (uint8_t)USART_ReceiveData(USART3);
-        #if (USE_RTOS == NONE)
-        #elif (USE_RTOS == FREERTOS)
+    #if (USE_RTOS == NONE)
+    
+    #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART3_IRQ == 1)
+        if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
+        {
+            /* code */
+            uint8_t ucRxData = (uint8_t)USART_ReceiveData(USART3);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xQueueSendFromISR(xQueueUsart3IrqHdlr, &ulRxData, &xHigherPriorityTaskWoken);
+            xQueueSendFromISR(xQueueUsart3IrqHdlr, &ucRxData, &xHigherPriorityTaskWoken);
             /* 问题根源：请求上下文切换 */ 
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        #endif
-        USART_ClearITPendingBit(USART3, USART_IT_RXNE);
-    } 
+        }
+    #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART3_IRQ == 0)
+    
+    #endif
 }

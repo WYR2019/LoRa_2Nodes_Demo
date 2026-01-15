@@ -74,42 +74,53 @@ typedef enum{
 #define                 macESP8266_RST_LOW_LEVEL()          GPIO_ResetBits ( macESP8266_RST_PORT, macESP8266_RST_PIN )
 
 /* ESP8266 函数声明 */
-static void             vEsp8266GpioConfig                  ( void );
-void                    vEsp8266Init                        ( void );
+void                    vEsp8266GpioConfig                  ( void );
 void                    vEsp8266Rst                         ( void );
-bool                    bEsp8266Command                     ( char * pcCmd, char * pcAck1, char * pcAck2, uint32_t ulWaittime );
+bool                    bEsp8266Command                     ( char * pcCmd, char * pcAck1, 
+                                                              char * pcAck2, uint32_t ulWaittime );
 void                    vEsp8266AtTest                      ( void );
 bool                    bEsp8266NetModeChoose               ( eNetMode_t xMode );
 bool                    bEsp8266JoinAp                      ( char * pcSsid, char * pcPassWord );
-bool                    bEsp8266MqttInit                    ( char * pcMqttUserName, char * pcMqttPassword, char * pcMqttClientId, char * pcMqttServerIp, uint16_t usMqttServerPort, char * pcMqttSubscribeTopic );
+bool                    bEsp8266MqttInit                    ( char * pcMqttUserName, char * pcMqttPassword, char * pcMqttClientId, 
+                                                              char * pcMqttServerIp, uint16_t usMqttServerPort, char * pcMqttSubscribeTopic );
 bool                    bEsp8266BuildAp                     ( char * pcSsid, char * pcPassWord, eApPsdMode_t xPsdMode );
 bool                    bEsp8266EnableMultipleId            ( FunctionalState xEnumEnUnvarnishTx );
-bool                    bEsp8266LinkServer                  ( eNetPro_t enumE, char * pcIp, char * pcComNum, eIdNo_t xId);
+bool                    bEsp8266LinkServer                  ( eNetPro_t xNetProtocol, char * pcIp, 
+                                                              char * pcComNum, eIdNo_t xId);
 bool                    bEsp8266StartOrShutServer           ( FunctionalState xMode, char * pcPortNum, char * pcTimeOver );
 uint8_t                 ucEsp8266GetLinkStatus              ( void );
 uint8_t                 ucEsp8266GetIdLinkStatus            ( void );
 uint8_t                 ucEsp8266InquireApIp                ( char * pcApIp, uint8_t ucArrayLength );
 bool                    bEsp8266UnvarnishSend               ( void );
 void                    vEsp8266ExitUnvarnishSend           ( void );
-bool                    bEsp8266SendString                  ( FunctionalState xEnumEnUnvarnishTx, char * pcStr, uint32_t ulStrLength, eIdNo_t xId );
+bool                    bEsp8266SendString                  ( FunctionalState xEnumEnUnvarnishTx, char * pcStr, 
+                                                              uint32_t ulStrLength, eIdNo_t xId );
 char *                  pcEsp8266ReceiveString              ( FunctionalState xEnumEnUnvarnishTx );
 
 /* 用户需要设置的参数 */
-#define                 ESP8266_APSSID                      "TESTAP888"                                                                                         // 要连接的热点的名称
-#define                 ESP8266_APPWD                       "123345567"                                                                                         // 要连接的热点的密钥
+// #define                 ESP8266_APSSID                      "CMCC-5bjx"                                                                                         // 要连接的热点的名称
+#define                 ESP8266_APSSID                      "TESTAP"
+#define                 ESP8266_APPWD                       "jp7qpqn3"                                                                                          // 要连接的热点的密钥
 
-#define                 ESP8266_MQTT_SERVER_IP              "121.36.104.9"                                                                                      // MQTT服务器IP地址
-#define                 ESP8266_MQTT_SERVER_PORT            1883                                                                                                // MQTT服务器端口号
-#define                 ESP8266_MQTT_CLIENT_ID              "LoRaEnvAssistant&stm32"                                                                            // MQTT客户端ID
-#define                 ESP8266_MQTT_USERNAME               "stm32"                                                                                             // MQTT用户名
-#define                 ESP8266_MQTT_PASSWORD               "123456789"                                                                                         // MQTT密码
+#define                 ALIYUN                              0
+#define                 EMQX                                1
+#define                 ESP8266_MQTT_SERVER_MODE            ALIYUN                                                                                              // 选择MQTT服务器模式：ALIYUN/EMQX
+
+#define                 ESP8266_EMQX_MQTT_SERVER_IP         "121.36.104.9"                                                                                      // MQTT服务器IP地址
+#define                 ESP8266_EMQX_MQTT_SERVER_PORT       1883                                                                                                // MQTT服务器端口号
+#define                 ESP8266_EMQX_MQTT_CLIENTID          "LoRaEnvAssistant&stm32"                                                                            // MQTT客户端ID
+#define                 ESP8266_EMQX_MQTT_USERNAME          "stm32"                                                                                             // MQTT用户名
+#define                 ESP8266_EMQX_MQTT_PASSWORD          "123456789"                                                                                         // MQTT密码
+#define                 ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC   "/LoRaEnvAssistant/LoRaEnvAssistant&mqttfx/topics"                                                  // 订阅主题
+#define                 ESP8266_EMQX_MQTT_PUBLISH_TOPIC     "/LoRaEnvAssistant/LoRaEnvAssistant&stm32/topics"                                                   // 发布主题
 
 #define                 ESP8266_ALIYUN_MQTT_IP              "iot-06z00by9al78fmz.mqtt.iothub.aliyuncs.com"
 #define                 ESP8266_ALIYUN_MQTT_PORT            1883
-#define                 ESP8266_ALIYUN_MQTT_CLIENT_ID       "k11ilqnf8mF.GATEWAY_STM32_ESP8266|securemode=2\\,signmethod=hmacsha256\\,timestamp=1768114890602|"          
+#define                 ESP8266_ALIYUN_MQTT_CLIENTID        "k11ilqnf8mF.GATEWAY_STM32_ESP8266|securemode=2\\,signmethod=hmacsha256\\,timestamp=1768415322303|"          
 #define                 ESP8266_ALIYUN_MQTT_USERNAME        "GATEWAY_STM32_ESP8266&k11ilqnf8mF"
-#define                 ESP8266_ALIYUN_MQTT_PASSWORD        "8457286184495376a925f47ca284bb46a2fe8f6a6b76b0479ddb066038fe0d26"
+#define                 ESP8266_ALIYUN_MQTT_PASSWORD        "a74261b04d7dda672342776b88e956f26f74f4d9d104461f8b65cbf544ab9c03"
 #define                 ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC "/k11ilqnf8mF/GATEWAY_STM32_ESP8266/user/get"
+#define                 ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC   "/k11ilqnf8mF/GATEWAY_STM32_ESP8266/user/update"
 
 /* 外部全局变量 */
 

@@ -1,27 +1,22 @@
 #include "stm32f10x.h"                  // Device header
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
 #include "Delay.h"
 #include "USART.h"
 #include "LED.h"
 #include "ESP8266.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
 
 /* 创建一个新任务，需要创建任务句柄,任务句柄与任务函数一一对应。 */
-TaskHandle_t xTaskStateLedHdlr;
-TaskHandle_t xTaskBufferRxHdlr;
+TaskHandle_t xTaskWorkStatusLedHdlr;
 TaskHandle_t xTaskWifiJoinApHdlr;
-TaskHandle_t xTaskWifiMqttInitHdlr;
+TaskHandle_t xTaskWifiNwkInitHdlr;
+TaskHandle_t xTaskMqttPublishTestHdlr;
 
 /* 创建队列句柄 */
 QueueHandle_t xQueueUsart1IrqHdlr;
 QueueHandle_t xQueueUsart2IrqHdlr;
 QueueHandle_t xQueueUsart3IrqHdlr;
-
-/* 创建二值信号量句柄 */
-SemaphoreHandle_t xSemWifiRetOkHdlr;
-SemaphoreHandle_t xSemWifiRetErrHdlr;
 
 /**
   * @brief  状态指示LED任务         
@@ -30,7 +25,7 @@ SemaphoreHandle_t xSemWifiRetErrHdlr;
   * @retval None
   */
 /* 创建任务 */
-void vTaskStateLed(void *pvParameters)
+void vTaskWorkStatusLed(void *pvParameters)
 {
     while(1)
     {
@@ -42,70 +37,108 @@ void vTaskStateLed(void *pvParameters)
 }
 
 /**
-  * @brief  连接WiFi任务         
-  * @note   通过ESP8266模块连接指定的WiFi热点。
-  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
-  * @retval None
-  */
-void vTaskWifiJoinAp(void *pvParameters)
-{
-    while (1)
-    {
-        macESP8266_CH_ENABLE();
-        vEsp8266AtTest();
-        bEsp8266NetModeChoose(STA);
-        while(!bEsp8266JoinAp(ESP8266_APSSID, ESP8266_APPWD));
-        vUsartPrintf(USART1, "Wifi Join To AP Success\r\n");
-        vTaskDelete(NULL);
-    }
-}
-
-/**
-  * @brief  初始化MQTT协议任务         
+  * @brief  初始化Wi-Fi模块网络任务         
   * @note   通过ESP8266模块初始化MQTT协议连接。
   * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
   * @retval None
   */
-void vTaskWifiMqttInit(void *pvParameters)
+void vTaskWifiNetWorkInit(void *pvParameters)
 {
     while (1)
     {
-        // if (*ucMqttMode == ALIYUN)
-        // {
-        //     /* code */
-        //     if (bEsp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENT_ID, 
-        //         ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == true)
-        //     {
-        //         /* code */
-        //         vUsartPrintf(USART1, "MQTT Init Success\r\n");
-        //         vTaskDelete(NULL);
-        //     }
-        // }
-        // else if (*ucMqttMode == EMQX)
-        // {
-        //     /* code */
-        //     if (bEsp8266MqttInit(ESP8266_MQTT_USERNAME, ESP8266_MQTT_PASSWORD, ESP8266_MQTT_CLIENT_ID, 
-        //         ESP8266_MQTT_SERVER_IP, ESP8266_MQTT_SERVER_PORT, NULL) == true)
-        //     {
-        //         /* code */
-        //         vUsartPrintf(USART1, "MQTT Init Success\r\n");
-        //         vTaskDelete(NULL);
-        //     }
-        // }
-        if (bEsp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENT_ID, 
-            ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == true)
+        vEsp8266GpioConfig();
+        vEsp8266AtTest();
+        if (bEsp8266NetModeChoose(STA) == pdTRUE)
+        {
+            vUsartSendString(USART1, "Set ESP8266 Net Mode Successfully.\r\n");
+        } else
         {
             /* code */
-            vUsartPrintf(USART1, "MQTT Init Success\r\n");
-            vTaskDelete(NULL);
+            vUsartSendString(USART1, "Set ESP8266 Net Mode Failed.\r\n");
+            continue;
+        } 
+        if (bEsp8266JoinAp(ESP8266_APSSID, ESP8266_APPWD) == pdTRUE)
+        {
+            vUsartSendString(USART1, "Wifi Join To AP Successfully.\r\n");
+        } else
+        {
+            /* code */
+            vUsartSendString(USART1, "Wifi Join To AP Failed.\r\n");
+            continue;
         }
-        // if (bEsp8266MqttInit(ESP8266_MQTT_USERNAME, ESP8266_MQTT_PASSWORD, ESP8266_MQTT_CLIENT_ID, 
-        //     ESP8266_MQTT_SERVER_IP, ESP8266_MQTT_SERVER_PORT, NULL) == true)
-        // {
-        //     /* code */
-        //     vUsartPrintf(USART1, "MQTT Init Success\r\n");
-        //     vTaskDelete(NULL);
-        // }
+        #if (ESP8266_MQTT_SERVER_MODE == ALIYUN)
+            if (bEsp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENTID, 
+                ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == pdTRUE)
+            {
+                /* code */
+                vUsartSendString(USART1, "Aliyun MQTT Init Successfully.\r\n");
+                /* 通知MQTT发布任务 */
+                xTaskNotifyGive(xTaskMqttPublishTestHdlr);
+                vTaskDelete(NULL);
+            } else
+            {
+                /* code */
+                vUsartSendString(USART1, "Aliyun MQTT Init Failed.\r\n");
+                continue;
+            }
+        #elif (ESP8266_MQTT_SERVER_MODE == EMQX)
+            if (bEsp8266MqttInit(ESP8266_EMQX_MQTT_USERNAME, ESP8266_EMQX_MQTT_PASSWORD, ESP8266_EMQX_MQTT_CLIENTID, 
+                ESP8266_EMQX_MQTT_SERVER_IP, ESP8266_EMQX_MQTT_SERVER_PORT, ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == pdTRUE)
+            {
+                /* code */
+                vUsartPrintf(USART1, "EMQX MQTT Init Successfully.\r\n");
+                xTaskNotifyGive(xTaskMqttPublishTestHdlr);
+                vTaskDelete(NULL);
+            } else
+            {
+                /* code */
+                vUsartSendString(USART1, "EMQX MQTT Init Failed.\r\n");
+                continue;
+            }
+        #endif
+    }
+}
+
+/**
+  * @brief  MQTT发布测试任务         
+  * @note   通过ESP8266模块向MQTT服务器发布测试消息。
+  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @retval None
+  */
+void vTaskMqttPublishTest(void *pvParameters)
+{
+    /* 任务通知接收函数 */
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    char cCmd[256] = {0};
+    while (1)
+    {
+        /* code */
+        #if (ESP8266_MQTT_SERVER_MODE == ALIYUN)
+            const char* pcMsg = "test";
+            sprintf(cCmd, "AT+MQTTPUB=0,\"%s\",\"%s\",1,0", 
+                ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC, pcMsg);
+            if (bEsp8266Command(cCmd, "OK", NULL, 3000) == pdTRUE) 
+            {
+                vUsartSendString(USART1, "Aliyun MQTT Publish Successfully.\r\n");
+            } else
+            {
+                /* code */
+                vUsartSendString(USART1, "Aliyun MQTT Publish Failed.\r\n");
+            }
+            vTaskDelay(500);
+        #elif (ESP8266_MQTT_SERVER_MODE == EMQX)
+            const char* pcMsg = "test";
+            sprintf(cCmd, "AT+MQTTPUB=0,\"%s\",\"%s\",0,0", ESP8266_EMQX_MQTT_PUBLISH_TOPIC, pcMsg);
+            if (bEsp8266Command(cCmd, "OK", NULL, 3000) == pdTRUE) 
+            {
+                vUsartSendString(USART1, "EMQX MQTT Publish Successfully.\r\n");
+            } else
+            {
+                /* code */
+                vUsartSendString(USART1, "EMQX MQTT Publish Failed.\r\n");
+            }
+            vTaskDelay(500);
+        #endif
     }
 }
 
@@ -118,26 +151,26 @@ void vTaskWifiMqttInit(void *pvParameters)
 void vCreateTasksList(void)
 {
     xTaskCreate(
-               (TaskFunction_t        ) vTaskStateLed,
+               (TaskFunction_t        ) vTaskWorkStatusLed,
                (char *                ) "TaskName_StateLed", 
                (configSTACK_DEPTH_TYPE) 256,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskStateLedHdlr);
+               (TaskHandle_t *        ) &xTaskWorkStatusLedHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskWifiJoinAp,
-               (char *                ) "TaskName_WifiConnectToAP", 
-               (configSTACK_DEPTH_TYPE) 512,
-               (void *                ) NULL, 
-               (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskWifiJoinApHdlr);
-    xTaskCreate(
-               (TaskFunction_t        ) vTaskWifiMqttInit,
+               (TaskFunction_t        ) vTaskWifiNetWorkInit,
                (char *                ) "TaskName_WifiInitMQTTProtocol", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL,
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskWifiMqttInitHdlr);
+               (TaskHandle_t *        ) &xTaskWifiNwkInitHdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) vTaskMqttPublishTest,
+               (char *                ) "TaskName_MqttPublishTest", 
+               (configSTACK_DEPTH_TYPE) 512,
+               (void *                ) NULL,
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &xTaskMqttPublishTestHdlr);
 }
 
 /**
@@ -174,8 +207,6 @@ void vCreateQueuesList(void)
   */
 void vCreateSemaphoresList(void)
 {
-    xSemWifiRetOkHdlr  = xSemaphoreCreateBinary();
-    xSemWifiRetErrHdlr = xSemaphoreCreateBinary();
 }
 
 /**

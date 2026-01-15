@@ -58,7 +58,7 @@
 #define configUSE_TIME_SLICING                       1
 /* 队列。为1开启，为0关闭 */
 #define configUSE_QUEUE_SETS                         0
-/* 开启任务通知功能，默认开启 */
+/* 开启任务通知功能，用于通知下一个任务运行，默认开启 */
 #define configUSE_TASK_NOTIFICATIONS                 1
 /* 互斥信号量开关 */
 #define configUSE_MUTEXES                            0

@@ -49,15 +49,17 @@
 
 extern volatile uint8_t ucTcpClosedFlag;
 
-#define                 BUFFER_MAX_LENGTH                      1024                                                                                                // 最大接收缓存字节数
-extern struct SerialFrame_t                                                                                                                                // 串口数据帧的处理结构体
+#define BUFFER_MAX_LENGTH                                       1024                    // 接收缓冲区最大字节数
+extern struct SerialFrame_t                                                             // 串口数据帧的处理结构体
 {
-    char  cSerialReceivedBuffer [ BUFFER_MAX_LENGTH ];
-    union {
-    __IO uint16_t usInfoAll;
-    struct {
-            __IO uint16_t usFrameLength       :15;                                                                                                                 // 14:0
-            __IO uint16_t usFrameFinishFlag   :1;                                                                                                                  // 15
+    char cSerialReceivedBuffer [ BUFFER_MAX_LENGTH ];
+    union 
+    {
+        __IO uint16_t usInfoAll;
+        struct 
+        {
+            __IO uint16_t usFrameLength                         :15;                    // 14:0
+            __IO uint16_t usFrameFinishFlag                     :1;                     // 15
         } Bits_t;
     }; 
 } xSerialFrameRecord;
