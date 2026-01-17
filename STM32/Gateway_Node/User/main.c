@@ -109,27 +109,31 @@ void vTaskMqttPublishTest(void *pvParameters)
 {
     /* 任务通知接收函数 */
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    char cCmd[256] = {0};
+    char pcCmd[256] = {0};
+    char *pcJsonMsg = "{\"temperature\":23,\"humidity\":60}";
     while (1)
     {
         /* code */
         #if (ESP8266_MQTT_SERVER_MODE == ALIYUN)
-            const char* pcMsg = "test";
-            sprintf(cCmd, "AT+MQTTPUB=0,\"%s\",\"%s\",1,0", 
-                ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC, pcMsg);
-            if (bEsp8266Command(cCmd, "OK", NULL, 3000) == pdTRUE) 
+            uint8_t ucLen = strlen(pcJsonMsg);
+            snprintf(pcCmd, sizeof(pcCmd), "AT+MQTTPUBRAW=0,\"%s\",%d,1,0", 
+                     ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC, ucLen);
+            if (bEsp8266Command(pcCmd, "OK", ">", 3000) == pdTRUE && 
+                bEsp8266Command(pcJsonMsg, "OK", NULL, 3000) == pdTRUE)
             {
+                /* code */
                 vUsartSendString(USART1, "Aliyun MQTT Publish Successfully.\r\n");
             } else
             {
                 /* code */
                 vUsartSendString(USART1, "Aliyun MQTT Publish Failed.\r\n");
             }
-            vTaskDelay(500);
         #elif (ESP8266_MQTT_SERVER_MODE == EMQX)
-            const char* pcMsg = "test";
-            sprintf(cCmd, "AT+MQTTPUB=0,\"%s\",\"%s\",0,0", ESP8266_EMQX_MQTT_PUBLISH_TOPIC, pcMsg);
-            if (bEsp8266Command(cCmd, "OK", NULL, 3000) == pdTRUE) 
+            uint8_t ucLen = strlen(pcJsonMsg);
+            snprintf(pcCmd, sizeof(pcCmd), "AT+MQTTPUBRAW=0,\"%s\",%d,1,0", 
+                     ESP8266_EMQX_MQTT_PUBLISH_TOPIC, ucLen);
+            if (bEsp8266Command(pcCmd, "OK", ">", 3000) == pdTRUE && 
+                bEsp8266Command(pcJsonMsg, "OK", NULL, 3000) == pdTRUE)
             {
                 vUsartSendString(USART1, "EMQX MQTT Publish Successfully.\r\n");
             } else

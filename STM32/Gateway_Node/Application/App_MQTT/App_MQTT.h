@@ -14,7 +14,7 @@ typedef enum
 }eMqttMode_t;
 
 bool bMqttSubMsgFormat(eMqttMode_t ucMode, char *pcReceivedMsg, char *pcTopic, char *pcMessage);
-bool bMqttNormalSubscribe(char *pcTopic, char *pcMessage);
+bool bMqttDefaultSubscribe(char *pcTopic, char *pcMessage);
 bool bMqttNormalPublish(char *pcTopic, char *pcMessage);
 
 #endif /* __APP_MQTT_H__ */

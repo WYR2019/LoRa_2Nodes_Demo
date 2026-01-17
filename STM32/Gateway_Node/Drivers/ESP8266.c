@@ -54,13 +54,12 @@ void vEsp8266Rst ( void )
  */
 bool bEsp8266Command ( char * pcCmd, char * pcAck1, char * pcAck2, uint32_t ulWaittime )
 {    
-    xSerialFrameRecord .Bits_t .usFrameLength = 0;                                             //从新开始接收新的数据包
+    xSerialFrameRecord .Bits_t .usFrameLength = 0;                                                  //从新开始接收新的数据包
     vUsartPrintf ( USART2, "%s\r\n", pcCmd );
-    if ( ( pcAck1 == 0 ) && ( pcAck2 == 0 ) )                                                 //不需要接收数据
+    if ( ( pcAck1 == 0 ) && ( pcAck2 == 0 ) )                                                       //不需要接收数据
         return true;
-    vDelayMs( ulWaittime );                                                                     //延时
+    vDelayMs( ulWaittime );                                                                         //延时
     xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ]  = '\0';
-    // macPC_Usart ( "%s", xSerialFrameRecord .cSerialReceivedBuffer );
     if ( ( pcAck1 != 0 ) && ( pcAck2 != 0 ) )
         return ( ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck1 ) || 
                             ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck2 ) );
@@ -138,8 +137,8 @@ bool bEsp8266JoinAp ( char * pcSsid, char * pcPassWord )
   * @retval 0，初始化失败
   */
 bool bEsp8266MqttInit ( char * pcMqttUserName, char * pcMqttPassword, char * pcMqttClientId, 
-                       char * pcMqttServerIp, uint16_t usMqttServerPort, 
-                       char * pcMqttSubscribeTopic )
+                        char * pcMqttServerIp, uint16_t usMqttServerPort, 
+                        char * pcMqttSubscribeTopic )
 {
     char cCmd[512] = {0};
     

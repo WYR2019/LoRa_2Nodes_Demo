@@ -19,3 +19,8 @@ ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
 **3、**
 修改部分函数格式，具体详见代码仓库。
+
+### 2026.1.17：
+
+**1、**
+支持以json格式向mqtt服务器发布数据。
