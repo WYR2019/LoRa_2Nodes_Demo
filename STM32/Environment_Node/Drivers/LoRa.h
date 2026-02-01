@@ -120,23 +120,23 @@ static LoRaNode2Config_t xLoRaNode2Config = {
 };
 
 static LoRaSensorID_t xLoRaSensorID = {
-    .ucIdDht11      = LORA_SENSOR_DHT11,
-    .ucIdMq2        = LORA_SENSOR_MQ2,
-    .ucIdLight      = LORA_SENSOR_LIGHT,
-    .ucIdFire       = LORA_SENSOR_FIRE
+    .ucIdDht11             = LORA_SENSOR_DHT11,
+    .ucIdMq2               = LORA_SENSOR_MQ2,
+    .ucIdLight             = LORA_SENSOR_LIGHT,
+    .ucIdFire              = LORA_SENSOR_FIRE
 };
 
 static LoRaExecutorID_t xLoRaExecutorID = {
-    .ucIdLed        = LORA_EXECUTOR_LED,
-    .ucIdFan        = LORA_EXECUTOR_FAN,
-    .ucIdHumidifier = LORA_EXECUTOR_HUMIDIFIER,
-    .ucIdBuzzer     = LORA_EXECUTOR_BUZZER,
-    .ucIdServo      = LORA_EXECUTOR_SERVO
+    .ucIdLed               = LORA_EXECUTOR_LED,
+    .ucIdFan               = LORA_EXECUTOR_FAN,
+    .ucIdHumidifier        = LORA_EXECUTOR_HUMIDIFIER,
+    .ucIdBuzzer            = LORA_EXECUTOR_BUZZER,
+    .ucIdServo             = LORA_EXECUTOR_SERVO
 };
 
 static LoRaExecutorCmd_t xLoRaExecutorCommand = {
-    .ucCommandOn     = LORA_EXECUTOR_COMMAND_ON,
-    .ucCommandOff    = LORA_EXECUTOR_COMMAND_OFF,
+    .ucCommandOn           = LORA_EXECUTOR_COMMAND_ON,
+    .ucCommandOff          = LORA_EXECUTOR_COMMAND_OFF,
 };
 
 void vLoRaConnectionPkt(uint8_t ucNodeId);

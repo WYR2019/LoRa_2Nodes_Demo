@@ -54,19 +54,19 @@ void vEsp8266Rst ( void )
  */
 bool bEsp8266Command ( char * pcCmd, char * pcAck1, char * pcAck2, uint32_t ulWaittime )
 {    
-    xSerialFrameRecord .Bits_t .usFrameLength = 0;                                                  //从新开始接收新的数据包
+    xSerialFrameRecord.Bits_t.usFrameLength = 0;                                                    //从新开始接收新的数据包
     vUsartPrintf ( USART2, "%s\r\n", pcCmd );
     if ( ( pcAck1 == 0 ) && ( pcAck2 == 0 ) )                                                       //不需要接收数据
         return true;
     vDelayMs( ulWaittime );                                                                         //延时
-    xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ]  = '\0';
+    xSerialFrameRecord.cSerialReceivedBuffer [ xSerialFrameRecord.Bits_t.usFrameLength ]  = '\0';
     if ( ( pcAck1 != 0 ) && ( pcAck2 != 0 ) )
-        return ( ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck1 ) || 
-                            ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck2 ) );
+        return ( ( bool ) strstr ( xSerialFrameRecord.cSerialReceivedBuffer, pcAck1 ) || 
+                            ( bool ) strstr ( xSerialFrameRecord.cSerialReceivedBuffer, pcAck2 ) );
     else if ( pcAck1 != 0 )
-        return ( ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck1 ) );
+        return ( ( bool ) strstr ( xSerialFrameRecord.cSerialReceivedBuffer, pcAck1 ) );
     else
-        return ( ( bool ) strstr ( xSerialFrameRecord .cSerialReceivedBuffer, pcAck2 ) );
+        return ( ( bool ) strstr ( xSerialFrameRecord.cSerialReceivedBuffer, pcAck2 ) );
 }
 
 /**
@@ -80,9 +80,10 @@ void vEsp8266AtTest ( void )
     char count=0;
     macESP8266_RST_HIGH_LEVEL();
     vDelayMs( 1000 );
-    while ( count < 10 )
+    while ( count < 3 )
     {
-        if( bEsp8266Command ( "AT", "OK", NULL, 500 ) ) return;
+        if( bEsp8266Command ( "AT", "OK", NULL, 500 ) != true ) 
+            return;
         vEsp8266Rst();
         ++ count;
     }
@@ -120,9 +121,14 @@ bool bEsp8266NetModeChoose ( eNetMode_t xMode )
   */
 bool bEsp8266JoinAp ( char * pcSsid, char * pcPassWord )
 {
-    char cCmd [120];
+    char cCmd [128];
     sprintf ( cCmd, "AT+CWJAP=\"%s\",\"%s\"", pcSsid, pcPassWord );
-    return bEsp8266Command ( cCmd, "OK", NULL, 5000 );
+    if (strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "WIFI CONNECTED" ) != NULL)
+    {
+        /* code */
+        return true;
+    }
+    return bEsp8266Command ( cCmd, "OK", "WIFI CONNECTED", 8000 );
 }
 
 /**
@@ -140,31 +146,31 @@ bool bEsp8266MqttInit ( char * pcMqttUserName, char * pcMqttPassword, char * pcM
                         char * pcMqttServerIp, uint16_t usMqttServerPort, 
                         char * pcMqttSubscribeTopic )
 {
-    char cCmd[512] = {0};
+    char cCmd[256] = {0};
     
     /* 1. 配置MQTT用户信息 */
     snprintf(cCmd, sizeof(cCmd), "AT+MQTTUSERCFG=0,1,\"NULL\",\"%s\",\"%s\",0,0,\"\"", 
              pcMqttUserName, pcMqttPassword);
-    if (!bEsp8266Command(cCmd, "OK", NULL, 2000))
+    if (bEsp8266Command(cCmd, "OK", NULL, 2000) != true)
         return false;
     
     /* 2. 设置客户端ID */
     memset(cCmd, 0, sizeof(cCmd));
     snprintf(cCmd, sizeof(cCmd), "AT+MQTTCLIENTID=0,\"%s\"", pcMqttClientId);
-    if (!bEsp8266Command(cCmd, "OK", NULL, 2000))
+    if (bEsp8266Command(cCmd, "OK", NULL, 2000) != true)
         return false;
     
     /* 3. 连接到MQTT服务器 */
     memset(cCmd, 0, sizeof(cCmd));
     snprintf(cCmd, sizeof(cCmd), "AT+MQTTCONN=0,\"%s\",%u,1", 
              pcMqttServerIp, usMqttServerPort);
-    if (!bEsp8266Command(cCmd, "OK", NULL, 5000) && !bEsp8266Command(cCmd, "+MQTTCONN", NULL, 5000))
+    if (bEsp8266Command(cCmd, "OK", NULL, 8000) != true && bEsp8266Command(cCmd, "+MQTTCONN", NULL, 8000) != true)
         return false;
     
     /* 4. 订阅主题 */
     memset(cCmd, 0, sizeof(cCmd));
     snprintf(cCmd, sizeof(cCmd), "AT+MQTTSUB=0,\"%s\",1", pcMqttSubscribeTopic);
-    if (!bEsp8266Command(cCmd, "OK", NULL, 2000))
+    if (bEsp8266Command(cCmd, "OK", NULL, 2000) != true)
         return false;
     
     return true;
@@ -181,7 +187,7 @@ bool bEsp8266MqttInit ( char * pcMqttUserName, char * pcMqttPassword, char * pcM
   */
 bool bEsp8266BuildAp ( char * pcSsid, char * pcPassWord, eApPsdMode_t xPsdMode )
 {
-    char cCmd [120];
+    char cCmd [128];
     sprintf ( cCmd, "AT+CWSAP=\"%s\",\"%s\",1,%d", pcSsid, pcPassWord, xPsdMode );
     return bEsp8266Command ( cCmd, "OK", 0, 1000 );
 }
@@ -210,7 +216,7 @@ bool bEsp8266EnableMultipleId ( FunctionalState xEnumEnUnvarnishTx )
   */
 bool bEsp8266LinkServer ( eNetPro_t xNetProtocol, char * pcIp, char * pcComNum, eIdNo_t xId)
 {
-    char cStr [100] = { 0 }, cCmd [120];
+    char cStr [128] = { 0 }, cCmd [128];
     switch (  xNetProtocol )
     {
         case enumTCP:
@@ -240,7 +246,7 @@ bool bEsp8266LinkServer ( eNetPro_t xNetProtocol, char * pcIp, char * pcComNum, 
   */
 bool bEsp8266StartOrShutServer ( FunctionalState xMode, char * pcPortNum, char * pcTimeOver )
 {
-    char cCmd1 [120], cCmd2 [120];
+    char cCmd1 [128], cCmd2 [128];
     if ( xMode )
     {
         sprintf ( cCmd1, "AT+CIPSERVER=%d,%s", 1, pcPortNum );
@@ -268,12 +274,12 @@ uint8_t ucEsp8266GetLinkStatus ( void )
 {
     if ( bEsp8266Command ( "AT+CIPSTATUS", "OK", 0, 500 ) )
     {
-        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "STATUS:2\r\n" ) )
+        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "STATUS:2\r\n" ) )
             return 2;
-        else if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "STATUS:3\r\n" ) )
+        else if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "STATUS:3\r\n" ) )
             return 3;
         
-        else if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "STATUS:4\r\n" ) )
+        else if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "STATUS:4\r\n" ) )
             return 4;
     }
     return 0;
@@ -290,23 +296,23 @@ uint8_t ucEsp8266GetIdLinkStatus ( void )
     uint8_t ucIdLinkStatus = 0x00;
     if ( bEsp8266Command ( "AT+CIPSTATUS", "OK", 0, 500 ) )
     {
-        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:0," ) )
+        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:0," ) )
             ucIdLinkStatus |= 0x01;
         else 
             ucIdLinkStatus &= ~ 0x01;
-        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:1," ) )
+        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:1," ) )
             ucIdLinkStatus |= 0x02;
         else 
             ucIdLinkStatus &= ~ 0x02;
-        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:2," ) )
+        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:2," ) )
             ucIdLinkStatus |= 0x04;
         else 
             ucIdLinkStatus &= ~ 0x04;
-        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:3," ) )
+        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:3," ) )
             ucIdLinkStatus |= 0x08;
         else 
             ucIdLinkStatus &= ~ 0x08;
-        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+CIPSTATUS:4," ) )
+        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:4," ) )
             ucIdLinkStatus |= 0x10;
         else 
             ucIdLinkStatus &= ~ 0x10;
@@ -324,20 +330,20 @@ uint8_t ucEsp8266GetIdLinkStatus ( void )
   */
 uint8_t ucEsp8266InquireApIp ( char * pcApIp, uint8_t ucArrayLength )
 {
-    char uc;
+    char c;
     char * pCh;
     bEsp8266Command ( "AT+CIFSR", "OK", 0, 500 );
-    pCh = strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "APIP,\"" );
+    pCh = strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "APIP,\"" );
     if ( pCh )
         pCh += 6;
     else
         return 0;
-    for ( uc = 0; uc < ucArrayLength; uc ++ )
+    for ( c = 0; c < ucArrayLength; c ++ )
     {
-        pcApIp [ uc ] = * ( pCh + uc);
-        if ( pcApIp [ uc ] == '\"' )
+        pcApIp [ c ] = * ( pCh + c);
+        if ( pcApIp [ c ] == '\"' )
         {
-            pcApIp [ uc ] = '\0';
+            pcApIp [ c ] = '\0';
             break;
         }
     }
@@ -381,7 +387,7 @@ void vEsp8266ExitUnvarnishSend ( void )
   */
 bool bEsp8266SendString ( FunctionalState xEnumEnUnvarnishTx, char * pcStr, uint32_t ulStrLength, eIdNo_t xId )
 {
-    char cStr [20];
+    char cStr [256];
     bool bRet = false;
     if ( xEnumEnUnvarnishTx )
     {
@@ -409,16 +415,16 @@ bool bEsp8266SendString ( FunctionalState xEnumEnUnvarnishTx, char * pcStr, uint
 char * pcEsp8266ReceiveString ( FunctionalState xEnumEnUnvarnishTx )
 {
     char * pRecStr = 0;
-    xSerialFrameRecord .Bits_t .usFrameLength = 0;
-    xSerialFrameRecord .Bits_t .usFrameFinishFlag = 0;
-    while ( ! xSerialFrameRecord .Bits_t .usFrameFinishFlag );
-    xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ] = '\0';
+    xSerialFrameRecord.Bits_t.usFrameLength = 0;
+    xSerialFrameRecord.Bits_t.usFrameFinishFlag = 0;
+    while ( ! xSerialFrameRecord.Bits_t.usFrameFinishFlag );
+    xSerialFrameRecord.cSerialReceivedBuffer [ xSerialFrameRecord.Bits_t.usFrameLength ] = '\0';
     if ( xEnumEnUnvarnishTx )
-        pRecStr = xSerialFrameRecord .cSerialReceivedBuffer;
+        pRecStr = xSerialFrameRecord.cSerialReceivedBuffer;
     else 
     {
-        if ( strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "+IPD" ) )
-            pRecStr = xSerialFrameRecord .cSerialReceivedBuffer;
+        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+IPD" ) )
+            pRecStr = xSerialFrameRecord.cSerialReceivedBuffer;
     }
     return pRecStr;
 }

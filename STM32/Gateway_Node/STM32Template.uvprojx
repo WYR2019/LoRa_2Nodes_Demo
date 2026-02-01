@@ -341,7 +341,7 @@
               <MiscControls>--no-multibyte-chars</MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\SystemFiles;.\Libraries\inc;.\User;.\BSP;.\Drivers;.\FreeRTOS\inc;.\FreeRTOS\portable\RVDS\ARM_CM3;.\FreeRTOS\config;.\Application\NetFIFO</IncludePath>
+              <IncludePath>.\SystemFiles;.\Libraries\inc;.\User;.\BSP;.\Drivers;.\FreeRTOS\inc;.\FreeRTOS\portable\RVDS\ARM_CM3;.\FreeRTOS\config;.\Application\NetFIFO;.\Application\App_MQTT</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -903,17 +903,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Application/NetFIFO</GroupName>
+          <GroupName>Application/App_MQTT</GroupName>
           <Files>
             <File>
-              <FileName>NetFIFO.c</FileName>
+              <FileName>App_MQTT.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\NetFIFO\NetFIFO.c</FilePath>
+              <FilePath>.\Application\App_MQTT\App_MQTT.c</FilePath>
             </File>
             <File>
-              <FileName>NetFIFO.h</FileName>
+              <FileName>App_MQTT.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Application\NetFIFO\NetFIFO.h</FilePath>
+              <FilePath>.\Application\App_MQTT\App_MQTT.h</FilePath>
             </File>
           </Files>
         </Group>

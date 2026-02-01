@@ -1062,7 +1062,7 @@
 
   <Group>
     <GroupName>FreeRTOS/inc</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1286,7 +1286,7 @@
 
   <Group>
     <GroupName>FreeRTOS/src</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1441,8 +1441,8 @@
   </Group>
 
   <Group>
-    <GroupName>Application/NetFIFO</GroupName>
-    <tvExp>1</tvExp>
+    <GroupName>Application/App_MQTT</GroupName>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1453,8 +1453,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\Application\NetFIFO\NetFIFO.c</PathWithFileName>
-      <FilenameWithoutPath>NetFIFO.c</FilenameWithoutPath>
+      <PathWithFileName>.\Application\App_MQTT\App_MQTT.c</PathWithFileName>
+      <FilenameWithoutPath>App_MQTT.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1465,8 +1465,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\Application\NetFIFO\NetFIFO.h</PathWithFileName>
-      <FilenameWithoutPath>NetFIFO.h</FilenameWithoutPath>
+      <PathWithFileName>.\Application\App_MQTT\App_MQTT.h</PathWithFileName>
+      <FilenameWithoutPath>App_MQTT.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

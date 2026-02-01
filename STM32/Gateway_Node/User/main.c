@@ -6,12 +6,14 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "App_MQTT.h"
 
 /* 创建一个新任务，需要创建任务句柄,任务句柄与任务函数一一对应。 */
 TaskHandle_t xTaskWorkStatusLedHdlr;
 TaskHandle_t xTaskWifiJoinApHdlr;
 TaskHandle_t xTaskWifiNwkInitHdlr;
-TaskHandle_t xTaskMqttPublishTestHdlr;
+TaskHandle_t xTaskMqttPublishHdlr;
+TaskHandle_t xTaskMqttSubscribeHdlr;
 
 /* 创建队列句柄 */
 QueueHandle_t xQueueUsart1IrqHdlr;
@@ -19,12 +21,11 @@ QueueHandle_t xQueueUsart2IrqHdlr;
 QueueHandle_t xQueueUsart3IrqHdlr;
 
 /**
-  * @brief  状态指示LED任务         
+  * @brief  状态指示LED任务
   * @note   通过控制PC13引脚的LED灯，实现系统状态的指示功能。
   * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
   * @retval None
   */
-/* 创建任务 */
 void vTaskWorkStatusLed(void *pvParameters)
 {
     while(1)
@@ -37,7 +38,7 @@ void vTaskWorkStatusLed(void *pvParameters)
 }
 
 /**
-  * @brief  初始化Wi-Fi模块网络任务         
+  * @brief  初始化Wi-Fi模块网络任务
   * @note   通过ESP8266模块初始化MQTT协议连接。
   * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
   * @retval None
@@ -73,7 +74,8 @@ void vTaskWifiNetWorkInit(void *pvParameters)
                 /* code */
                 vUsartSendString(USART1, "Aliyun MQTT Init Successfully.\r\n");
                 /* 通知MQTT发布任务 */
-                xTaskNotifyGive(xTaskMqttPublishTestHdlr);
+                xTaskNotifyGive(xTaskMqttPublishHdlr);
+                xTaskNotifyGive(xTaskMqttSubscribeHdlr);
                 vTaskDelete(NULL);
             } else
             {
@@ -87,7 +89,8 @@ void vTaskWifiNetWorkInit(void *pvParameters)
             {
                 /* code */
                 vUsartPrintf(USART1, "EMQX MQTT Init Successfully.\r\n");
-                xTaskNotifyGive(xTaskMqttPublishTestHdlr);
+                xTaskNotifyGive(xTaskMqttPublishHdlr);
+                xTaskNotifyGive(xTaskMqttSubscribeHdlr);
                 vTaskDelete(NULL);
             } else
             {
@@ -100,54 +103,86 @@ void vTaskWifiNetWorkInit(void *pvParameters)
 }
 
 /**
-  * @brief  MQTT发布测试任务         
+  * @brief  MQTT发布测试任务
   * @note   通过ESP8266模块向MQTT服务器发布测试消息。
   * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
   * @retval None
   */
-void vTaskMqttPublishTest(void *pvParameters)
+void vTaskMqttPublish(void *pvParameters)
 {
     /* 任务通知接收函数 */
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    char pcCmd[256] = {0};
     char *pcJsonMsg = "{\"temperature\":23,\"humidity\":60}";
     while (1)
     {
         /* code */
         #if (ESP8266_MQTT_SERVER_MODE == ALIYUN)
-            uint8_t ucLen = strlen(pcJsonMsg);
-            snprintf(pcCmd, sizeof(pcCmd), "AT+MQTTPUBRAW=0,\"%s\",%d,1,0", 
-                     ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC, ucLen);
-            if (bEsp8266Command(pcCmd, "OK", ">", 3000) == pdTRUE && 
-                bEsp8266Command(pcJsonMsg, "OK", NULL, 3000) == pdTRUE)
+            while (bMqttPublish(ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC, pcJsonMsg) == pdTRUE)
             {
                 /* code */
-                vUsartSendString(USART1, "Aliyun MQTT Publish Successfully.\r\n");
-            } else
-            {
-                /* code */
-                vUsartSendString(USART1, "Aliyun MQTT Publish Failed.\r\n");
+                vUsartSendString(USART1, "MQTT Publish Successfully.\r\n");
             }
+            vUsartSendString(USART1, "MQTT Publish Failed.\r\n");
+            vTaskDelay(2000);
         #elif (ESP8266_MQTT_SERVER_MODE == EMQX)
-            uint8_t ucLen = strlen(pcJsonMsg);
-            snprintf(pcCmd, sizeof(pcCmd), "AT+MQTTPUBRAW=0,\"%s\",%d,1,0", 
-                     ESP8266_EMQX_MQTT_PUBLISH_TOPIC, ucLen);
-            if (bEsp8266Command(pcCmd, "OK", ">", 3000) == pdTRUE && 
-                bEsp8266Command(pcJsonMsg, "OK", NULL, 3000) == pdTRUE)
-            {
-                vUsartSendString(USART1, "EMQX MQTT Publish Successfully.\r\n");
-            } else
+            while (bMqttPublish(ESP8266_EMQX_MQTT_PUBLISH_TOPIC, pcJsonMsg) == pdTRUE)
             {
                 /* code */
-                vUsartSendString(USART1, "EMQX MQTT Publish Failed.\r\n");
+                vUsartSendString(USART1, "MQTT Publish Successfully.\r\n");
             }
-            vTaskDelay(500);
+            vUsartSendString(USART1, "MQTT Publish Failed.\r\n");
+            vTaskDelay(2000);
         #endif
     }
 }
 
 /**
-  * @brief  创建所有任务列表         
+  * @brief  MQTT订阅任务
+  * @note   通过ESP8266模块订阅MQTT主题并处理接收到的命令。
+  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @retval None
+  */
+void vTaskMqttSubscribe(void *pvParameters)
+{
+    while (1)
+    {
+        /* code */
+        if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_ON)
+        {
+            /* code */
+            vUsartPrintf(USART1, "Lights on\r\n");
+        }
+        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_OFF)
+        {
+            /* code */
+            vUsartPrintf(USART1, "Lights off\r\n");
+        }
+        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_ON)
+        {
+            /* code */
+            vUsartPrintf(USART1, "Fan on\r\n");
+        }
+        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_OFF)
+        {
+            /* code */
+            vUsartPrintf(USART1, "Fan off\r\n");
+        }
+        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_ON)
+        {
+            /* code */
+            vUsartPrintf(USART1, "Humidifier on\r\n");
+        }
+        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_OFF)
+        {
+            /* code */
+            vUsartPrintf(USART1, "Humidifier off\r\n");
+        }
+        vTaskDelay(1000);
+    }
+}
+
+/**
+  * @brief  创建所有任务列表
   * @note   在此函数中创建所有需要的任务，并为每个任务分配适当的堆栈大小和优先级。
   * @param  None
   * @retval None
@@ -169,16 +204,23 @@ void vCreateTasksList(void)
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &xTaskWifiNwkInitHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskMqttPublishTest,
+               (TaskFunction_t        ) vTaskMqttPublish,
                (char *                ) "TaskName_MqttPublishTest", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL,
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskMqttPublishTestHdlr);
+               (TaskHandle_t *        ) &xTaskMqttPublishHdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) vTaskMqttSubscribe,
+               (char *                ) "TaskName_MqttSubscribe", 
+               (configSTACK_DEPTH_TYPE) 512,
+               (void *                ) NULL,
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &xTaskMqttSubscribeHdlr);
 }
 
 /**
-  * @brief  创建所有队列列表         
+  * @brief  创建所有队列列表
   * @note   在此函数中创建所有需要的队列，并为每个队列分配适当的长度和项大小。
   * @param  None
   * @retval None
@@ -204,7 +246,7 @@ void vCreateQueuesList(void)
 }
 
 /**
-  * @brief  创建所有信号量列表         
+  * @brief  创建所有信号量列表
   * @note   在此函数中创建所有需要的信号量。
   * @param  None
   * @retval None
@@ -214,7 +256,7 @@ void vCreateSemaphoresList(void)
 }
 
 /**
-  * @brief  主函数         
+  * @brief  主函数
   * @note   初始化系统各个模块，创建任务、队列和信号量，并启动调度器。
   * @param  None
   * @retval int

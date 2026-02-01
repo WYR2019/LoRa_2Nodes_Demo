@@ -1,8 +1,8 @@
-#include "NetFIFO.h"
+#include "App_NetFIFO.h"
 
 /**
   * @brief  初始化环形缓冲区
-  * @param  pBuffer: 缓冲区结构体指针
+  * @param  pxBuffer: 缓冲区结构体指针
   * @retval None
   */
 void vNetBufferInit(NetFifoBuffer_t *pxBuffer)

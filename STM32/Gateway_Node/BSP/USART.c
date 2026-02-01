@@ -25,24 +25,24 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
         GPIO_Init(USART1_GPIO_PORT, &GPIO_InitStructure);
 
         USART_InitTypeDef USART_InitStructure;
-        USART_InitStructure.USART_BaudRate = ulBaudrate;                                                    // 设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
+        USART_InitStructure.USART_BaudRate = ulBaudrate;                                                                // 设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-        USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;                     // 硬件流控制,不使用流控
-        USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;                                       // 串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
-        USART_InitStructure.USART_Parity = USART_Parity_No;                                                 // 无校验位
-        USART_InitStructure.USART_StopBits = USART_StopBits_1;                                              // 一位停止位
-        USART_InitStructure.USART_WordLength = USART_WordLength_8b;                                         // 字长，不需要校验，字长就选择8位
+        USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;                                 // 硬件流控制,不使用流控
+        USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;                                                   // 串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
+        USART_InitStructure.USART_Parity = USART_Parity_No;                                                             // 无校验位
+        USART_InitStructure.USART_StopBits = USART_StopBits_1;                                                          // 一位停止位
+        USART_InitStructure.USART_WordLength = USART_WordLength_8b;                                                     // 字长，不需要校验，字长就选择8位
         USART_Init(USART1, &USART_InitStructure);
-                                                                                                            // 上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
-        USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);                                                      // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
-        USART_ITConfig(USART1, USART_IT_IDLE, ENABLE);                                                      // 使能串口总线空闲中断
-        NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);                                                     // 分组，分组4为4bit抢占优先级和0bit响应优先级，抢占优先级可设置为0-15。由于FreeRTOS没有响应优先级，而优先级分组4相当于4位抢占优先级和0位响应优先级。
-        NVIC_InitTypeDef NVIC_InitStructure;                                                                // 初始化NVIC的USART1通道
-        NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;                                                   // 中断通道
+                                                                                                                        // 上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
+        USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);                                                                  // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
+        USART_ITConfig(USART1, USART_IT_IDLE, ENABLE);                                                                  // 使能串口总线空闲中断
+        NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);                                                                 // 分组，分组4为4bit抢占优先级和0bit响应优先级，抢占优先级可设置为0-15。由于FreeRTOS没有响应优先级，而优先级分组4相当于4位抢占优先级和0位响应优先级。
+        NVIC_InitTypeDef NVIC_InitStructure;                                                                            // 初始化NVIC的USART1通道
+        NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;                                                               // 中断通道
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;                                           // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
-        // NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;                                               // 响应优先级配置，用不上了
-        NVIC_Init(&NVIC_InitStructure);                                                                     // 指向NVIC_InitStructure的地址
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;                                                       // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
+        // NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;                                                           // 响应优先级配置，用不上了
+        NVIC_Init(&NVIC_InitStructure);                                                                                 // 指向NVIC_InitStructure的地址
 
         USART_Cmd(USART1, ENABLE);
     } else if (xUsartId == USART2)
@@ -59,17 +59,17 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
         GPIO_Init(USART2_GPIO_PORT, &GPIO_InitStructure);
 
         USART_InitTypeDef USART_InitStructure;
-        USART_InitStructure.USART_BaudRate = ulBaudrate;                                                    // 设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
+        USART_InitStructure.USART_BaudRate = ulBaudrate;                                                                // 设定后，USART_Init函数内部会自动算好9600对应的分频系数，并写到BRR寄存器
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-        USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;                     // 硬件流控制,不使用流控
-        USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;                                       // 串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
-        USART_InitStructure.USART_Parity = USART_Parity_No;                                                 // 无校验位
-        USART_InitStructure.USART_StopBits = USART_StopBits_1;                                              // 一位停止位
-        USART_InitStructure.USART_WordLength = USART_WordLength_8b;                                         // 字长，不需要校验，字长就选择8位
+        USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;                                 // 硬件流控制,不使用流控
+        USART_InitStructure.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;                                                   // 串口模式，如果既使用输入和输出模式就用或符号，发送模式和接收模式
+        USART_InitStructure.USART_Parity = USART_Parity_No;                                                             // 无校验位
+        USART_InitStructure.USART_StopBits = USART_StopBits_1;                                                          // 一位停止位
+        USART_InitStructure.USART_WordLength = USART_WordLength_8b;                                                     // 字长，不需要校验，字长就选择8位
         USART_Init(USART2, &USART_InitStructure);
-                                                                                                            // 上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
-        USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);                                                      // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
-        USART_ITConfig(USART2, USART_IT_IDLE, ENABLE);                                                      // 使能串口总线空闲中断
+                                                                                                                        // 上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
+        USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);                                                                  // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
+        USART_ITConfig(USART2, USART_IT_IDLE, ENABLE);                                                                  // 使能串口总线空闲中断
 
         NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);                                                     // 分组，分组4为4bit抢占优先级和0bit响应优先级，抢占优先级可设置为0-15。由于FreeRTOS没有响应优先级，而优先级分组4相当于4位抢占优先级和0位响应优先级。
         NVIC_InitTypeDef NVIC_InitStructure;                                                                // 初始化NVIC的USART1通道
@@ -258,14 +258,14 @@ void USART2_IRQHandler(void)
         if ( USART_GetITStatus ( USART2, USART_IT_RXNE ) != RESET )
         {
             ucRxData = USART_ReceiveData( USART2 );
-            if ( xSerialFrameRecord .Bits_t .usFrameLength < ( BUFFER_MAX_LENGTH - 1 ) )                       //预留1个字节写结束符
-                xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ++ ]  = ucRxData;
+            if ( xSerialFrameRecord.Bits_t.usFrameLength < ( BUFFER_MAX_LENGTH - 1 ) )                                  // 预留1个字节写结束符
+                xSerialFrameRecord.cSerialReceivedBuffer [ xSerialFrameRecord.Bits_t.usFrameLength ++ ] = ucRxData;
         }
-        if ( USART_GetITStatus( USART2, USART_IT_IDLE ) == SET )                                         //数据帧接收完毕
+        if ( USART_GetITStatus( USART2, USART_IT_IDLE ) == SET )                                                        // 数据帧接收完毕
         {
-            xSerialFrameRecord .Bits_t .usFrameFinishFlag = 1;
-            ucRxData = USART_ReceiveData( USART2 );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
-            ucTcpClosedFlag = strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "CLOSED\r\n" ) ? 1 : 0;
+            xSerialFrameRecord.Bits_t.usFrameFinishFlag = 1;
+            ucRxData = USART_ReceiveData( USART2 );                                                                     // 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+            ucTcpClosedFlag = strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "CLOSED\r\n" ) ? 1 : 0;
         }
     #elif (USE_RTOS == FREERTOS && ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 1)
         if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
@@ -283,14 +283,14 @@ void USART2_IRQHandler(void)
         if ( USART_GetITStatus ( USART2, USART_IT_RXNE ) != RESET )
         {
             ucRxData = USART_ReceiveData( USART2 );
-            if ( xSerialFrameRecord .Bits_t .usFrameLength < ( BUFFER_MAX_LENGTH - 1 ) )                       //预留1个字节写结束符
-                xSerialFrameRecord .cSerialReceivedBuffer [ xSerialFrameRecord .Bits_t .usFrameLength ++ ]  = ucRxData;
+            if ( xSerialFrameRecord.Bits_t.usFrameLength < ( BUFFER_MAX_LENGTH - 1 ) )                                  // 预留1个字节写结束符
+                xSerialFrameRecord.cSerialReceivedBuffer [ xSerialFrameRecord.Bits_t.usFrameLength ++ ] = ucRxData;
         }
-        if ( USART_GetITStatus( USART2, USART_IT_IDLE ) == SET )                                         //数据帧接收完毕
+        if ( USART_GetITStatus( USART2, USART_IT_IDLE ) == SET )                                                        //数据帧接收完毕
         {
-            xSerialFrameRecord .Bits_t .usFrameFinishFlag = 1;
-            ucRxData = USART_ReceiveData( USART2 );                                                              //由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
-            ucTcpClosedFlag = strstr ( xSerialFrameRecord .cSerialReceivedBuffer, "CLOSED\r\n" ) ? 1 : 0;
+            xSerialFrameRecord.Bits_t.usFrameFinishFlag = 1;
+            ucRxData = USART_ReceiveData( USART2 );                                                                     // 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+            ucTcpClosedFlag = strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "CLOSED\r\n" ) ? 1 : 0;
         }
         USART_SendData(USART1, ucRxData);
     #endif

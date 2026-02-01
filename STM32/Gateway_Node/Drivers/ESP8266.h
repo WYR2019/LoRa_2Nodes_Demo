@@ -62,29 +62,34 @@ typedef enum{
 #define                 macESP8266_RST_LOW_LEVEL()          GPIO_ResetBits ( macESP8266_RST_PORT, macESP8266_RST_PIN )
 
 /* 用户需要设置的参数 */
-#define                 ESP8266_APSSID                      "CMCC-5bjx"                                                                                         // 要连接的热点的名称
-// #define                 ESP8266_APSSID                      "TESTAP"
-#define                 ESP8266_APPWD                       "jp7qpqn3"                                                                                          // 要连接的热点的密钥
+#define                 ESP8266_APSSID                      "CMCC-5bjx"                                                                                             // 要连接的热点的名称
+#define                 ESP8266_APPWD                       "jp7qpqn3"                                                                                              // 要连接的热点的密钥
 
 #define                 ALIYUN                              0
 #define                 EMQX                                1
-#define                 ESP8266_MQTT_SERVER_MODE            ALIYUN                                                                                              // 选择MQTT服务器模式：ALIYUN/EMQX
+#define                 ESP8266_MQTT_SERVER_MODE            EMQX                                                                                                  // 选择MQTT服务器模式：ALIYUN/EMQX
 
-#define                 ESP8266_EMQX_MQTT_SERVER_IP         "121.36.104.9"                                                                                      // MQTT服务器IP地址
-#define                 ESP8266_EMQX_MQTT_SERVER_PORT       1883                                                                                                // MQTT服务器端口号
-#define                 ESP8266_EMQX_MQTT_CLIENTID          "LoRaEnvAssistant&stm32"                                                                            // MQTT客户端ID
-#define                 ESP8266_EMQX_MQTT_USERNAME          "stm32"                                                                                             // MQTT用户名
-#define                 ESP8266_EMQX_MQTT_PASSWORD          "123456789"                                                                                         // MQTT密码
-#define                 ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC   "/LoRaEnvAssistant/LoRaEnvAssistant&mqttfx/topics"                                                  // 订阅主题
-#define                 ESP8266_EMQX_MQTT_PUBLISH_TOPIC     "/LoRaEnvAssistant/LoRaEnvAssistant&stm32/topics"                                                   // 发布主题
+#define                 ESP8266_EMQX_MQTT_SERVER_IP         "121.36.104.9"                                                                                          // MQTT服务器IP地址
+#define                 ESP8266_EMQX_MQTT_SERVER_PORT       1883                                                                                                    // MQTT服务器端口号
+#define                 ESP8266_EMQX_MQTT_PROJECTID         "LoRaEnvAssistant"                                                                                      // MQTT项目ID
+#define                 ESP8266_EMQX_MQTT_DEVICENAME        "stm32"                                                                                                 // MQTT设备名称
+#define                 ESP8266_EMQX_MQTT_SUB_DEVICENAME    "mqttfx"                                                                                                // MQTT订阅设备名称
+#define                 ESP8266_EMQX_MQTT_CLIENTID          ESP8266_EMQX_MQTT_PROJECTID"&"ESP8266_EMQX_MQTT_DEVICENAME                                              // MQTT客户端ID
+#define                 ESP8266_EMQX_MQTT_USERNAME          ESP8266_EMQX_MQTT_DEVICENAME                                                                            // MQTT用户名
+#define                 ESP8266_EMQX_MQTT_PASSWORD          "123456789"                                                                                             // MQTT密码
+#define                 ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC   "/"ESP8266_EMQX_MQTT_PROJECTID"/"ESP8266_EMQX_MQTT_PROJECTID"&"ESP8266_EMQX_MQTT_SUB_DEVICENAME"/topics"                                                  // 订阅主题
+#define                 ESP8266_EMQX_MQTT_PUBLISH_TOPIC     "/"ESP8266_EMQX_MQTT_PROJECTID"/"ESP8266_EMQX_MQTT_CLIENTID"/topics"                                    // 发布主题
 
 #define                 ESP8266_ALIYUN_MQTT_IP              "iot-06z00by9al78fmz.mqtt.iothub.aliyuncs.com"
 #define                 ESP8266_ALIYUN_MQTT_PORT            1883
-#define                 ESP8266_ALIYUN_MQTT_CLIENTID        "k11ilqnf8mF.GATEWAY_STM32_ESP8266|securemode=2\\,signmethod=hmacsha256\\,timestamp=1768415322303|"          
-#define                 ESP8266_ALIYUN_MQTT_USERNAME        "GATEWAY_STM32_ESP8266&k11ilqnf8mF"
+#define                 ESP8266_ALIYUN_MQTT_PRODUCTKEY      "k11ilqnf8mF"
+#define                 ESP8266_ALIYUN_MQTT_DEVICENAME      "GATEWAY_STM32_ESP8266"
+#define                 ESP8266_ALIYUN_MQTT_CLIENTID        ESP8266_ALIYUN_MQTT_PRODUCTKEY"."ESP8266_ALIYUN_MQTT_DEVICENAME \
+                                                            "|securemode=2\\,signmethod=hmacsha256\\,timestamp=1768415322303|"
+#define                 ESP8266_ALIYUN_MQTT_USERNAME        ESP8266_ALIYUN_MQTT_DEVICENAME"&"ESP8266_ALIYUN_MQTT_PRODUCTKEY
 #define                 ESP8266_ALIYUN_MQTT_PASSWORD        "a74261b04d7dda672342776b88e956f26f74f4d9d104461f8b65cbf544ab9c03"
-#define                 ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC "/k11ilqnf8mF/GATEWAY_STM32_ESP8266/user/get"
-#define                 ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC   "/k11ilqnf8mF/GATEWAY_STM32_ESP8266/user/update"
+#define                 ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC "/"ESP8266_ALIYUN_MQTT_PRODUCTKEY"/"ESP8266_ALIYUN_MQTT_DEVICENAME"/user/get"
+#define                 ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC   "/"ESP8266_ALIYUN_MQTT_PRODUCTKEY"/"ESP8266_ALIYUN_MQTT_DEVICENAME"/user/update"
 
 /* ESP8266 函数声明 */
 void                    vEsp8266GpioConfig                  ( void );

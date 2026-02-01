@@ -13,8 +13,21 @@ typedef enum
     MQTT_MODE_PROPERTY,
 }eMqttMode_t;
 
-bool bMqttSubMsgFormat(eMqttMode_t ucMode, char *pcReceivedMsg, char *pcTopic, char *pcMessage);
-bool bMqttDefaultSubscribe(char *pcTopic, char *pcMessage);
-bool bMqttNormalPublish(char *pcTopic, char *pcMessage);
+typedef enum 
+{
+    /* data */
+    MQTT_CMD_LED_ON = 0,
+    MQTT_CMD_LED_OFF,
+    MQTT_CMD_FAN_ON,
+    MQTT_CMD_FAN_OFF,
+    MQTT_CMD_HUMIDIFIER_ON,
+    MQTT_CMD_HUMIDIFIER_OFF,
+    MQTT_CMD_UNKNOWN = -1,
+}eMqttCmd_t;
+
+
+bool bMqttPublish(char *pcTopic, char *pcMessage);
+bool bMqttSubMsgFormat(char *pcTopic, char *pcMessage);
+eMqttCmd_t xMqttCmdParse(char *pcTopic);
 
 #endif /* __APP_MQTT_H__ */
