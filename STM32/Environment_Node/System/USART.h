@@ -1,14 +1,9 @@
 #ifndef __USART_H__
 #define __USART_H__
 
-/*  «∑Ò π”√RTOS£¨»Ù–Ë“™ π”√RTOS£¨‘ÚΩ´œ¬√Ê∂‘”¶µƒ≤Ÿ◊˜œµÕ≥µƒ‘§±‡“Î…Ë÷√–Ë“™ π”√µΩµƒRTOS√˚≥∆£¨∑¥÷Æ‘Ú…Ë÷√Œ™NONE°£ */
-#define USE_RTOS                                                FREERTOS
-#define NONE                                                    0
-#define FREERTOS                                                1
+/* ÊòØÂê¶‰ΩøÁî®FREERTOS„ÄÇ */
+#define ENABLE_FREERTOS                                         1
 
-#define vUsart1IrqHandler                                       USART1_IRQHandler
-#define vEsp8266IrqHandler                                      USART2_IRQHandler
-#define vLoRaIrqHandler                                         USART3_IRQHandler
 #define USART1_GPIO_CLOCK                                       RCC_APB2Periph_GPIOA
 #define USART2_GPIO_CLOCK                                       RCC_APB2Periph_GPIOA
 #define USART3_GPIO_CLOCK                                       RCC_APB2Periph_GPIOB
@@ -22,14 +17,14 @@
 #define USART3_GPIO_PIN_TX                                      GPIO_Pin_10
 #define USART3_GPIO_PIN_RX                                      GPIO_Pin_11
 
-#if (USE_RTOS == NONE)
-
-#elif (USE_RTOS == FREERTOS)
+#if ENABLE_FREERTOS
     #include "FreeRTOS.h"
     #include "queue.h"
     #define ENABLE_FREERTOS_API_QUEUE_USART1_IRQ                0
     #define ENABLE_FREERTOS_API_QUEUE_USART2_IRQ                0
     #define ENABLE_FREERTOS_API_QUEUE_USART3_IRQ                1
+#else
+
 #endif
 
 #include "stm32f10x.h"                  // Device header
@@ -37,32 +32,32 @@
 #include <stdarg.h>
 #include <string.h>
 
-#if (ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
+#if ENABLE_FREERTOS_API_QUEUE_USART1_IRQ
     extern QueueHandle_t xQueueUsart1IrqHdlr;
 #endif
-#if (ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 1)
+#if ENABLE_FREERTOS_API_QUEUE_USART2_IRQ
     extern QueueHandle_t xQueueUsart2IrqHdlr;
 #endif
-#if (ENABLE_FREERTOS_API_QUEUE_USART3_IRQ == 1)
+#if ENABLE_FREERTOS_API_QUEUE_USART3_IRQ
     extern QueueHandle_t xQueueUsart3IrqHdlr;
 #endif
 
-extern volatile uint8_t ucTcpClosedFlag;
+#define vUsart1IrqHandler(void)                                 USART1_IRQHandler(void)
+#define vEsp8266IrqHandler(void)                                USART2_IRQHandler(void)
+#define vLoRaIrqHandler(void)                                   USART3_IRQHandler(void)
+#define vDebugLogPrint(format, ...)                             vUsartPrintf(USART1, format, ##__VA_ARGS__)
 
-#define BUFFER_MAX_LENGTH                                       1024                    // Ω” ’ª∫≥Â«¯◊Ó¥Û◊÷Ω⁄ ˝
-extern struct SerialFrame_t                                                             // ¥Æø⁄ ˝æ›÷°µƒ¥¶¿ÌΩ·ππÃÂ
+#define BUFFER_MAX_LENGTH                                       512                         // Êé•Êî∂ÁºìÂÜ≤Âå∫ÊúÄÂ§ßÂ≠óËäÇÊï∞
+typedef struct                                                                              // ‰∏≤Âè£Êï∞ÊçÆÂ∏ßÁöÑÂ§ÑÁêÜÁªìÊûÑ‰Ωì
 {
-    char cSerialReceivedBuffer [ BUFFER_MAX_LENGTH ];
-    union 
+    char cRecvBuffer[BUFFER_MAX_LENGTH];
+    union
     {
-        __IO uint16_t usInfoAll;
-        struct 
-        {
-            __IO uint16_t usFrameLength                         :15;                    // 14:0
-            __IO uint16_t usFrameFinishFlag                     :1;                     // 15
-        } Bits_t;
-    }; 
-} xSerialFrameRecord;
+        /* data */
+        volatile uint16_t usRecvDataLength                      :15;                        // 14:0
+        volatile uint16_t usRecvFinishFlag                      :1;                         // 15
+    }Flags_t;
+}SerialReceiver_t;
 
 void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate);
 void vUsartSendByte(USART_TypeDef *xUsartId, uint8_t ucByte);

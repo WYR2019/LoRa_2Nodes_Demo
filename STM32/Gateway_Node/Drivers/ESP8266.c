@@ -1,430 +1,202 @@
-#include "esp8266.h"
+#include "ESP8266.h"
 
-volatile uint8_t ucTcpClosedFlag = 0;
-char cStr [ 1500 ] = { 0 };
-struct SerialFrame_t xSerialFrameRecord = { 0 };
-
-/**
-  * @brief  vEsp8266GpioConfig
-  * @note   ESP8266Ä£¿éÁ¬½ÓÒı½ÅÅäÖÃº¯Êı£¬¸Ãº¯Êı±»vEsp8266Initµ÷ÓÃ¡£
-  * @param  ÎŞ
-  * @retval ÎŞ
-  */
-void vEsp8266GpioConfig ( void )
-{
-    /* ¶¨ÒåÒ»¸öGPIO_InitTypeDefÀàĞÍµÄ½á¹¹Ìå */
-    GPIO_InitTypeDef GPIO_InitStructure;
-    /* ÅäÖÃ CH_PD Òı½Å*/
-    RCC_APB2PeriphClockCmd ( macESP8266_CH_PD_CLK, ENABLE );
-    GPIO_InitStructure.GPIO_Pin = macESP8266_CH_PD_PIN;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init ( macESP8266_CH_PD_PORT, & GPIO_InitStructure );
-    /* ÅäÖÃ RST Òı½Å*/
-    RCC_APB2PeriphClockCmd ( macESP8266_RST_CLK, ENABLE );
-    GPIO_InitStructure.GPIO_Pin = macESP8266_RST_PIN;
-    GPIO_Init ( macESP8266_RST_PORT, & GPIO_InitStructure );
-}
+/* åˆå§‹åŒ–ä¸²å£ç¼“å†²åŒºå¥æŸ„ */
+SerialReceiver_t xEsp8266Receiver = {0};
 
 /**
   * @brief  vEsp8266Rst
-  * @note   µ÷ÓÃÕâ¸öº¯Êı£¬¾Í¿ÉÒÔÖØÆôESP8266Ä£¿é£¬¸Ãº¯Êı±»vEsp8266AtTestµ÷ÓÃ¡£
-  * @param  ÎŞ
-  * @retval ÎŞ
+  * @note   è°ƒç”¨è¿™ä¸ªå‡½æ•°ï¼Œå°±å¯ä»¥é‡å¯ESP8266æ¨¡å—ï¼Œè¯¥å‡½æ•°è¢«vEsp8266AtTestè°ƒç”¨ã€‚
+  * @param  æ— 
+  * @retval æ— 
   */
-void vEsp8266Rst ( void )
+void vEsp8266Rst(void)
 {
-    #if 0
-        bEsp8266Command ( "AT+RST", "OK", "ready", 2500 );
-    #else
-        macESP8266_RST_LOW_LEVEL();
-        vDelayMs ( 500 ); 
-    macESP8266_RST_HIGH_LEVEL();
-    #endif
+#if 0
+    bEsp8266Command("AT+RST", "OK", "ready", 2500);
+#else
+    ESP8266_RST_LOW_LEVEL();
+    vDelayMs(500);
+    ESP8266_RST_HIGH_LEVEL();
+#endif
+}
+
+/**
+  * @brief  ä¸²å£2æ¥æ”¶ä¸­æ–­å¤„ç†å‡½æ•°
+  * @note   æ¥æ”¶ä¸²å£ä¸­æ–­å‘é€çš„æ¯å¸§æ•°æ®åˆ°ä¸²å£æ¶ˆæ¯é˜Ÿåˆ—ä¸­ï¼Œä»¥ä¾¿åç»­å¤„ç†æ•°æ®ã€‚
+  * @param  None
+  * @retval None
+  */
+void vEsp8266IrqHandler(void)
+{
+    uint8_t ucRxData = 0;
+    if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
+    {
+        ucRxData = USART_ReceiveData(USART2);
+        if (xEsp8266Receiver.Flags_t.usBufferIndex < (BUFFER_MAX_LENGTH - 1))                                   // é¢„ç•™1ä¸ªå­—èŠ‚å†™ç»“æŸç¬¦
+            xEsp8266Receiver.cRecvBuffer[xEsp8266Receiver.Flags_t.usBufferIndex++] = ucRxData;
+        // USART_SendData(USART1, ucRxData);                                                                       // æ‰“å°åˆ°æŒ‡å®šä¸²å£è°ƒè¯•
+    }
+    if (USART_GetITStatus(USART2, USART_IT_IDLE) == SET)                                                        // æ•°æ®å¸§æ¥æ”¶å®Œæ¯•
+    {
+        xEsp8266Receiver.Flags_t.usRecvFinishFlag = 1;
+        ucRxData = USART_ReceiveData(USART2);                                                                   // ç”±è½¯ä»¶åºåˆ—æ¸…é™¤ä¸­æ–­æ ‡å¿—ä½(å…ˆè¯»USART_SRï¼Œç„¶åè¯»USART_DR)
+    }
 }
 
 /**
  * @brief  bEsp8266Command
- * @note   ¶ÔESP8266Ä£¿é·¢ËÍATÖ¸Áî,²¢µÈ´ıÏìÓ¦¡£¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
- * @param  pcCmd£º´ı·¢ËÍµÄÖ¸Áî
- * @param  pcReply1£¬pcReply2£ºÆÚ´ıµÄÏìÓ¦£¬ÎªNULL±í²»ĞèÏìÓ¦£¬Á½ÕßÎª»òÂß¼­¹ØÏµ¡£
- * @param  ulWaittime£ºµÈ´ıÏìÓ¦µÄÊ±¼ä
- * @retval true£ºÖ¸Áî·¢ËÍ³É¹¦
- * @retval false£ºÖ¸Áî·¢ËÍÊ§°Ü
+ * @note   å¯¹ESP8266æ¨¡å—å‘é€ATæŒ‡ä»¤,å¹¶ç­‰å¾…å“åº”ã€‚è¯¥å‡½æ•°è¢«å¤–éƒ¨è°ƒç”¨ã€‚
+ * @param  pcCmdï¼šå¾…å‘é€çš„æŒ‡ä»¤
+ * @param  pcAck1
+ * @param  pcAck2ï¼šæœŸå¾…çš„å“åº”ï¼Œä¸ºNULLè¡¨ä¸éœ€å“åº”ï¼Œä¸¤è€…ä¸ºæˆ–é€»è¾‘å…³ç³»ã€‚
+ * @param  ulWaittimeï¼šç­‰å¾…å“åº”çš„æ—¶é—´
+ * @retval trueï¼šæŒ‡ä»¤å‘é€æˆåŠŸ
+ * @retval falseï¼šæŒ‡ä»¤å‘é€å¤±è´¥
  */
-bool bEsp8266Command ( char * pcCmd, char * pcAck1, char * pcAck2, uint32_t ulWaittime )
-{    
-    xSerialFrameRecord.Bits_t.usFrameLength = 0;                                                    //´ÓĞÂ¿ªÊ¼½ÓÊÕĞÂµÄÊı¾İ°ü
-    vUsartPrintf ( USART2, "%s\r\n", pcCmd );
-    if ( ( pcAck1 == 0 ) && ( pcAck2 == 0 ) )                                                       //²»ĞèÒª½ÓÊÕÊı¾İ
+bool bEsp8266Command(char *pcCmd, char *pcAck1, char *pcAck2, uint32_t ulWaittime)
+{
+    xEsp8266Receiver.Flags_t.usBufferIndex = 0;                                          // ä»æ–°å¼€å§‹æ¥æ”¶æ–°çš„æ•°æ®åŒ…
+    vEsp8266DataTransmit("%s\r\n", pcCmd);
+    if ((pcAck1 == 0) && (pcAck2 == 0))                                                     // ä¸éœ€è¦æ¥æ”¶æ•°æ®
         return true;
-    vDelayMs( ulWaittime );                                                                         //ÑÓÊ±
-    xSerialFrameRecord.cSerialReceivedBuffer [ xSerialFrameRecord.Bits_t.usFrameLength ]  = '\0';
-    if ( ( pcAck1 != 0 ) && ( pcAck2 != 0 ) )
-        return ( ( bool ) strstr ( xSerialFrameRecord.cSerialReceivedBuffer, pcAck1 ) || 
-                            ( bool ) strstr ( xSerialFrameRecord.cSerialReceivedBuffer, pcAck2 ) );
-    else if ( pcAck1 != 0 )
-        return ( ( bool ) strstr ( xSerialFrameRecord.cSerialReceivedBuffer, pcAck1 ) );
+    vDelayMs(ulWaittime);                                                                   // å»¶æ—¶
+    xEsp8266Receiver.cRecvBuffer[xEsp8266Receiver.Flags_t.usBufferIndex] = '\0';
+    if ((pcAck1 != 0) && (pcAck2 != 0))
+        return ((bool)strstr(xEsp8266Receiver.cRecvBuffer, pcAck1) ||
+                (bool)strstr(xEsp8266Receiver.cRecvBuffer, pcAck2));
+    else if (pcAck1 != 0)
+        return ((bool)strstr(xEsp8266Receiver.cRecvBuffer, pcAck1));
     else
-        return ( ( bool ) strstr ( xSerialFrameRecord.cSerialReceivedBuffer, pcAck2 ) );
+        return ((bool)strstr(xEsp8266Receiver.cRecvBuffer, pcAck2));
 }
 
 /**
   * @brief  vEsp8266AtTest
-  * @note   ¶ÔESP8266Ä£¿é½øĞĞAT²âÊÔÆô¶¯£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  ÎŞ
-  * @retval ÎŞ
+  * @note   å¯¹ESP8266æ¨¡å—è¿›è¡ŒATæµ‹è¯•å¯åŠ¨ï¼Œè¯¥å‡½æ•°è¢«å¤–éƒ¨è°ƒç”¨ã€‚
+  * @param  æ— 
+  * @retval æ— 
   */
-void vEsp8266AtTest ( void )
+void vEsp8266AtTest(void)
 {
-    char count=0;
-    macESP8266_RST_HIGH_LEVEL();
-    vDelayMs( 1000 );
-    while ( count < 3 )
+    int iCnt = 0;
+    ESP8266_RST_HIGH_LEVEL();
+    vDelayMs(1000);
+    while (iCnt < 3)
     {
-        if( bEsp8266Command ( "AT", "OK", NULL, 500 ) != true ) 
+        if (bEsp8266Command("AT", "OK", NULL, 500) != true)
             return;
         vEsp8266Rst();
-        ++ count;
+        iCnt++;
     }
 }
 
 /** 
   * @brief  bEsp8266NetModeChoose
-  * @note   Ñ¡ÔñESP8266Ä£¿éµÄ¹¤×÷Ä£Ê½,¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  xMode£¬¹¤×÷Ä£Ê½
-  * @retval 1£¬Ñ¡Ôñ³É¹¦
-  * @retval 0£¬Ñ¡ÔñÊ§°Ü
+  * @note   é€‰æ‹©ESP8266æ¨¡å—çš„å·¥ä½œæ¨¡å¼,è¯¥å‡½æ•°è¢«å¤–éƒ¨è°ƒç”¨ã€‚
+  * @param  xModeï¼Œå·¥ä½œæ¨¡å¼
+  * @retval 1ï¼Œé€‰æ‹©æˆåŠŸ
+  * @retval 0ï¼Œé€‰æ‹©å¤±è´¥
   */
-bool bEsp8266NetModeChoose ( eNetMode_t xMode )
+bool bEsp8266NetModeChoose(eNetMode_t xMode)
 {
-    switch ( xMode )
+    switch (xMode)
     {
-        case STA:
-            return bEsp8266Command ( "AT+CWMODE=1", "OK", "no change", 2500 );
-        case AP:
-            return bEsp8266Command ( "AT+CWMODE=2", "OK", "no change", 2500 );
-        case STA_AP:
-            return bEsp8266Command ( "AT+CWMODE=3", "OK", "no change", 2500 );
-        default:
-            return false;
+    case STA:
+        return bEsp8266Command("AT+CWMODE=1", "OK", "no change", 2500);
+    case AP:
+        return bEsp8266Command("AT+CWMODE=2", "OK", "no change", 2500);
+    case STA_AP:
+        return bEsp8266Command("AT+CWMODE=3", "OK", "no change", 2500);
+    default:
+        return false;
     }
 }
 
 /**
   * @brief  bEsp8266JoinAp
-  * @note   ESP8266Ä£¿éÁ¬½ÓÍâ²¿WiFi£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  pcSsid£¬WiFiÃû³Æ×Ö·û´®
-  * @param  pcPassWord£¬WiFiÃÜÂë×Ö·û´®
-  * @retval 1£¬Á¬½Ó³É¹¦
-  * @retval 0£¬Á¬½ÓÊ§°Ü
+  * @note   ESP8266æ¨¡å—è¿æ¥å¤–éƒ¨WiFiï¼Œè¯¥å‡½æ•°è¢«å¤–éƒ¨è°ƒç”¨ã€‚
+  * @param  pcSsidï¼ŒWiFiåç§°å­—ç¬¦ä¸²
+  * @param  pcPassWordï¼ŒWiFiå¯†ç å­—ç¬¦ä¸²
+  * @retval 1ï¼Œè¿æ¥æˆåŠŸ
+  * @retval 0ï¼Œè¿æ¥å¤±è´¥
   */
-bool bEsp8266JoinAp ( char * pcSsid, char * pcPassWord )
+bool bEsp8266JoinAp(char *pcSsid, char *pcPassWord)
 {
-    char cCmd [128];
-    sprintf ( cCmd, "AT+CWJAP=\"%s\",\"%s\"", pcSsid, pcPassWord );
-    if (strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "WIFI CONNECTED" ) != NULL)
+    char cCmd[128] = {0};
+    sprintf(cCmd, "AT+CWJAP=\"%s\",\"%s\"", pcSsid, pcPassWord);
+    if (strstr(xEsp8266Receiver.cRecvBuffer, "WIFI CONNECTED") != NULL)
     {
-        /* code */
         return true;
     }
-    return bEsp8266Command ( cCmd, "OK", "WIFI CONNECTED", 8000 );
+    return bEsp8266Command(cCmd, "OK", "WIFI CONNECTED", 8000);
 }
 
 /**
   * @brief  bEsp8266MqttInit
-  * @note   ESP8266Ä£¿éMQTT³õÊ¼»¯£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  pcMqttUserName£¬MQTTÓÃ»§Ãû×Ö·û´®
-  * @param  pcMqttPassword£¬MQTTÃÜÂë×Ö·û´®
-  * @param  pcMqttClientId£¬MQTT¿Í»§¶ËID×Ö·û´®
-  * @param  pcMqttServerIp£¬MQTT·şÎñÆ÷IPµØÖ·×Ö·û´®
-  * @param  usMqttServerPort£¬MQTT·şÎñÆ÷¶Ë¿ÚºÅ
-  * @retval 1£¬³õÊ¼»¯³É¹¦
-  * @retval 0£¬³õÊ¼»¯Ê§°Ü
+  * @note   ESP8266æ¨¡å—MQTTåˆå§‹åŒ–ï¼Œè¯¥å‡½æ•°è¢«å¤–éƒ¨è°ƒç”¨ã€‚
+  * @param  pcMqttUserNameï¼ŒMQTTç”¨æˆ·åå­—ç¬¦ä¸²
+  * @param  pcMqttPasswordï¼ŒMQTTå¯†ç å­—ç¬¦ä¸²
+  * @param  pcMqttClientIdï¼ŒMQTTå®¢æˆ·ç«¯IDå­—ç¬¦ä¸²
+  * @param  pcMqttServerIpï¼ŒMQTTæœåŠ¡å™¨IPåœ°å€å­—ç¬¦ä¸²
+  * @param  usMqttServerPortï¼ŒMQTTæœåŠ¡å™¨ç«¯å£å·
+  * @retval 1ï¼Œåˆå§‹åŒ–æˆåŠŸ
+  * @retval 0ï¼Œåˆå§‹åŒ–å¤±è´¥
   */
-bool bEsp8266MqttInit ( char * pcMqttUserName, char * pcMqttPassword, char * pcMqttClientId, 
-                        char * pcMqttServerIp, uint16_t usMqttServerPort, 
-                        char * pcMqttSubscribeTopic )
+bool bEsp8266MqttInit(char *pcMqttUserName, char *pcMqttPassword, char *pcMqttClientId, char *pcMqttServerIp,
+                      uint16_t usMqttServerPort, char *pcMqttSubscribeTopic)
 {
     char cCmd[256] = {0};
-    
-    /* 1. ÅäÖÃMQTTÓÃ»§ĞÅÏ¢ */
-    snprintf(cCmd, sizeof(cCmd), "AT+MQTTUSERCFG=0,1,\"NULL\",\"%s\",\"%s\",0,0,\"\"", 
-             pcMqttUserName, pcMqttPassword);
+
+    /* 1. é…ç½®MQTTç”¨æˆ·ä¿¡æ¯ */
+    snprintf(cCmd, sizeof(cCmd), "AT+MQTTUSERCFG=0,1,\"%s\",\"%s\",\"%s\",0,0,\"\"", pcMqttClientId, pcMqttUserName, pcMqttPassword);
     if (bEsp8266Command(cCmd, "OK", NULL, 2000) != true)
         return false;
-    
-    /* 2. ÉèÖÃ¿Í»§¶ËID */
+
+    /* 2. è¿æ¥åˆ°MQTTæœåŠ¡å™¨ */
     memset(cCmd, 0, sizeof(cCmd));
-    snprintf(cCmd, sizeof(cCmd), "AT+MQTTCLIENTID=0,\"%s\"", pcMqttClientId);
-    if (bEsp8266Command(cCmd, "OK", NULL, 2000) != true)
-        return false;
-    
-    /* 3. Á¬½Óµ½MQTT·şÎñÆ÷ */
-    memset(cCmd, 0, sizeof(cCmd));
-    snprintf(cCmd, sizeof(cCmd), "AT+MQTTCONN=0,\"%s\",%u,1", 
-             pcMqttServerIp, usMqttServerPort);
+    snprintf(cCmd, sizeof(cCmd), "AT+MQTTCONN=0,\"%s\",%u,1", pcMqttServerIp, usMqttServerPort);
     if (bEsp8266Command(cCmd, "OK", NULL, 8000) != true && bEsp8266Command(cCmd, "+MQTTCONN", NULL, 8000) != true)
         return false;
-    
-    /* 4. ¶©ÔÄÖ÷Ìâ */
+
+    /* 3. è®¢é˜…ä¸»é¢˜ */
     memset(cCmd, 0, sizeof(cCmd));
     snprintf(cCmd, sizeof(cCmd), "AT+MQTTSUB=0,\"%s\",1", pcMqttSubscribeTopic);
     if (bEsp8266Command(cCmd, "OK", NULL, 2000) != true)
         return false;
-    
+
     return true;
 }
 
 /**
-  * @brief  bEsp8266BuildAp
-  * @note   ESP8266Ä£¿é´´½¨APÈÈµã£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  pcSsid£¬APÃû³Æ×Ö·û´®
-  * @param  pcPassWord£¬APÃÜÂë×Ö·û´®
-  * @param  xPsdMode£¬AP¼ÓÃÜ·½Ê½
-  * @retval 1£¬´´½¨³É¹¦
-  * @retval 0£¬´´½¨Ê§°Ü
+  * @brief  bMqttPublish
+  * @note   é€šè¿‡ESP8266æ¨¡å—å‘MQTTæœåŠ¡å™¨å‘å¸ƒæ¶ˆæ¯ï¼Œè¯¥å‡½æ•°è¢«å¤–éƒ¨è°ƒç”¨ã€‚
+  * @param  pcTopicï¼šå‘å¸ƒçš„ä¸»é¢˜å­—ç¬¦ä¸²
+  * @param  pcMessageï¼šå‘å¸ƒçš„æ¶ˆæ¯å­—ç¬¦ä¸²
+  * @retval trueï¼šå‘å¸ƒæˆåŠŸ
+  * @retval falseï¼šå‘å¸ƒå¤±è´¥
   */
-bool bEsp8266BuildAp ( char * pcSsid, char * pcPassWord, eApPsdMode_t xPsdMode )
+bool bMqttPublish(char *pcTopic, char *pcMessage)
 {
-    char cCmd [128];
-    sprintf ( cCmd, "AT+CWSAP=\"%s\",\"%s\",1,%d", pcSsid, pcPassWord, xPsdMode );
-    return bEsp8266Command ( cCmd, "OK", 0, 1000 );
+    char cCmd[128] = {0};
+    uint8_t ucLen = strlen(pcMessage);
+    snprintf(cCmd, sizeof(cCmd), "AT+MQTTPUBRAW=0,\"%s\",%d,1,0", pcTopic, ucLen);
+    return bEsp8266Command(cCmd, ">", NULL, 2000) && bEsp8266Command(pcMessage, "OK", NULL, 2000);
 }
 
 /**
-  * @brief  bEsp8266EnableMultipleId
-  * @note   ESP8266Ä£¿éÊ¹ÄÜ/½ûÖ¹¶àÁ¬½Ó£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  xEnumEnUnvarnishTx£¬ENABLE£ºÊ¹ÄÜ¶àÁ¬½Ó£»DISABLE£º½ûÖ¹¶àÁ¬½Ó
-  * @retval 1£¬²Ù×÷³É¹¦
-  * @retval 0£¬²Ù×÷Ê§°Ü
+  * @brief  bMqttSubscribe
+  * @note   è§£æMQTTè®¢é˜…æ¶ˆæ¯ï¼Œè¯¥å‡½æ•°è¢«å¤–éƒ¨è°ƒç”¨ã€‚
+  * @param  pcTopicï¼šè®¢é˜…çš„ä¸»é¢˜å­—ç¬¦ä¸²
+  * @param  pcMessageï¼šè®¢é˜…çš„æ¶ˆæ¯å­—ç¬¦ä¸²
+  * @retval trueï¼šè§£ææˆåŠŸ
+  * @retval falseï¼šè§£æå¤±è´¥
   */
-bool bEsp8266EnableMultipleId ( FunctionalState xEnumEnUnvarnishTx )
+bool bMqttSubscribe(char *pcTopic, char *pcMessage)
 {
-    return bEsp8266Command ( "AT+CIPMUX=%d", "OK", 0, 500 );
-}
-
-/**
-  * @brief  bEsp8266LinkServer
-  * @note   ESP8266Ä£¿éÁ¬½Ó·şÎñÆ÷£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  xNetProtocol£¬Á¬½ÓĞ­ÒéÀàĞÍ
-  * @param  pcIp£¬·şÎñÆ÷IPµØÖ·×Ö·û´®
-  * @param  pcComNum£¬·şÎñÆ÷¶Ë¿ÚºÅ×Ö·û´®
-  * @param  xId£¬Á¬½ÓIDºÅ
-  * @retval 1£¬Á¬½Ó³É¹¦
-  * @retval 0£¬Á¬½ÓÊ§°Ü
-  */
-bool bEsp8266LinkServer ( eNetPro_t xNetProtocol, char * pcIp, char * pcComNum, eIdNo_t xId)
-{
-    char cStr [128] = { 0 }, cCmd [128];
-    switch (  xNetProtocol )
-    {
-        case enumTCP:
-            sprintf ( cStr, "\"%s\",\"%s\",%s", "TCP", pcIp, pcComNum );
-            break;
-        case enumUDP:
-            sprintf ( cStr, "\"%s\",\"%s\",%s", "UDP", pcIp, pcComNum );
-            break;
-        default:
-            break;
-    }
-    if ( xId < 5 )
-    sprintf ( cCmd, "AT+CIPSTART=%d,%s", xId, cStr);
-    else
-        sprintf ( cCmd, "AT+CIPSTART=%s", cStr );
-    return bEsp8266Command ( cCmd, "OK", "ALREADY CONNECT", 4000 );
-}
-
-/**
-  * @brief  bEsp8266StartOrShutServer
-  * @note   ESP8266Ä£¿éÆô¶¯/¹Ø±Õ·şÎñÆ÷£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  xMode£¬ENABLE£ºÆô¶¯·şÎñÆ÷£»DISABLE£º¹Ø±Õ·şÎñÆ÷
-  * @param  pcPortNum£¬·şÎñÆ÷¶Ë¿ÚºÅ×Ö·û´®
-  * @param  pcTimeOver£¬·şÎñÆ÷³¬Ê±Ê±¼ä×Ö·û´®
-  * @retval 1£¬²Ù×÷³É¹¦
-  * @retval 0£¬²Ù×÷Ê§°Ü
-  */
-bool bEsp8266StartOrShutServer ( FunctionalState xMode, char * pcPortNum, char * pcTimeOver )
-{
-    char cCmd1 [128], cCmd2 [128];
-    if ( xMode )
-    {
-        sprintf ( cCmd1, "AT+CIPSERVER=%d,%s", 1, pcPortNum );
-        sprintf ( cCmd2, "AT+CIPSTO=%s", pcTimeOver );
-        return ( bEsp8266Command ( cCmd1, "OK", 0, 500 ) &&
-                            bEsp8266Command ( cCmd2, "OK", 0, 500 ) );
-    }
-    else
-    {
-        sprintf ( cCmd1, "AT+CIPSERVER=%d,%s", 0, pcPortNum );
-        return bEsp8266Command ( cCmd1, "OK", 0, 500 );
-    }
-}
-
-/**
-  * @brief  ucEsp8266GetLinkStatus
-  * @note   »ñÈ¡ESP8266µÄÁ¬½Ó×´Ì¬£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  ÎŞ
-  * @retval 0£¬Î´Á¬½Ó
-  * @retval 2£¬ÒÑÁ¬½ÓÖÁAPµ«Î´Á¬½Ó·şÎñÆ÷
-  * @retval 3£¬ÒÑÁ¬½ÓÖÁAPÇÒÒÑÁ¬½Ó·şÎñÆ÷
-  * @retval 4£¬Á¬½Ó¶Ï¿ª
-  */
-uint8_t ucEsp8266GetLinkStatus ( void )
-{
-    if ( bEsp8266Command ( "AT+CIPSTATUS", "OK", 0, 500 ) )
-    {
-        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "STATUS:2\r\n" ) )
-            return 2;
-        else if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "STATUS:3\r\n" ) )
-            return 3;
-        
-        else if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "STATUS:4\r\n" ) )
-            return 4;
-    }
-    return 0;
-}
-
-/**
-  * @brief  ucEsp8266GetIdLinkStatus
-  * @note   »ñÈ¡ESP8266µÄ¸÷IDÁ¬½Ó×´Ì¬£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  ÎŞ
-  * @retval ¸÷IDÁ¬½Ó×´Ì¬£¬Î»0~4·Ö±ğ±íÊ¾ID0~ID4µÄÁ¬½Ó×´Ì¬£¬1±íÊ¾ÒÑÁ¬½Ó£¬0±íÊ¾Î´Á¬½Ó
-  */
-uint8_t ucEsp8266GetIdLinkStatus ( void )
-{
-    uint8_t ucIdLinkStatus = 0x00;
-    if ( bEsp8266Command ( "AT+CIPSTATUS", "OK", 0, 500 ) )
-    {
-        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:0," ) )
-            ucIdLinkStatus |= 0x01;
-        else 
-            ucIdLinkStatus &= ~ 0x01;
-        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:1," ) )
-            ucIdLinkStatus |= 0x02;
-        else 
-            ucIdLinkStatus &= ~ 0x02;
-        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:2," ) )
-            ucIdLinkStatus |= 0x04;
-        else 
-            ucIdLinkStatus &= ~ 0x04;
-        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:3," ) )
-            ucIdLinkStatus |= 0x08;
-        else 
-            ucIdLinkStatus &= ~ 0x08;
-        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+CIPSTATUS:4," ) )
-            ucIdLinkStatus |= 0x10;
-        else 
-            ucIdLinkStatus &= ~ 0x10;
-    }
-    return ucIdLinkStatus;
-}
-
-/**
-  * @brief  ucEsp8266InquireApIp
-  * @note   »ñÈ¡ESP8266µÄAP IP£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  pcApIp£¬´æ·Å AP IP µÄÊı×éµÄÊ×µØÖ·
-  * @param  ucArrayLength£¬´æ·Å AP IP µÄÊı×éµÄ³¤¶È
-  * @retval 0£¬»ñÈ¡Ê§°Ü
-  * @retval 1£¬»ñÈ¡³É¹¦
-  */
-uint8_t ucEsp8266InquireApIp ( char * pcApIp, uint8_t ucArrayLength )
-{
-    char c;
-    char * pCh;
-    bEsp8266Command ( "AT+CIFSR", "OK", 0, 500 );
-    pCh = strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "APIP,\"" );
-    if ( pCh )
-        pCh += 6;
-    else
-        return 0;
-    for ( c = 0; c < ucArrayLength; c ++ )
-    {
-        pcApIp [ c ] = * ( pCh + c);
-        if ( pcApIp [ c ] == '\"' )
-        {
-            pcApIp [ c ] = '\0';
-            break;
-        }
-    }
-    return 1;
-}
-
-/**
-  * @brief  bEsp8266UnvarnishSend
-  * @note   ÅäÖÃESP8266Ä£¿é½øÈëÍ¸´«Ä£Ê½£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  ÎŞ
-  * @retval 1£¬ÅäÖÃ³É¹¦
-  * @retval 0£¬ÅäÖÃÊ§°Ü
-  */
-bool bEsp8266UnvarnishSend ( void )
-{
-    return bEsp8266Command ( "AT+CIPMODE=1", "OK", 0, 500 );
-}
-
-/**
-  * @brief  vEsp8266ExitUnvarnishSend
-  * @note   Ê¹ESP8266Ä£¿éÍË³öÍ¸´«Ä£Ê½£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  ÎŞ
-  * @retval ÎŞ
-  */
-void vEsp8266ExitUnvarnishSend ( void )
-{
-    vDelayMs( 1000 );
-    vUsartPrintf ( USART2, "+++" );
-    vDelayMs( 500 ); 
-}
-
-/**
-  * @brief  bEsp8266SendString
-  * @note   ESP8266Ä£¿é·¢ËÍ×Ö·û´®£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  xEnumEnUnvarnishTx£¬ÉùÃ÷ÊÇ·ñÒÑÊ¹ÄÜÁËÍ¸´«Ä£Ê½
-  * @param  pcStr£¬´ı·¢ËÍµÄ×Ö·û´®Ê×µØÖ·
-  * @param  ulStrLength£¬´ı·¢ËÍµÄ×Ö·û´®³¤¶È
-  * @param  ucId£¬Á¬½ÓIDºÅ
-  * @retval 1£¬·¢ËÍ³É¹¦
-  * @retval 0£¬·¢ËÍÊ§°Ü
-  */
-bool bEsp8266SendString ( FunctionalState xEnumEnUnvarnishTx, char * pcStr, uint32_t ulStrLength, eIdNo_t xId )
-{
-    char cStr [256];
-    bool bRet = false;
-    if ( xEnumEnUnvarnishTx )
-    {
-        vUsartPrintf ( USART2, "%s", pcStr );
-        bRet = true;
-    }
-    else
-    {
-        if ( xId < 5 )
-            sprintf ( cStr, "AT+CIPSEND=%d,%d", xId, ulStrLength + 2 );
-        else
-            sprintf ( cStr, "AT+CIPSEND=%d", ulStrLength + 2 );
-        bEsp8266Command ( cStr, "> ", 0, 1000 );
-        bRet = bEsp8266Command ( pcStr, "SEND OK", 0, 1000 );
-    }
-    return bRet;
-}
-
-/**
-  * @brief  pcEsp8266ReceiveString
-  * @note   ESP8266Ä£¿é½ÓÊÕ×Ö·û´®£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  xEnumEnUnvarnishTx£¬ÉùÃ÷ÊÇ·ñÒÑÊ¹ÄÜÁËÍ¸´«Ä£Ê½
-  * @retval ½ÓÊÕµ½µÄ×Ö·û´®Ê×µØÖ·£¬Î´½ÓÊÕµ½·µ»Ø0
-  */
-char * pcEsp8266ReceiveString ( FunctionalState xEnumEnUnvarnishTx )
-{
-    char * pRecStr = 0;
-    xSerialFrameRecord.Bits_t.usFrameLength = 0;
-    xSerialFrameRecord.Bits_t.usFrameFinishFlag = 0;
-    while ( ! xSerialFrameRecord.Bits_t.usFrameFinishFlag );
-    xSerialFrameRecord.cSerialReceivedBuffer [ xSerialFrameRecord.Bits_t.usFrameLength ] = '\0';
-    if ( xEnumEnUnvarnishTx )
-        pRecStr = xSerialFrameRecord.cSerialReceivedBuffer;
-    else 
-    {
-        if ( strstr ( xSerialFrameRecord.cSerialReceivedBuffer, "+IPD" ) )
-            pRecStr = xSerialFrameRecord.cSerialReceivedBuffer;
-    }
-    return pRecStr;
+    /* æ­¤å‡½æ•°ç”¨äºè§£æè®¢é˜…æ¶ˆæ¯ï¼Œæ ¹æ®ä¸åŒçš„æ¨¡å¼æå–ä¸»é¢˜å’Œæ¶ˆæ¯å†…å®¹ï¼Œå…·ä½“å®ç°æ ¹æ®å®é™…çš„æ¶ˆæ¯æ ¼å¼è¿›è¡Œç¼–å†™ã€‚ */
+    char *pcSubRecMsg = 0;
+    pcSubRecMsg = strstr(xEsp8266Receiver.cRecvBuffer, pcMessage);
+    if (strstr(xEsp8266Receiver.cRecvBuffer, pcTopic), pcSubRecMsg)
+        return true;
+    return false;                                                       // å ä½ç¬¦ï¼Œå®é™…å®ç°éœ€è¦è¿”å›è§£æç»“æœ
 }

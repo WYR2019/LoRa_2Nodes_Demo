@@ -1,29 +1,33 @@
 #include "stm32f10x.h"                  // Device header
-#include "Delay.h"
-#include "USART.h"
-#include "LED.h"
+#include "BSP_Delay.h"
+#include "BSP_LED.h"
+#include "BSP_USART.h"
 #include "ESP8266.h"
+#include "LoRa.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "App_MQTT.h"
 
-/* ´´½¨Ò»¸öĞÂÈÎÎñ£¬ĞèÒª´´½¨ÈÎÎñ¾ä±ú,ÈÎÎñ¾ä±úÓëÈÎÎñº¯ÊıÒ»Ò»¶ÔÓ¦¡£ */
+/* åˆ›å»ºä¸€ä¸ªæ–°ä»»åŠ¡ï¼Œéœ€è¦åˆ›å»ºä»»åŠ¡å¥æŸ„,ä»»åŠ¡å¥æŸ„ä¸ä»»åŠ¡å‡½æ•°ä¸€ä¸€å¯¹åº”ã€‚ */
 TaskHandle_t xTaskWorkStatusLedHdlr;
-TaskHandle_t xTaskWifiJoinApHdlr;
-TaskHandle_t xTaskWifiNwkInitHdlr;
+TaskHandle_t xTaskNetworkInitHdlr;
 TaskHandle_t xTaskMqttPublishHdlr;
 TaskHandle_t xTaskMqttSubscribeHdlr;
+TaskHandle_t xTaskLoRaConfigQueryHdlr;
+TaskHandle_t xTaskGetDht11DataHdlr;
 
-/* ´´½¨¶ÓÁĞ¾ä±ú */
+/* åˆ›å»ºé˜Ÿåˆ—å¥æŸ„ */
 QueueHandle_t xQueueUsart1IrqHdlr;
 QueueHandle_t xQueueUsart2IrqHdlr;
 QueueHandle_t xQueueUsart3IrqHdlr;
 
+extern LoRaMsgRecvData_t xLoRaMsgRecvData;
+
 /**
-  * @brief  ×´Ì¬Ö¸Ê¾LEDÈÎÎñ
-  * @note   Í¨¹ı¿ØÖÆPC13Òı½ÅµÄLEDµÆ£¬ÊµÏÖÏµÍ³×´Ì¬µÄÖ¸Ê¾¹¦ÄÜ¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬ÈôÃ»ÓĞÌØ¶¨µÄ²ÎÊıÔòÉèÖÃÎª¿ÕÖ¸Õë
+  * @brief  çŠ¶æ€æŒ‡ç¤ºLEDä»»åŠ¡
+  * @note   é€šè¿‡æ§åˆ¶PC13å¼•è„šçš„LEDç¯ï¼Œå®ç°ç³»ç»ŸçŠ¶æ€çš„æŒ‡ç¤ºåŠŸèƒ½ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œè‹¥æ²¡æœ‰ç‰¹å®šçš„å‚æ•°åˆ™è®¾ç½®ä¸ºç©ºæŒ‡é’ˆ
   * @retval None
   */
 void vTaskWorkStatusLed(void *pvParameters)
@@ -38,171 +42,148 @@ void vTaskWorkStatusLed(void *pvParameters)
 }
 
 /**
-  * @brief  ³õÊ¼»¯Wi-FiÄ£¿éÍøÂçÈÎÎñ
-  * @note   Í¨¹ıESP8266Ä£¿é³õÊ¼»¯MQTTĞ­ÒéÁ¬½Ó¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬ÈôÃ»ÓĞÌØ¶¨µÄ²ÎÊıÔòÉèÖÃÎª¿ÕÖ¸Õë
+  * @brief  åˆå§‹åŒ–Wi-Fiæ¨¡å—ç½‘ç»œä»»åŠ¡
+  * @note   é€šè¿‡ESP8266æ¨¡å—åˆå§‹åŒ–MQTTåè®®è¿æ¥ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œè‹¥æ²¡æœ‰ç‰¹å®šçš„å‚æ•°åˆ™è®¾ç½®ä¸ºç©ºæŒ‡é’ˆ
   * @retval None
   */
-void vTaskWifiNetWorkInit(void *pvParameters)
+void vTaskNetworkInit(void *pvParameters)
 {
     while (1)
     {
-        vEsp8266GpioConfig();
         vEsp8266AtTest();
         if (bEsp8266NetModeChoose(STA) == pdTRUE)
         {
-            vUsartSendString(USART1, "Set ESP8266 Net Mode Successfully.\r\n");
+            vDebugLogPrint("Set ESP8266 Net Mode Successfully.\r\n");
         } else
         {
-            /* code */
-            vUsartSendString(USART1, "Set ESP8266 Net Mode Failed.\r\n");
+            // vDebugLogPrint("Set ESP8266 Net Mode Failed.\r\n");
             continue;
         } 
         if (bEsp8266JoinAp(ESP8266_APSSID, ESP8266_APPWD) == pdTRUE)
         {
-            vUsartSendString(USART1, "Wifi Join To AP Successfully.\r\n");
+            vDebugLogPrint("Wifi Join To AP Successfully.\r\n");
         } else
         {
-            /* code */
-            vUsartSendString(USART1, "Wifi Join To AP Failed.\r\n");
+            // vDebugLogPrint("Wifi Join To AP Failed.\r\n");
             continue;
         }
-        #if (ESP8266_MQTT_SERVER_MODE == ALIYUN)
-            if (bEsp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENTID, 
-                ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == pdTRUE)
-            {
-                /* code */
-                vUsartSendString(USART1, "Aliyun MQTT Init Successfully.\r\n");
-                /* Í¨ÖªMQTT·¢²¼ÈÎÎñ */
-                xTaskNotifyGive(xTaskMqttPublishHdlr);
-                xTaskNotifyGive(xTaskMqttSubscribeHdlr);
-                vTaskDelete(NULL);
-            } else
-            {
-                /* code */
-                vUsartSendString(USART1, "Aliyun MQTT Init Failed.\r\n");
-                continue;
-            }
-        #elif (ESP8266_MQTT_SERVER_MODE == EMQX)
-            if (bEsp8266MqttInit(ESP8266_EMQX_MQTT_USERNAME, ESP8266_EMQX_MQTT_PASSWORD, ESP8266_EMQX_MQTT_CLIENTID, 
-                ESP8266_EMQX_MQTT_SERVER_IP, ESP8266_EMQX_MQTT_SERVER_PORT, ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == pdTRUE)
-            {
-                /* code */
-                vUsartPrintf(USART1, "EMQX MQTT Init Successfully.\r\n");
-                xTaskNotifyGive(xTaskMqttPublishHdlr);
-                xTaskNotifyGive(xTaskMqttSubscribeHdlr);
-                vTaskDelete(NULL);
-            } else
-            {
-                /* code */
-                vUsartSendString(USART1, "EMQX MQTT Init Failed.\r\n");
-                continue;
-            }
-        #endif
+        if (bEsp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENTID, 
+            ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == pdTRUE)
+        {
+            vDebugLogPrint("Aliyun MQTT Init Successfully.\r\n");
+            /* é€šçŸ¥MQTTå‘å¸ƒä»»åŠ¡ */
+            xTaskNotifyGive(xTaskMqttPublishHdlr);
+            xTaskNotifyGive(xTaskMqttSubscribeHdlr);
+            vTaskDelete(NULL);
+        } else
+        {
+            // vDebugLogPrint("Aliyun MQTT Init Failed.\r\n");
+            continue;
+        }
     }
 }
 
 /**
-  * @brief  MQTT·¢²¼²âÊÔÈÎÎñ
-  * @note   Í¨¹ıESP8266Ä£¿éÏòMQTT·şÎñÆ÷·¢²¼²âÊÔÏûÏ¢¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬ÈôÃ»ÓĞÌØ¶¨µÄ²ÎÊıÔòÉèÖÃÎª¿ÕÖ¸Õë
+  * @brief  MQTTå‘å¸ƒæµ‹è¯•ä»»åŠ¡
+  * @note   é€šè¿‡ESP8266æ¨¡å—å‘MQTTæœåŠ¡å™¨å‘å¸ƒæµ‹è¯•æ¶ˆæ¯ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œè‹¥æ²¡æœ‰ç‰¹å®šçš„å‚æ•°åˆ™è®¾ç½®ä¸ºç©ºæŒ‡é’ˆ
   * @retval None
   */
 void vTaskMqttPublish(void *pvParameters)
 {
-    /* ÈÎÎñÍ¨Öª½ÓÊÕº¯Êı */
+    /* ä»»åŠ¡é€šçŸ¥æ¥æ”¶å‡½æ•° */
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    char *pcJsonMsg = "{\"temperature\":23,\"humidity\":60}";
+    char cMsg[128] = {0};
     while (1)
     {
-        /* code */
-        #if (ESP8266_MQTT_SERVER_MODE == ALIYUN)
-            while (bMqttPublish(ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC, pcJsonMsg) == pdTRUE)
-            {
-                /* code */
-                vUsartSendString(USART1, "MQTT Publish Successfully.\r\n");
-            }
-            vUsartSendString(USART1, "MQTT Publish Failed.\r\n");
-            vTaskDelay(2000);
-        #elif (ESP8266_MQTT_SERVER_MODE == EMQX)
-            while (bMqttPublish(ESP8266_EMQX_MQTT_PUBLISH_TOPIC, pcJsonMsg) == pdTRUE)
-            {
-                /* code */
-                vUsartSendString(USART1, "MQTT Publish Successfully.\r\n");
-            }
-            vUsartSendString(USART1, "MQTT Publish Failed.\r\n");
-            vTaskDelay(2000);
-        #endif
+        vLoRaParseDataTest();
+        vTaskDelay(500);
+        snprintf(cMsg, sizeof(cMsg), "{\"node1\": [{ \"temperature\":\"%d\" , \"humidity\":\"%d\" },{ \"led\":\"off\" }]}", 
+                                        xLoRaMsgRecvData.Sensor_t.ucTemperature, xLoRaMsgRecvData.Sensor_t.ucHumidity);
+        vDebugLogPrint("Node1 Sensor:temperature:%dâ°C, humidity:%d%\r\n", xLoRaMsgRecvData.Sensor_t.ucTemperature, xLoRaMsgRecvData.Sensor_t.ucHumidity);
+        if (bMqttPublish(ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC, cMsg) == pdTRUE)
+        {
+            vDebugLogPrint("MQTT Publish Successfully.\r\n");
+        }
+//        vDebugLogPrint("MQTT Publish Failed.\r\n");
     }
 }
 
 /**
-  * @brief  MQTT¶©ÔÄÈÎÎñ
-  * @note   Í¨¹ıESP8266Ä£¿é¶©ÔÄMQTTÖ÷Ìâ²¢´¦Àí½ÓÊÕµ½µÄÃüÁî¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬ÈôÃ»ÓĞÌØ¶¨µÄ²ÎÊıÔòÉèÖÃÎª¿ÕÖ¸Õë
+  * @brief  MQTTè®¢é˜…ä»»åŠ¡
+  * @note   é€šè¿‡ESP8266æ¨¡å—è®¢é˜…MQTTä¸»é¢˜å¹¶å¤„ç†æ¥æ”¶åˆ°çš„å‘½ä»¤ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œè‹¥æ²¡æœ‰ç‰¹å®šçš„å‚æ•°åˆ™è®¾ç½®ä¸ºç©ºæŒ‡é’ˆ
   * @retval None
   */
 void vTaskMqttSubscribe(void *pvParameters)
 {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     while (1)
     {
-        /* code */
-        if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_ON)
+        if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_ON)
         {
-            /* code */
-            vUsartPrintf(USART1, "Lights on\r\n");
+            vDebugLogPrint("Lights on\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_OFF)
+        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_OFF)
         {
-            /* code */
-            vUsartPrintf(USART1, "Lights off\r\n");
+            vDebugLogPrint("Lights off\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_ON)
+        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_ON)
         {
-            /* code */
-            vUsartPrintf(USART1, "Fan on\r\n");
+            vDebugLogPrint("Fan on\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_OFF)
+        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_OFF)
         {
-            /* code */
-            vUsartPrintf(USART1, "Fan off\r\n");
+            vDebugLogPrint("Fan off\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_ON)
+        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_ON)
         {
-            /* code */
-            vUsartPrintf(USART1, "Humidifier on\r\n");
+            vDebugLogPrint("Humidifier on\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_OFF)
+        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_OFF)
         {
-            /* code */
-            vUsartPrintf(USART1, "Humidifier off\r\n");
+            vDebugLogPrint("Humidifier off\r\n");
         }
         vTaskDelay(1000);
     }
 }
 
+void vTaskLoRaConfigQuery(void *pvParameters)
+{
+    while (1)
+    {
+        for (size_t i = 0; i < 3; i++)
+        {
+            vLoRaConfigQuery();
+            vTaskDelay(500);
+        }
+        vTaskDelete(NULL);
+    }
+}
+
 /**
-  * @brief  ´´½¨ËùÓĞÈÎÎñÁĞ±í
-  * @note   ÔÚ´Ëº¯ÊıÖĞ´´½¨ËùÓĞĞèÒªµÄÈÎÎñ£¬²¢ÎªÃ¿¸öÈÎÎñ·ÖÅäÊÊµ±µÄ¶ÑÕ»´óĞ¡ºÍÓÅÏÈ¼¶¡£
+  * @brief  åˆ›å»ºæ‰€æœ‰ä»»åŠ¡åˆ—è¡¨
+  * @note   åœ¨æ­¤å‡½æ•°ä¸­åˆ›å»ºæ‰€æœ‰éœ€è¦çš„ä»»åŠ¡ï¼Œå¹¶ä¸ºæ¯ä¸ªä»»åŠ¡åˆ†é…é€‚å½“çš„å †æ ˆå¤§å°å’Œä¼˜å…ˆçº§ã€‚
   * @param  None
   * @retval None
   */
 void vCreateTasksList(void)
 {
+    // xTaskCreate(
+    //            (TaskFunction_t        ) vTaskWorkStatusLed,
+    //            (char *                ) "TaskName_StateLed", 
+    //            (configSTACK_DEPTH_TYPE) 128,
+    //            (void *                ) NULL, 
+    //            (UBaseType_t           ) 2,
+    //            (TaskHandle_t *        ) &xTaskWorkStatusLedHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskWorkStatusLed,
-               (char *                ) "TaskName_StateLed", 
-               (configSTACK_DEPTH_TYPE) 256,
-               (void *                ) NULL, 
-               (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskWorkStatusLedHdlr);
-    xTaskCreate(
-               (TaskFunction_t        ) vTaskWifiNetWorkInit,
+               (TaskFunction_t        ) vTaskNetworkInit,
                (char *                ) "TaskName_WifiInitMQTTProtocol", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL,
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskWifiNwkInitHdlr);
+               (TaskHandle_t *        ) &xTaskNetworkInitHdlr);
     xTaskCreate(
                (TaskFunction_t        ) vTaskMqttPublish,
                (char *                ) "TaskName_MqttPublishTest", 
@@ -217,47 +198,54 @@ void vCreateTasksList(void)
                (void *                ) NULL,
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &xTaskMqttSubscribeHdlr);
+//    xTaskCreate(
+//               (TaskFunction_t        ) vTaskLoRaConfigQuery,
+//               (char *                ) "TaskName_LoRaQueryTest", 
+//               (configSTACK_DEPTH_TYPE) 128,
+//               (void *                ) NULL,
+//               (UBaseType_t           ) 2,
+//               (TaskHandle_t *        ) &xTaskLoRaConfigQueryHdlr);
 }
 
 /**
-  * @brief  ´´½¨ËùÓĞ¶ÓÁĞÁĞ±í
-  * @note   ÔÚ´Ëº¯ÊıÖĞ´´½¨ËùÓĞĞèÒªµÄ¶ÓÁĞ£¬²¢ÎªÃ¿¸ö¶ÓÁĞ·ÖÅäÊÊµ±µÄ³¤¶ÈºÍÏî´óĞ¡¡£
+  * @brief  åˆ›å»ºæ‰€æœ‰é˜Ÿåˆ—åˆ—è¡¨
+  * @note   åœ¨æ­¤å‡½æ•°ä¸­åˆ›å»ºæ‰€æœ‰éœ€è¦çš„é˜Ÿåˆ—ï¼Œå¹¶ä¸ºæ¯ä¸ªé˜Ÿåˆ—åˆ†é…é€‚å½“çš„é•¿åº¦å’Œé¡¹å¤§å°ã€‚
   * @param  None
   * @retval None
   */
 void vCreateQueuesList(void)
 {
-    #if (ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
-        xQueueUsart1IrqHdlr = xQueueCreate(
+#if (ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
+    xQueueUsart1IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t *));
-    #endif
-    #if (ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 1)
-        xQueueUsart2IrqHdlr = xQueueCreate(
+#endif
+#if (ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 1)
+    xQueueUsart2IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 1024,
                                       (UBaseType_t) sizeof(char *));
-    #endif
-    #if (ENABLE_FREERTOS_API_QUEUE_USART3_IRQ == 1)
-        xQueueUsart3IrqHdlr = xQueueCreate(
+#endif
+#if (ENABLE_FREERTOS_API_QUEUE_USART3_IRQ == 1)
+    xQueueUsart3IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t *));
-    #endif
-    
+#endif
 }
 
 /**
-  * @brief  ´´½¨ËùÓĞĞÅºÅÁ¿ÁĞ±í
-  * @note   ÔÚ´Ëº¯ÊıÖĞ´´½¨ËùÓĞĞèÒªµÄĞÅºÅÁ¿¡£
+  * @brief  åˆ›å»ºæ‰€æœ‰ä¿¡å·é‡åˆ—è¡¨
+  * @note   åœ¨æ­¤å‡½æ•°ä¸­åˆ›å»ºæ‰€æœ‰éœ€è¦çš„ä¿¡å·é‡ã€‚
   * @param  None
   * @retval None
   */
 void vCreateSemaphoresList(void)
 {
+    
 }
 
 /**
-  * @brief  Ö÷º¯Êı
-  * @note   ³õÊ¼»¯ÏµÍ³¸÷¸öÄ£¿é£¬´´½¨ÈÎÎñ¡¢¶ÓÁĞºÍĞÅºÅÁ¿£¬²¢Æô¶¯µ÷¶ÈÆ÷¡£
+  * @brief  ä¸»å‡½æ•°
+  * @note   åˆå§‹åŒ–ç³»ç»Ÿå„ä¸ªæ¨¡å—ï¼Œåˆ›å»ºä»»åŠ¡ã€é˜Ÿåˆ—å’Œä¿¡å·é‡ï¼Œå¹¶å¯åŠ¨è°ƒåº¦å™¨ã€‚
   * @param  None
   * @retval int
   */
@@ -268,12 +256,9 @@ int main(void)
     vUsartInit(USART3, 115200);
     vDelayInit();
     vPc13LedInit();
+    vEsp8266GpioConfig();
     vCreateTasksList();
     vCreateQueuesList();
     vCreateSemaphoresList();
     vTaskStartScheduler();
-    while(1)
-    {
-
-    }
 }

@@ -681,14 +681,14 @@
           <GroupName>System</GroupName>
           <Files>
             <File>
-              <FileName>Delay.c</FileName>
+              <FileName>BSP_Delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\System\Delay.c</FilePath>
+              <FilePath>.\System\BSP_Delay.c</FilePath>
             </File>
             <File>
-              <FileName>Delay.h</FileName>
+              <FileName>BSP_Delay.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\System\Delay.h</FilePath>
+              <FilePath>.\System\BSP_Delay.h</FilePath>
             </File>
             <File>
               <FileName>CRC32.c</FileName>

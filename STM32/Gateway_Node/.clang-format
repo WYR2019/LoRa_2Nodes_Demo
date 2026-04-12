@@ -1,0 +1,97 @@
+# clang-format 配置文件
+# 适用于嵌入式 C/C++ 项目（FreeRTOS 风格），并根据 Doxygen 注释要求优化
+BasedOnStyle: LLVM
+Language: Cpp
+
+# 缩进设置
+UseTab: Never
+IndentWidth: 4
+TabWidth: 4
+ContinuationIndentWidth: 4
+AccessModifierOffset: -4
+
+# 大括号换行策略（自定义）
+BreakBeforeBraces: Custom
+BraceWrapping:
+  # 函数定义后换行
+  AfterFunction: true
+  # 控制语句（if, while, for, switch）后换行
+  AfterControlStatement: Always
+  # 枚举、结构体、联合体后换行
+  AfterEnum: true
+  AfterStruct: true
+  AfterUnion: true
+  # else 不换行（与前面的 } 在同一行）
+  BeforeElse: false
+  # catch 不换行
+  BeforeCatch: false
+  # while（do-while 的 while）不换行
+  BeforeWhile: false
+  # 不缩进大括号内容
+  IndentBraces: false
+  # 空函数体允许合并
+  SplitEmptyFunction: true
+
+# 不允许短控制语句或函数写在一行
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+# 指针/引用符号靠近变量名（常见嵌入式风格）
+PointerAlignment: Right
+ReferenceAlignment: Right
+
+# 空格控制
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+SpacesInContainerLiterals: false
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# 函数调用/声明的参数换行对齐方式
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+# ========== 宏对齐设置 ==========
+# 连续宏定义的值部分按列对齐（类似您提供的示例）
+AlignConsecutiveMacros: true
+# ================================
+AlignOperands: Align
+AlignTrailingComments: true    # 对齐行末注释，如 // 注释
+
+# ========== 注释相关设置（根据 Doxygen 注释优化）==========
+# 禁止重新排版注释，避免破坏 Doxygen 标签结构（如 @brief、@param 等）
+ReflowComments: false
+# 行末注释前保留一个空格
+SpacesBeforeTrailingComments: 1
+# 允许保留最多两个空行，以维持注释与代码之间的清晰分隔
+MaxEmptyLinesToKeep: 2
+# =====================================================
+
+# 列宽限制
+ColumnLimit: 120
+
+# 预处理指令不缩进
+IndentPPDirectives: None
+PPIndentWidth: 4
+
+# 包含块排序（可根据项目调整）
+IncludeBlocks: Preserve
+IncludeCategories:
+  - Regex: '^<.*\.h>'
+    Priority: 1
+  - Regex: '^".*\.h"'
+    Priority: 2
+
+# 不允许尾随逗号
+Cpp11BracedListStyle: true
+
+# 其他
+FixNamespaceComments: true
+# 若需要自动排序头文件可改为 true
+SortIncludes: false

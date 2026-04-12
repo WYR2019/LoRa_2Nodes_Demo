@@ -1,195 +1,183 @@
 #include "LoRa.h"
 
-void vLoRaConnectionPkt(uint8_t ucNodeId)
-{
-    if (ucNodeId == xLoRaNode1Config.ucLoRaNode1Identifier)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode1Config, 3);
-    }
-    else if (ucNodeId == xLoRaNode2Config.ucLoRaNode2Identifier)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode2Config, 3);
-    }
-    else
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaGateConfig, 3);
-    }
-}
+SerialReceiver_t xLoRaReceiver = {0};
+LoRaMsgRecvData_t xLoRaMsgRecvData;
 
 /**
-  * @brief  LoRa���ͷ���hex���ݰ�����,Ҳ��LoRa�ڶ���ģʽ��ִ�нڵ��ͨ�ŵ���Ҫ������				
-  * @note   hex���ݰ��ĸ�ʽΪ�̶�����
+  * @brief  串口3接收中断处理函数
+  * @note   接收串口中断发送的每帧数据到串口消息队列中，以便后续处理数据。
   * @param  None
   * @retval None
   */
-void vLoRaToGateIdPkt(uint8_t ucNodeId)
+void vLoRaIrqHandler(void)
 {
-    if (ucNodeId == xLoRaNode1Config.ucLoRaNode1Identifier)
+#if ENABLE_FREERTOS_API_QUEUE_USART3_IRQ
+    if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
     {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode1Config.ucLoRaNode1Identifier, 1);
-    } else if (ucNodeId == xLoRaNode2Config.ucLoRaNode2Identifier)
+        uint8_t ucRxData = (uint8_t)USART_ReceiveData(USART3);
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xQueueSendFromISR(xQueueUsart3IrqHdlr, &ucRxData, &xHigherPriorityTaskWoken);
+        /* 问题根源：请求上下文切换 */ 
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+    }
+#else
+    uint8_t ucRxData;
+    if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
     {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode2Config.ucLoRaNode2Identifier, 1);
+        ucRxData = USART_ReceiveData(USART3);
+        if (xLoRaReceiver.Flags_t.usBufferIndex < (LORA_MAX_BUFFER - 2))                    // 预留1个字节写结束符
+            xLoRaReceiver.cRecvBuffer[xLoRaReceiver.Flags_t.usBufferIndex++] = ucRxData;
+        // USART_SendData(USART1, ucRxData);                                                   // 打印到指定串口调试
+        if (xLoRaReceiver.Flags_t.usBufferIndex >= (LORA_MAX_BUFFER - 2))
+        {
+            xLoRaReceiver.Flags_t.usBufferIndex = 0;
+            memset((uint8_t *)xLoRaReceiver.cRecvBuffer, 0, sizeof(xLoRaReceiver.cRecvBuffer));
+        }
+    }
+    if (USART_GetITStatus(USART3, USART_IT_IDLE) == SET)                                    // 数据帧接收完毕
+    {
+        xLoRaReceiver.Flags_t.usRecvFinishFlag = 1;
+    }
+#endif
+}
+
+bool bLoRaSendATCmdForAck(char *pcCmd, char *pcAck1, char *pcAck2, uint32_t ulWaittime)
+{
+    xLoRaReceiver.Flags_t.usBufferIndex = 0;                                                // 从新开始接收新的数据包
+    vLoRaDataTransmit("%s\r\n", pcCmd);
+    if ((pcAck1 == 0) && (pcAck2 == 0))                                                     // 不需要接收数据
+        return true;
+    vDelayMs(ulWaittime);                                                                   // 延时
+    xLoRaReceiver.cRecvBuffer[xLoRaReceiver.Flags_t.usBufferIndex] = '\0';
+    if ((pcAck1 != 0) && (pcAck2 != 0))
+        return ((bool)strstr(xLoRaReceiver.cRecvBuffer, pcAck1) ||
+                (bool)strstr(xLoRaReceiver.cRecvBuffer, pcAck2));
+    else if (pcAck1 != 0)
+        return ((bool)strstr(xLoRaReceiver.cRecvBuffer, pcAck1));
+    else
+        return ((bool)strstr(xLoRaReceiver.cRecvBuffer, pcAck2));
+}
+
+void vLoRaConfigQuery(void)
+{
+    LORA_MD0_SETHIGHLVL();
+    char cCmd[64] = {0};
+    snprintf(cCmd, sizeof(cCmd), "AT+WLRATE?");
+    if (bLoRaSendATCmdForAck(cCmd, "OK", NULL, 300) == true)
+    {
+        vDebugLogPrint("test ok\r\n");
+    } 
+    else
+    {
+        vDebugLogPrint("test error\r\n");
+    }
+    LORA_MD0_SETLOWLVL();
+}
+
+void vLoRaConnection(uint8_t ucNodeId)
+{
+    if (ucNodeId == xLoRaNodeConfig.Node1Cfg_t.ucLoRaNode1Identifier)
+    {
+        vLoRaHexNumTransmit((uint8_t *)&xLoRaNodeConfig.Node1Cfg_t, 3);
+    }
+    else if (ucNodeId == xLoRaNodeConfig.Node2Cfg_t.ucLoRaNode2Identifier)
+    {
+        vLoRaHexNumTransmit((uint8_t *)&xLoRaNodeConfig.Node2Cfg_t, 3);
+    }
+    else
+    {
+        vLoRaHexNumTransmit((uint8_t *)&xLoRaNodeConfig.GateCfg_t, 3);
     }
 }
 
-void vLoRaToGateSenIdPkt(uint8_t ucSensorId)
+// 可抽象成：prev 上个状态 next 下个状态
+#define LORA_FRAME_LENGTH   8   // 一帧固定长度
+
+void ucLoRaRecvDataParse(uint8_t *pucBuffer, uint8_t ucLength)
 {
-    if (ucSensorId == xLoRaSensorID.ucIdDht11)
+    static enum
     {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdDht11, 1);
-    } else if (ucSensorId == xLoRaSensorID.ucIdMq2)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdMq2, 1);
-    } else if (ucSensorId == xLoRaSensorID.ucIdFire)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdFire, 1);  
-    } else if (ucSensorId == xLoRaSensorID.ucIdLight)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdLight, 1);
-    }
-}
+        WAIT_HEAD,
+        WAIT_NODEID,
+        WAIT_SENSOR,
+        WAIT_TEMP,
+        WAIT_HUMIDITY,
+        WAIT_TAIL        // 新增：处理温湿度之后的剩余字节
+    } State_t = WAIT_HEAD;
 
-void vLoRaToGateExeIdPkt(uint8_t ucExeId)
-{
-    if (ucExeId == xLoRaExecutorID.ucIdLed)
+    // 用来记录尾部还需跳过的字节数（对于8字节帧，尾部长3字节）
+    static uint8_t ucTailRemain = 0;
+
+    for (int i = 0; i < ucLength; i++)
     {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdLed, 1);
-    } else if (ucExeId == xLoRaExecutorID.ucIdFan)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdFan, 1);
-    } else if (ucExeId == xLoRaExecutorID.ucIdHumidifier)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdHumidifier, 1);
-    } else if (ucExeId == xLoRaExecutorID.ucIdBuzzer)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdBuzzer, 1);
-    } else if (ucExeId == xLoRaExecutorID.ucIdServo)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdServo, 1);
-    }
-}
+        uint8_t byte = pucBuffer[i];
 
-eLoRaMsgRecStatus xLoRaMessageReceived(uint8_t *pucData)
-{
-    switch (*pucData)
-    {
-        case 0xD1:
-        /* code */
-        return statusNode1;
-    
-        case 0xD2:
-        return statusNode2;
+        switch (State_t)
+        {
+        case WAIT_HEAD:
+            if (byte == LORA_MSG_HEAD)
+            {
+                State_t = WAIT_NODEID;
+            }
+            else
+            {
+                vDebugLogPrint("Status 1 error!.\r\n");
+            }
+            break;
 
-        case 0xFA:
-        return statusExeLed;
+        case WAIT_NODEID:
+            if (byte == LORA_NODE1_IDENTIFIER || byte == LORA_NODE2_IDENTIFIER)
+            {
+                State_t = WAIT_SENSOR;
+            }
+            break;
 
-        case 0xFB:
-        return statusExeFan;
+        case WAIT_SENSOR:
+            if (byte == LORA_SENSOR_DHT11)
+            {
+                State_t = WAIT_TEMP;
+            }
+            break;
 
-        case 0xFC:
-        return statusExeHumidifier;
+        case WAIT_TEMP:
+            xLoRaMsgRecvData.Sensor_t.ucTemperature = byte;
+            State_t = WAIT_HUMIDITY;
+            break;
 
-        case 0xFD:
-        return statusExeBuzzer;
+        case WAIT_HUMIDITY:
+            xLoRaMsgRecvData.Sensor_t.ucHumidity = byte;
+            // 进入尾部处理状态，需要跳过 (帧长 - 已处理字节数) 字节
+            // 已处理：HEAD(1) + NODEID(1) + SENSOR(1) + TEMP(1) + HUMIDITY(1) = 5 字节
+            ucTailRemain = LORA_FRAME_LENGTH - 5;   // 8 - 5 = 3 字节
+            State_t = WAIT_TAIL;
+            break;
 
-        case 0xFE:
-        return statusExeServo;
-
-        case 0x01:
-        return statusExeOn;
-
-        case 0x00:
-        return statusExeOff;
+        case WAIT_TAIL:
+            // 跳过尾部字节
+            if (ucTailRemain > 0)
+            {
+                ucTailRemain--;
+                if (ucTailRemain == 0)
+                {
+                    State_t = WAIT_HEAD;    // 尾部结束，准备接收下一帧
+                }
+            }
+            else
+            {
+                // 防御：若异常进入此处，直接回到 HEAD
+                State_t = WAIT_HEAD;
+            }
+            break;
 
         default:
-        return null;
+            State_t = WAIT_HEAD;
+            break;
+        }
     }
 }
 
-eLoRaMsgRecStatus xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeId, uint8_t ucDataRecExeSta)
+void vLoRaParseDataTest(void)
 {
-    switch (xLoRaMessageReceived(&ucDataRecNodeId))
-    {
-        case statusNode1:
-        /* code */
-        while (xLoRaMessageReceived(&ucDataRecExeSta) == statusExeOn)
-        {
-            /* code */
-            if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeLed)
-            {
-                /* code */
-                return statusLedOn;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeFan)
-            {
-                /* code */
-                return statusFanOn;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeHumidifier)
-            {
-                /* code */
-                return statusHumidifierOn;
-            }
-        }
-        while (xLoRaMessageReceived(&ucDataRecExeSta) == statusExeOff)
-        {
-            /* code */
-            if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeLed)
-            {
-                /* code */
-                return statusLedOff;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeFan)
-            {
-                /* code */
-                return statusFanOff;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeHumidifier)
-            {
-                /* code */
-                return statusHumidifierOff;
-            }
-        }
-        
-        case statusNode2:
-        while (xLoRaMessageReceived(&ucDataRecExeSta) == statusExeOn)
-        {
-            /* code */
-            if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeBuzzer)
-            {
-                /* code */
-                return statusBuzzerOn;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeServo)
-            {
-                /* code */
-                return statusServoOn;
-            }
-        }
-        while (xLoRaMessageReceived(&ucDataRecExeSta) == statusExeOff)
-        {
-            /* code */
-            if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeBuzzer)
-            {
-                /* code */
-                return statusBuzzerOff;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeServo)
-            {
-                /* code */
-                return statusServoOff;
-            }
-        }
-        default:
-        return null;
-    }
+    ucLoRaRecvDataParse((uint8_t *)xLoRaReceiver.cRecvBuffer, xLoRaReceiver.Flags_t.usBufferIndex);
 }

@@ -681,24 +681,44 @@
           <GroupName>BSP</GroupName>
           <Files>
             <File>
-              <FileName>Delay.c</FileName>
+              <FileName>BSP_Delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\BSP\Delay.c</FilePath>
+              <FilePath>.\BSP\BSP_Delay.c</FilePath>
             </File>
             <File>
-              <FileName>Delay.h</FileName>
+              <FileName>BSP_Delay.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\BSP\Delay.h</FilePath>
+              <FilePath>.\BSP\BSP_Delay.h</FilePath>
             </File>
             <File>
-              <FileName>USART.c</FileName>
+              <FileName>BSP_GPIO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\BSP\USART.c</FilePath>
+              <FilePath>.\BSP\BSP_GPIO.c</FilePath>
             </File>
             <File>
-              <FileName>USART.h</FileName>
+              <FileName>BSP_GPIO.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\BSP\USART.h</FilePath>
+              <FilePath>.\BSP\BSP_GPIO.h</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\BSP\BSP_LED.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_LED.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\BSP\BSP_LED.h</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_USART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\BSP\BSP_USART.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_USART.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\BSP\BSP_USART.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -706,14 +726,14 @@
           <GroupName>Drivers</GroupName>
           <Files>
             <File>
-              <FileName>LED.c</FileName>
+              <FileName>ESP8266.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Drivers\LED.c</FilePath>
+              <FilePath>.\Drivers\ESP8266.c</FilePath>
             </File>
             <File>
-              <FileName>LED.h</FileName>
+              <FileName>ESP8266.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Drivers\LED.h</FilePath>
+              <FilePath>.\Drivers\ESP8266.h</FilePath>
             </File>
             <File>
               <FileName>LoRa.c</FileName>
@@ -724,16 +744,6 @@
               <FileName>LoRa.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Drivers\LoRa.h</FilePath>
-            </File>
-            <File>
-              <FileName>ESP8266.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Drivers\ESP8266.c</FilePath>
-            </File>
-            <File>
-              <FileName>ESP8266.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Drivers\ESP8266.h</FilePath>
             </File>
           </Files>
         </Group>

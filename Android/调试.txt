@@ -1,0 +1,12 @@
+1、引入fragment：
+（1）创建所需要的fragment文件。
+（2）创建一个menu包和menu文件，在里面声明所有的fragment按钮及图标。
+（3）在“drawable”包中右键新建“Vector Asset”，新建所需要的图标。
+（4）在主xml和activity中完成fragment的控制代码。
+2、部署rangeslider实现两边滑块：
+（1）在/res/arrays中添加两边滑块的最大值和最小值：
+    <string-array name="range_slider_temp_values">
+        <item>16</item>
+        <item>26</item>
+    </string-array>
+（2）添加布局即可。

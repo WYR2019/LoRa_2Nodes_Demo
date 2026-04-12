@@ -1,9 +1,9 @@
 #include "DHT11.h"
 
 /**
-  * @brief  DHT11¹¤×÷Ä£Ê½ÉèÖÃº¯Êı
-  * @note   ÉèÖÃDHT11µÄIO¿ÚÎªÊäÈë»òÊä³öÄ£Ê½¡£
-  * @param  ucMode Ä£Ê½Ñ¡Ôñ£¬1ÎªÊä³öÄ£Ê½£¬0ÎªÊäÈëÄ£Ê½
+  * @brief  DHT11å·¥ä½œæ¨¡å¼è®¾ç½®å‡½æ•°
+  * @note   è®¾ç½®DHT11çš„IOå£ä¸ºè¾“å…¥æˆ–è¾“å‡ºæ¨¡å¼ã€‚
+  * @param  ucMode æ¨¡å¼é€‰æ‹©ï¼Œ1ä¸ºè¾“å‡ºæ¨¡å¼ï¼Œ0ä¸ºè¾“å…¥æ¨¡å¼
   * @retval None
   */
 void vDht11Mode(uint8_t ucMode)
@@ -18,140 +18,140 @@ void vDht11Mode(uint8_t ucMode)
     }
     else
     {
-        GPIO_InitStructure.GPIO_Pin =  DHT11_GPIO_PIN;
+        GPIO_InitStructure.GPIO_Pin = DHT11_GPIO_PIN;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     }
     GPIO_Init(DHT11_GPIO_PORT, &GPIO_InitStructure);
 }
 
 /**
-  * @brief  DHT11¸´Î»º¯Êı
-  * @note   Ö÷»úÏòDHT11·¢ËÍ¸´Î»ĞÅºÅ£¬×¼±¸¶ÁÈ¡Êı¾İ
+  * @brief  DHT11å¤ä½å‡½æ•°
+  * @note   ä¸»æœºå‘DHT11å‘é€å¤ä½ä¿¡å·ï¼Œå‡†å¤‡è¯»å–æ•°æ®
   * @param  None
   * @retval None
   */
 void vDht11Rst(void)
 {                 
     vDht11Mode(DHT11_MODE_OUT);                                               // SET OUTPUT
-    DHT11_Low;                                                                // À­µÍDQ
-    vDelayMs(20);                                                             // Ö÷»úÀ­µÍ18~30ms
+    DHT11_Low;                                                                // æ‹‰ä½DQ
+    vDelayMs(20);                                                             // ä¸»æœºæ‹‰ä½18~30ms
     DHT11_High;                                                               // DQ=1 
-    vDelayUs(13);                                                             // Ö÷»úÀ­¸ß10~35us
+    vDelayUs(13);                                                             // ä¸»æœºæ‹‰é«˜10~35us
 }
 
 /**
-  * @brief  DHT11¼ì²éº¯Êı
-  * @note   ¼ì²âDHT11µÄ´æÔÚÓë·ñ£¬Í¨¹ı¶ÁÈ¡ÏìÓ¦ĞÅºÅÅĞ¶Ï¡£
+  * @brief  DHT11æ£€æŸ¥å‡½æ•°
+  * @note   æ£€æµ‹DHT11çš„å­˜åœ¨ä¸å¦ï¼Œé€šè¿‡è¯»å–å“åº”ä¿¡å·åˆ¤æ–­ã€‚
   * @param  None
-  * @retval 0:´æÔÚ 1:²»´æÔÚ 
+  * @retval 0:å­˜åœ¨ 1:ä¸å­˜åœ¨ 
   */
 uint8_t vDht11Check(void)  
 {   
-    uint8_t retry=0;
+    uint8_t ucRetry = 0;
     vDht11Mode(DHT11_MODE_IN);//SET INPUT
-    while (GPIO_ReadInputDataBit(DHT11_GPIO_PORT, DHT11_GPIO_PIN)&&retry<100)  // DHT11»áÀ­µÍ40~80us
+    while (GPIO_ReadInputDataBit(DHT11_GPIO_PORT, DHT11_GPIO_PIN) && ucRetry < 100)  // DHT11ä¼šæ‹‰ä½40~80us
     {
-        retry++;
+        ucRetry++;
         vDelayUs(1);
     };
-    if(retry>=100)
+    if(ucRetry >= 100)
         return 1;
-    else retry=0;
-    while (!GPIO_ReadInputDataBit(DHT11_GPIO_PORT, DHT11_GPIO_PIN)&&retry<100) // DHT11À­µÍºó»áÔÙ´ÎÀ­¸ß40~80us
+    else ucRetry = 0;
+    while (!GPIO_ReadInputDataBit(DHT11_GPIO_PORT, DHT11_GPIO_PIN) && ucRetry < 100) // DHT11æ‹‰ä½åä¼šå†æ¬¡æ‹‰é«˜40~80us
     {
-        retry++;
+        ucRetry++;
         vDelayUs(1);
     };
-    if(retry>=100)
+    if(ucRetry >= 100)
         return 1;
     return 0;
 }
 
 /**
-  * @brief  DHT11³õÊ¼»¯º¯Êı
-  * @note   ³õÊ¼»¯DHT11µÄIO¿Ú£¬²¢¼ì²âDHT11µÄ´æÔÚ¡£
+  * @brief  DHT11åˆå§‹åŒ–å‡½æ•°
+  * @note   åˆå§‹åŒ–DHT11çš„IOå£ï¼Œå¹¶æ£€æµ‹DHT11çš„å­˜åœ¨ã€‚
   * @param  None
-  * @retval 0:´æÔÚ;1:²»´æÔÚ
+  * @retval 0:å­˜åœ¨;1:ä¸å­˜åœ¨
   */
 uint8_t vDht11Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;	
-    RCC_APB2PeriphClockCmd(DHT11_GPIO_CLK, ENABLE);                           // Ê¹ÄÜPA¶Ë¿ÚÊ±ÖÓ
-    GPIO_InitStructure.GPIO_Pin = DHT11_GPIO_PIN;                             // PG11¶Ë¿ÚÅäÖÃ
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;                          // ÍÆÍìÊä³ö
+    RCC_APB2PeriphClockCmd(DHT11_GPIO_CLK, ENABLE);                           // ä½¿èƒ½PAç«¯å£æ—¶é’Ÿ
+    GPIO_InitStructure.GPIO_Pin = DHT11_GPIO_PIN;                             // PG11ç«¯å£é…ç½®
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;                          // æ¨æŒ½è¾“å‡º
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
- 	  GPIO_Init(DHT11_GPIO_PORT, &GPIO_InitStructure);                          // ³õÊ¼»¯IO¿Ú
-    GPIO_SetBits(DHT11_GPIO_PORT, DHT11_GPIO_PIN);                             // PG11 Êä³ö¸ß
+    GPIO_Init(DHT11_GPIO_PORT, &GPIO_InitStructure);                          // åˆå§‹åŒ–IOå£
+    GPIO_SetBits(DHT11_GPIO_PORT, DHT11_GPIO_PIN);                             // PG11 è¾“å‡ºé«˜
 
-    vDht11Rst();                                                              // ¸´Î»DHT11
-    return vDht11Check();                                                     // µÈ´ıDHT11µÄ»ØÓ¦
+    vDht11Rst();                                                              // å¤ä½DHT11
+    return vDht11Check();                                                     // ç­‰å¾…DHT11çš„å›åº”
 } 
 
 /**
-  * @brief  DHT11¶ÁÈ¡Î»º¯Êı
-  * @note   ´ÓDHT11¶ÁÈ¡Ò»¸öÊı¾İÎ»£¬Í¨¹ı¼ì²â¸ßµçÆ½³ÖĞøÊ±¼äÅĞ¶ÏÊÇ0»¹ÊÇ1¡£
+  * @brief  DHT11è¯»å–ä½å‡½æ•°
+  * @note   ä»DHT11è¯»å–ä¸€ä¸ªæ•°æ®ä½ï¼Œé€šè¿‡æ£€æµ‹é«˜ç”µå¹³æŒç»­æ—¶é—´åˆ¤æ–­æ˜¯0è¿˜æ˜¯1ã€‚
   * @param  None
-  * @retval ¶ÁÈ¡µ½µÄÎ»Öµ£¬1»ò0
+  * @retval è¯»å–åˆ°çš„ä½å€¼ï¼Œ1æˆ–0
   */
 uint8_t vDht11ReadBit(void)
 {
-    uint8_t retry=0;
-    while(GPIO_ReadInputDataBit(DHT11_GPIO_PORT, DHT11_GPIO_PIN)&&retry<100)     // µÈ´ı±äÎªµÍµçÆ½
+    uint8_t ucRetry = 0;
+    while(GPIO_ReadInputDataBit(DHT11_GPIO_PORT, DHT11_GPIO_PIN) && ucRetry < 100)     // ç­‰å¾…å˜ä¸ºä½ç”µå¹³
     {
-        retry++;
+        ucRetry++;
         vDelayUs(1);
     }
-    retry=0;
-    while(!GPIO_ReadInputDataBit(DHT11_GPIO_PORT, DHT11_GPIO_PIN)&&retry<100)    // µÈ´ı±ä¸ßµçÆ½
+    ucRetry = 0;
+    while(!GPIO_ReadInputDataBit(DHT11_GPIO_PORT, DHT11_GPIO_PIN) && ucRetry < 100)    // ç­‰å¾…å˜é«˜ç”µå¹³
     {
-        retry++;
+        ucRetry++;
         vDelayUs(1);
     }
-    vDelayUs(40);//µÈ´ı40us
+    vDelayUs(40);//ç­‰å¾…40us
     if(GPIO_ReadInputDataBit(DHT11_GPIO_PORT, DHT11_GPIO_PIN))
         return 1;
     else return 0;
 }
 
 /**
-  * @brief  DHT11¶ÁÈ¡×Ö½Úº¯Êı
-  * @note   ´ÓDHT11¶ÁÈ¡Ò»¸ö×Ö½ÚÊı¾İ£¬Í¨¹ıÁ¬Ğø¶ÁÈ¡8¸öÎ»²¢×éºÏ³É×Ö½Ú¡£
+  * @brief  DHT11è¯»å–å­—èŠ‚å‡½æ•°
+  * @note   ä»DHT11è¯»å–ä¸€ä¸ªå­—èŠ‚æ•°æ®ï¼Œé€šè¿‡è¿ç»­è¯»å–8ä¸ªä½å¹¶ç»„åˆæˆå­—èŠ‚ã€‚
   * @param  None
-  * @retval ¶ÁÈ¡µ½µÄ×Ö½ÚÊı¾İ
+  * @retval è¯»å–åˆ°çš„å­—èŠ‚æ•°æ®
   */
 uint8_t vDht11ReadByte(void)    
 {        
     uint8_t i, dat;
     dat=0;
-    for (i=0;i<8;i++) 
+    for (i = 0; i < 8; i++) 
     {
-        dat<<=1; 
-        dat|=vDht11ReadBit();
+        dat <<= 1; 
+        dat |= vDht11ReadBit();
     }
     return dat;
 }
 
-/** @brief  DHT11¶ÁÈ¡Êı¾İº¯Êı
-  * @note   ´ÓDHT11¶ÁÈ¡ÎÂ¶ÈºÍÊª¶ÈÊı¾İ£¬²¢½øĞĞĞ£Ñé¡£
-  * @param  *pucTemp Ö¸Ïò´æ´¢ÎÂ¶ÈÊı¾İµÄ±äÁ¿Ö¸Õë
-  * @param  *pucHumi Ö¸Ïò´æ´¢Êª¶ÈÊı¾İµÄ±äÁ¿Ö¸Õë
-  * @retval 0:Õı³£;1:¶ÁÈ¡Ê§°Ü
+/** @brief  DHT11è¯»å–æ•°æ®å‡½æ•°
+  * @note   ä»DHT11è¯»å–æ¸©åº¦å’Œæ¹¿åº¦æ•°æ®ï¼Œå¹¶è¿›è¡Œæ ¡éªŒã€‚
+  * @param  *pucTemp æŒ‡å‘å­˜å‚¨æ¸©åº¦æ•°æ®çš„å˜é‡æŒ‡é’ˆ
+  * @param  *pucHumi æŒ‡å‘å­˜å‚¨æ¹¿åº¦æ•°æ®çš„å˜é‡æŒ‡é’ˆ
+  * @retval 0:æ­£å¸¸;1:è¯»å–å¤±è´¥
   */
 uint8_t vDht11ReadData(uint8_t *pucTemp, uint8_t *pucHumi)    
 {        
     uint8_t ucBuffer[5];
     uint8_t i;
     vDht11Rst();
-    if(vDht11Check()==0)
+    if(vDht11Check ()== 0)
     {
-        for(i=0;i<5;i++)//¶ÁÈ¡40Î»Êı¾İ
+        for(i = 0; i < 5; i++)//è¯»å–40ä½æ•°æ®
         {
-            ucBuffer[i]=vDht11ReadByte();
+            ucBuffer[i] = vDht11ReadByte();
         }
-        if((ucBuffer[0]+ucBuffer[1]+ucBuffer[2]+ucBuffer[3])==ucBuffer[4])
+        if((ucBuffer[0] + ucBuffer[1] + ucBuffer[2] + ucBuffer[3]) == ucBuffer[4])
         {
-            *pucHumi=ucBuffer[0];
-            *pucTemp=ucBuffer[2];
+            *pucHumi = ucBuffer[0];
+            *pucTemp = ucBuffer[2];
         }
     }
     else return 1;

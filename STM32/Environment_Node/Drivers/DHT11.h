@@ -2,31 +2,32 @@
 #define __DHT11_H__
 
 #include "stm32f10x.h"                  // Device header
-#include "Delay.h"
+#include "BSP_Delay.h"
 
-/* DHT11µÄÉèÖÃ */
+/* DHT11çš„è®¾ç½® */
 #define DHT11_GPIO_CLK                                        RCC_APB2Periph_GPIOB
 #define DHT11_GPIO_PORT                                       GPIOB
 #define DHT11_GPIO_PIN                                        GPIO_Pin_1
 
-/* Êä³ö×´Ì¬¶¨Òå */
+/* è¾“å‡ºçŠ¶æ€å®šä¹‰ */
 #define DHT11_MODE_OUT                                        1
 #define DHT11_MODE_IN                                         0
-/* ¿ØÖÆDHT11Òı½ÅÊä³ö¸ßµÍµçÆ½ */
+/* æ§åˆ¶DHT11å¼•è„šè¾“å‡ºé«˜ä½ç”µå¹³ */
 #define DHT11_Low                                             GPIO_ResetBits(DHT11_GPIO_PORT, DHT11_GPIO_PIN)
 #define DHT11_High                                            GPIO_SetBits(DHT11_GPIO_PORT, DHT11_GPIO_PIN)
 
-typedef struct {
+typedef struct
+{
     uint8_t ucTemp;
     uint8_t ucHumi;
 } DHT11Data_t;
 
-void vDht11Mode(uint8_t ucMode);                           // DHT11Òı½ÅÊä³öÄ£Ê½¿ØÖÆ
-void vDht11Rst(void);                                      // ¸´Î»DHT11
-uint8_t vDht11Init(void);                                  // ³õÊ¼»¯DHT11
-uint8_t vDht11Check(void);                                 // ¼ì²âDHT11
-uint8_t vDht11ReadBit(void);                               // ¶ÁÈ¡Ò»Î»µÄÊı¾İ
-uint8_t vDht11ReadByte(void);                              // ¶ÁÈ¡Ò»¸ö×Ö½ÚµÄÊı¾İ
-uint8_t vDht11ReadData(uint8_t *pucTemp, uint8_t *pucHumi); // ¶ÁÈ¡ÎÂÊª¶ÈÊı¾İ
+void vDht11Mode(uint8_t ucMode);                            // DHT11å¼•è„šè¾“å‡ºæ¨¡å¼æ§åˆ¶
+void vDht11Rst(void);                                       // å¤ä½DHT11
+uint8_t vDht11Init(void);                                   // åˆå§‹åŒ–DHT11
+uint8_t vDht11Check(void);                                  // æ£€æµ‹DHT11
+uint8_t vDht11ReadBit(void);                                // è¯»å–ä¸€ä½çš„æ•°æ®
+uint8_t vDht11ReadByte(void);                               // è¯»å–ä¸€ä¸ªå­—èŠ‚çš„æ•°æ®
+uint8_t vDht11ReadData(uint8_t *pucTemp, uint8_t *pucHumi); // è¯»å–æ¸©æ¹¿åº¦æ•°æ®
 
 #endif

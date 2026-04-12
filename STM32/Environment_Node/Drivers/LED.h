@@ -1,22 +1,27 @@
-/* Ìí¼ÓÒ»¸ö·ÀÖ¹Í·ÎÄ¼şÖØ¸´°üº¬µÄ´úÂëif not define£¬Èç¹ûÃ»ÓĞ¶¨Òå¸Ã×Ö·û´®£¬ÄÇÃ´¾ÍÏÈ¶¨ÒåÒ»¸ö */
+/* æ·»åŠ ä¸€ä¸ªé˜²æ­¢å¤´æ–‡ä»¶é‡å¤åŒ…å«çš„ä»£ç if not defineï¼Œå¦‚æœæ²¡æœ‰å®šä¹‰è¯¥å­—ç¬¦ä¸²ï¼Œé‚£ä¹ˆå°±å…ˆå®šä¹‰ä¸€ä¸ª */
 #ifndef __LED_H__
 #define __LED_H__
 
-#include "stm32f10x.h"                            // Device header
+#include "stm32f10x.h"                              // Device header
 
-#define LED_PC13_WORK_MODE                           LIGHT_MODE
-#define STM32_STATE_MODE                             0
-#define LIGHT_MODE                                   1
+/* PC13LEDçš„è®¾ç½® */
+#define LED_PC13_GPIO_CLOCK                         RCC_APB2Periph_GPIOC
+#define LED_PC13_GPIO_PORT                          GPIOC
+#define LED_PC13_GPIO_PIN                           GPIO_Pin_13
 
-/* PC13LEDµÄÉèÖÃ */
-#define LED_PC13_GPIO_CLOCK                          RCC_APB2Periph_GPIOC
-#define LED_PC13_GPIO_PORT                           GPIOC
-#define LED_PC13_GPIO_PIN                            GPIO_Pin_13
+/* PB0LEDçš„è®¾ç½® */
+#define LED_PB0_GPIO_CLOCK                          RCC_APB2Periph_GPIOB
+#define LED_PB0_GPIO_PORT                           GPIOB
+#define LED_PB0_GPIO_PIN                            GPIO_Pin_0
 
-/* ±äÁ¿ÉùÃ÷ */
+/* å˜é‡å£°æ˜ */
 void vPc13LedInit(void);
 void vPc13LedOn(void);
 void vPc13LedOff(void);
 void vPc13LedTurn(void);
+void vPb0LedInit(void);
+void vPb0LedOn(void);
+void vPb0LedOff(void);
+void vPb0LedTurn(void);
 
 #endif

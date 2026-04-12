@@ -1,120 +1,55 @@
 #ifndef __ESP8266_SAMPLE_H__
 #define	__ESP8266_SAMPLE_H__
 
+/* ESP8266 ÂáΩÊï∞ÂÆèÂÆö‰πâ */
+
+#define vEsp8266IrqHandler(void)            USART2_IRQHandler(void)
+#define vEsp8266DataTransmit(format, ...)   vUsartPrintf(USART2, format, ##__VA_ARGS__)
+
+#define ESP8266_CH_ENABLE()                 GPIO_SetBits(ESP8266_CH_PD_PORT, ESP8266_CH_PD_PIN)
+#define ESP8266_CH_DISABLE()                GPIO_ResetBits(ESP8266_CH_PD_PORT, ESP8266_CH_PD_PIN)
+#define ESP8266_RST_HIGH_LEVEL()            GPIO_SetBits(ESP8266_RST_PORT, ESP8266_RST_PIN)
+#define ESP8266_RST_LOW_LEVEL()             GPIO_ResetBits(ESP8266_RST_PORT, ESP8266_RST_PIN)
+
+#define ESP8266_APSSID                      "CMCC-5bjx"                                                                                                 // Ë¶ÅËøûÊé•ÁöÑÁÉ≠ÁÇπÁöÑÂêçÁß∞
+#define ESP8266_APPWD                       "jp7qpqn3"                                                                                                  // Ë¶ÅËøûÊé•ÁöÑÁÉ≠ÁÇπÁöÑÂØÜÈí•
+#define ESP8266_ALIYUN_MQTT_IP              "iot-06z00by9al78fmz.mqtt.iothub.aliyuncs.com"
+#define ESP8266_ALIYUN_MQTT_PORT            1883
+#define ESP8266_ALIYUN_MQTT_PRODUCTKEY      "k11ilf46LJ0"
+#define ESP8266_ALIYUN_MQTT_DEVICENAME      "stm32"
+#define ESP8266_ALIYUN_MQTT_PASSWORD        "bd30fbe2b5595f0378594a66158a9e5938d0254ce84d8046627293881c6691a8"
+#define ESP8266_ALIYUN_MQTT_CLIENTID        ESP8266_ALIYUN_MQTT_PRODUCTKEY"."ESP8266_ALIYUN_MQTT_DEVICENAME \
+                                                            "|securemode=2\\,signmethod=hmacsha256\\,timestamp=1772730809576|"
+#define ESP8266_ALIYUN_MQTT_USERNAME        ESP8266_ALIYUN_MQTT_DEVICENAME"&"ESP8266_ALIYUN_MQTT_PRODUCTKEY
+#define ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC "/"ESP8266_ALIYUN_MQTT_PRODUCTKEY"/"ESP8266_ALIYUN_MQTT_DEVICENAME"/user/get"
+#define ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC   "/"ESP8266_ALIYUN_MQTT_PRODUCTKEY"/"ESP8266_ALIYUN_MQTT_DEVICENAME"/user/update" 
+
 #include "stm32f10x.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include "Delay.h"
-#include "USART.h"
+#include "BSP_Delay.h"
+#include "BSP_GPIO.h"
+#include "BSP_USART.h"
 
-#if defined ( __CC_ARM )
-#pragma anon_unions
-#endif
-
-/******************************* ESP8266  ˝æ›¿‡–Õ∂®“Â ***************************/
-typedef enum{
+/******************************* ESP8266 Êï∞ÊçÆÁ±ªÂûãÂÆö‰πâ ***************************/
+typedef enum
+{
     STA,
     AP,
     STA_AP
 } eNetMode_t;
 
-typedef enum{
-    ALIYUN = 0,
-    EMQX
-} eMqttServerMode_t;
+/* ESP8266 ÂáΩÊï∞Â£∞Êòé */
+void vEsp8266Rst(void);
+bool bEsp8266Command(char *pcCmd, char *pcAck1, char *pcAck2, uint32_t ulWaittime);
+void vEsp8266AtTest(void);
+bool bEsp8266NetModeChoose(eNetMode_t xMode);
+bool bEsp8266JoinAp(char *pcSsid, char *pcPassWord);
+bool bEsp8266MqttInit(char *pcMqttUserName, char *pcMqttPassword, char *pcMqttClientId, char *pcMqttServerIp, uint16_t usMqttServerPort, char *pcMqttSubscribeTopic);
+bool bMqttPublish(char *pcTopic, char *pcMessage);
+bool bMqttSubscribe(char *pcTopic, char *pcMessage);
 
-typedef enum{
-    enumTCP,
-    enumUDP,
-} eNetPro_t;
-
-typedef enum{
-    Multiple_ID_0 = 0,
-    Multiple_ID_1,
-    Multiple_ID_2,
-    Multiple_ID_3,
-    Multiple_ID_4,
-    Single_ID_0,
-} eIdNo_t;
-
-typedef enum{
-    OPEN = 0,
-    WEP,
-    WPA_PSK,
-    WPA2_PSK,
-    WPA_WPA2_PSK,
-} eApPsdMode_t;
-
-/* ESP8266 ¡¨Ω”“˝Ω≈∂®“Â */
-#define                 macESP8266_CH_PD_CLK                RCC_APB2Periph_GPIOA
-#define                 macESP8266_CH_PD_PORT               GPIOA
-#define                 macESP8266_CH_PD_PIN                GPIO_Pin_5
-#define                 macESP8266_RST_CLK                  RCC_APB2Periph_GPIOA
-#define                 macESP8266_RST_PORT                 GPIOA
-#define                 macESP8266_RST_PIN                  GPIO_Pin_6
-
-/* ESP8266 ∫Ø ˝∫Í∂®“Â */
-// #define                 vEsp8266Printf(*format, ...)        vUsartPrintf(macESP8266_USART, *format, ...)
-#define                 macESP8266_CH_ENABLE()              GPIO_SetBits ( macESP8266_CH_PD_PORT, macESP8266_CH_PD_PIN )
-#define                 macESP8266_CH_DISABLE()             GPIO_ResetBits ( macESP8266_CH_PD_PORT, macESP8266_CH_PD_PIN )
-#define                 macESP8266_RST_HIGH_LEVEL()         GPIO_SetBits ( macESP8266_RST_PORT, macESP8266_RST_PIN )
-#define                 macESP8266_RST_LOW_LEVEL()          GPIO_ResetBits ( macESP8266_RST_PORT, macESP8266_RST_PIN )
-
-/* ”√ªß–Ë“™…Ë÷√µƒ≤Œ ˝ */
-#define                 ESP8266_APSSID                      "CMCC-5bjx"                                                                                             // “™¡¨Ω”µƒ»»µ„µƒ√˚≥∆
-#define                 ESP8266_APPWD                       "jp7qpqn3"                                                                                              // “™¡¨Ω”µƒ»»µ„µƒ√‹‘ø
-
-#define                 ALIYUN                              0
-#define                 EMQX                                1
-#define                 ESP8266_MQTT_SERVER_MODE            EMQX                                                                                                  // —°‘ÒMQTT∑˛ŒÒ∆˜ƒ£ Ω£∫ALIYUN/EMQX
-
-#define                 ESP8266_EMQX_MQTT_SERVER_IP         "121.36.104.9"                                                                                          // MQTT∑˛ŒÒ∆˜IPµÿ÷∑
-#define                 ESP8266_EMQX_MQTT_SERVER_PORT       1883                                                                                                    // MQTT∑˛ŒÒ∆˜∂Àø⁄∫≈
-#define                 ESP8266_EMQX_MQTT_PROJECTID         "LoRaEnvAssistant"                                                                                      // MQTTœÓƒøID
-#define                 ESP8266_EMQX_MQTT_DEVICENAME        "stm32"                                                                                                 // MQTT…Ë±∏√˚≥∆
-#define                 ESP8266_EMQX_MQTT_SUB_DEVICENAME    "mqttfx"                                                                                                // MQTT∂©‘ƒ…Ë±∏√˚≥∆
-#define                 ESP8266_EMQX_MQTT_CLIENTID          ESP8266_EMQX_MQTT_PROJECTID"&"ESP8266_EMQX_MQTT_DEVICENAME                                              // MQTTøÕªß∂ÀID
-#define                 ESP8266_EMQX_MQTT_USERNAME          ESP8266_EMQX_MQTT_DEVICENAME                                                                            // MQTT”√ªß√˚
-#define                 ESP8266_EMQX_MQTT_PASSWORD          "123456789"                                                                                             // MQTT√‹¬Î
-#define                 ESP8266_EMQX_MQTT_SUBSCRIBE_TOPIC   "/"ESP8266_EMQX_MQTT_PROJECTID"/"ESP8266_EMQX_MQTT_PROJECTID"&"ESP8266_EMQX_MQTT_SUB_DEVICENAME"/topics"                                                  // ∂©‘ƒ÷˜Ã‚
-#define                 ESP8266_EMQX_MQTT_PUBLISH_TOPIC     "/"ESP8266_EMQX_MQTT_PROJECTID"/"ESP8266_EMQX_MQTT_CLIENTID"/topics"                                    // ∑¢≤º÷˜Ã‚
-
-#define                 ESP8266_ALIYUN_MQTT_IP              "iot-06z00by9al78fmz.mqtt.iothub.aliyuncs.com"
-#define                 ESP8266_ALIYUN_MQTT_PORT            1883
-#define                 ESP8266_ALIYUN_MQTT_PRODUCTKEY      "k11ilqnf8mF"
-#define                 ESP8266_ALIYUN_MQTT_DEVICENAME      "GATEWAY_STM32_ESP8266"
-#define                 ESP8266_ALIYUN_MQTT_CLIENTID        ESP8266_ALIYUN_MQTT_PRODUCTKEY"."ESP8266_ALIYUN_MQTT_DEVICENAME \
-                                                            "|securemode=2\\,signmethod=hmacsha256\\,timestamp=1768415322303|"
-#define                 ESP8266_ALIYUN_MQTT_USERNAME        ESP8266_ALIYUN_MQTT_DEVICENAME"&"ESP8266_ALIYUN_MQTT_PRODUCTKEY
-#define                 ESP8266_ALIYUN_MQTT_PASSWORD        "a74261b04d7dda672342776b88e956f26f74f4d9d104461f8b65cbf544ab9c03"
-#define                 ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC "/"ESP8266_ALIYUN_MQTT_PRODUCTKEY"/"ESP8266_ALIYUN_MQTT_DEVICENAME"/user/get"
-#define                 ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC   "/"ESP8266_ALIYUN_MQTT_PRODUCTKEY"/"ESP8266_ALIYUN_MQTT_DEVICENAME"/user/update"
-
-/* ESP8266 ∫Ø ˝…˘√˜ */
-void                    vEsp8266GpioConfig                  ( void );
-void                    vEsp8266Rst                         ( void );
-bool                    bEsp8266Command                     ( char * pcCmd, char * pcAck1, 
-                                                              char * pcAck2, uint32_t ulWaittime );
-void                    vEsp8266AtTest                      ( void );
-bool                    bEsp8266NetModeChoose               ( eNetMode_t xMode );
-bool                    bEsp8266JoinAp                      ( char * pcSsid, char * pcPassWord );
-bool                    bEsp8266MqttInit                    ( char * pcMqttUserName, char * pcMqttPassword, char * pcMqttClientId, 
-                                                              char * pcMqttServerIp, uint16_t usMqttServerPort, char * pcMqttSubscribeTopic );
-bool                    bEsp8266BuildAp                     ( char * pcSsid, char * pcPassWord, eApPsdMode_t xPsdMode );
-bool                    bEsp8266EnableMultipleId            ( FunctionalState xEnumEnUnvarnishTx );
-bool                    bEsp8266LinkServer                  ( eNetPro_t xNetProtocol, char * pcIp, 
-                                                              char * pcComNum, eIdNo_t xId);
-bool                    bEsp8266StartOrShutServer           ( FunctionalState xMode, char * pcPortNum, char * pcTimeOver );
-uint8_t                 ucEsp8266GetLinkStatus              ( void );
-uint8_t                 ucEsp8266GetIdLinkStatus            ( void );
-uint8_t                 ucEsp8266InquireApIp                ( char * pcApIp, uint8_t ucArrayLength );
-bool                    bEsp8266UnvarnishSend               ( void );
-void                    vEsp8266ExitUnvarnishSend           ( void );
-bool                    bEsp8266SendString                  ( FunctionalState xEnumEnUnvarnishTx, char * pcStr, 
-                                                              uint32_t ulStrLength, eIdNo_t xId );
-char *                  pcEsp8266ReceiveString              ( FunctionalState xEnumEnUnvarnishTx );
-
-/* Õ‚≤ø»´æ÷±‰¡ø */
+/* Â§ñÈÉ®ÂÖ®Â±ÄÂèòÈáè */
 
 #endif /* __ESP8266_H */

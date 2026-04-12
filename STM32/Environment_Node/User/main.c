@@ -1,39 +1,44 @@
 #include "stm32f10x.h"                  // Device header
+#include "LED.h"
+#include "Relay.h"
+#include "USART.h"
+#include "DHT11.h"
+#include "LoRa.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
-#include "LED.h"
-#include "DHT11.h"
-#include "USART.h"
-#include "LoRa.h"
-#include "Relay.h"
 
-/* ÔÚ´´½¨ÈÎÎñÇ°£¬ĞèÒª´´½¨Ò»¸öÈÎÎñ¾ä±ú£¬Ã¿¸öÈÎÎñ¾ä±úÓëÈÎÎñÒ»Ò»¶ÔÓ¦¡£ */
+/* åœ¨åˆ›å»ºä»»åŠ¡å‰ï¼Œéœ€è¦åˆ›å»ºä¸€ä¸ªä»»åŠ¡å¥æŸ„ï¼Œæ¯ä¸ªä»»åŠ¡å¥æŸ„ä¸ä»»åŠ¡ä¸€ä¸€å¯¹åº”ã€‚ */
 TaskHandle_t xTaskStateLedHdlr;
-TaskHandle_t xTaskLedCtrlHdlr;
-TaskHandle_t xTaskFanCtrlHdlr;
 TaskHandle_t xTaskDht11Hdlr;
-TaskHandle_t xTaskLoRaToGateHdlr;
-TaskHandle_t xTaskLoRaMsgRecHdlr;
+TaskHandle_t xTaskLoRaSendHdlr;
+TaskHandle_t xTaskLoRaRecHdlr;
+TaskHandle_t xTaskDebugLogHdlr;
 
-/* ´´½¨¶ÓÁĞ¾ä±ú */
+/* åˆ›å»ºé˜Ÿåˆ—å¥æŸ„ */
 QueueHandle_t xQueueTempHdlr;
 QueueHandle_t xQueueHumiHdlr;
-QueueHandle_t xQueueUsart1IrqHdlr;
-QueueHandle_t xQueueUsart2IrqHdlr;
-QueueHandle_t xQueueUsart3IrqHdlr;
+#if ENABLE_FREERTOS_API_QUEUE_USART1_IRQ
+    QueueHandle_t xQueueUsart1IrqHdlr;
+#endif
+#if ENABLE_FREERTOS_API_QUEUE_USART2_IRQ
+    QueueHandle_t xQueueUsart2IrqHdlr;
+#endif
+#if ENABLE_FREERTOS_API_QUEUE_USART3_IRQ
+    QueueHandle_t xQueueUsart3IrqHdlr;
+#endif
 
-/* ´´½¨¶şÖµĞÅºÅÁ¿¾ä±ú */
+/* åˆ›å»ºäºŒå€¼ä¿¡å·é‡å¥æŸ„ */
 SemaphoreHandle_t xSemLedOnHdlr;
 SemaphoreHandle_t xSemLedOffHdlr;
 SemaphoreHandle_t xSemFanOnHdlr;
 SemaphoreHandle_t xSemFanOffHdlr;
 
 /**
-  * @brief  LED×´Ì¬Ö¸Ê¾ÈÎÎñº¯Êı
-  * @note   Í¨¹ıLEDµÄÉÁË¸×´Ì¬Ö¸Ê¾ÏµÍ³ÔËĞĞ×´Ì¬¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬Î´Ê¹ÓÃ£¬´«ÈëNULL¡£
+  * @brief  LEDçŠ¶æ€æŒ‡ç¤ºä»»åŠ¡å‡½æ•°
+  * @note   é€šè¿‡LEDçš„é—ªçƒçŠ¶æ€æŒ‡ç¤ºç³»ç»Ÿè¿è¡ŒçŠ¶æ€ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œæœªä½¿ç”¨ï¼Œä¼ å…¥NULLã€‚
   * @retval None
   */
 void vTaskStateLed(void *pvParameters)
@@ -48,143 +53,75 @@ void vTaskStateLed(void *pvParameters)
 }
 
 /**
-  * @brief  LED¿ØÖÆÈÎÎñº¯Êı
-  * @note   ¸ù¾İĞÅºÅÁ¿¿ØÖÆLEDµÄ¿ª¹Ø×´Ì¬¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬Î´Ê¹ÓÃ£¬´«ÈëNULL¡£
-  * @retval None
-  */
-void vTaskLedControl(void *pvParameters)
-{
-    while (1)
-    {
-        /* code */
-        if (xSemaphoreTake(xSemLedOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
-        {
-            vPc13LedOn();
-            xSemaphoreGive(xSemLedOnHdlr);
-        } else if (xSemaphoreTake(xSemLedOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
-        {
-            /* code */
-            vPc13LedOff();
-            xSemaphoreGive(xSemLedOffHdlr);
-        }
-    }
-}
-
-/**
-  * @brief  ·çÉÈ¿ØÖÆÈÎÎñº¯Êı
-  * @note   ¸ù¾İĞÅºÅÁ¿¿ØÖÆ·çÉÈµÄ¿ª¹Ø×´Ì¬¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬Î´Ê¹ÓÃ£¬´«ÈëNULL¡£
-  * @retval None
-  */
-void vTaskFanControl(void *pvParameters)
-{
-    while (1)
-    {
-        /* code */
-        if (xSemaphoreTake(xSemFanOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
-        {
-            vFanOn();
-        } else if (xSemaphoreTake(xSemFanOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
-        {
-            /* code */
-            vFanOff();
-        }
-    }
-}
-
-/**
-  * @brief  DHT11Êı¾İ¶ÁÈ¡ÈÎÎñº¯Êı
-  * @note   ¶¨ÆÚ¶ÁÈ¡DHT11´«¸ĞÆ÷µÄÊı¾İ£¬²¢½«ÎÂ¶ÈºÍÊª¶ÈÊı¾İ·¢ËÍµ½ÏàÓ¦µÄ¶ÓÁĞ¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬Î´Ê¹ÓÃ£¬´«ÈëNULL¡£
+  * @brief  DHT11æ•°æ®è¯»å–ä»»åŠ¡å‡½æ•°
+  * @note   å®šæœŸè¯»å–DHT11ä¼ æ„Ÿå™¨çš„æ•°æ®ï¼Œå¹¶å°†æ¸©åº¦å’Œæ¹¿åº¦æ•°æ®å‘é€åˆ°ç›¸åº”çš„é˜Ÿåˆ—ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œæœªä½¿ç”¨ï¼Œä¼ å…¥NULLã€‚
   * @retval None
   */
 void vTaskDht11(void *pvParameters)
 {
     DHT11Data_t xDHT11Data;
-    /* Êı¾İ´æ´¢Êı×é¡£ÒªÇóÓë¶ÓÁĞ²ÎÊıÉèÖÃ´óĞ¡Ò»Ò»¶ÔÓ¦¡£ */
-    uint8_t ucSendTempData = 0, ucSendHumiData = 0;
-    if (vDht11Init() != 0)
-    {
-        /* ³õÊ¼»¯Ê§°Ü£¬½øĞĞ´íÎó´¦Àí */ 
-        ucSendTempData = ucSendHumiData = 0xAA;
-        xQueueSend(xQueueTempHdlr, &ucSendTempData, pdMS_TO_TICKS(10));
-        xQueueSend(xQueueHumiHdlr, &ucSendHumiData, pdMS_TO_TICKS(10));
-    } 
+    /* æ•°æ®å­˜å‚¨æ•°ç»„ã€‚è¦æ±‚ä¸é˜Ÿåˆ—å‚æ•°è®¾ç½®å¤§å°ä¸€ä¸€å¯¹åº”ã€‚ */
+    uint8_t ucQueueTempData = 0, ucQueueHumiData = 0;
     while (1)
     {
-        /* code */
-        if (vDht11ReadData(&xDHT11Data.ucTemp,&xDHT11Data.ucHumi) == 0)
+        /* è¯»å–æˆåŠŸå¤„ç† */
+        if (vDht11ReadData(&xDHT11Data.ucTemp, &xDHT11Data.ucHumi) == 0)
         {
-            /* code */
-            ucSendTempData = xDHT11Data.ucTemp;
-            ucSendHumiData = xDHT11Data.ucHumi;
-            /* Ğ´¶ÓÁĞ¡£µÚÒ»¸ö²ÎÊıÊÇ¶ÓÁĞ¾ä±ú£¬µÚ¶ş¸öÊÇĞ´Èë¶ÓÁĞµÄµØÖ·£¨ÈçÊı×é£©£¬µÚÈı¸öÊÇÒò¶ÓÁĞÂúÔì³É×èÈûÊ±µÄµÈ´ıÊ±³¤£¬Ò²¾ÍÊÇÎŞ·¨Ğ´ÈëÊı¾İÊ±µÄµÈ´ıÊ±³¤£¬ÒÔ²Ù×÷ÏµÍ³Ä¬ÈÏÊ±ÖÓ½ÚÅÄÎª×¼¡£ */
-            xQueueSend(xQueueTempHdlr, &ucSendTempData, pdMS_TO_TICKS(10));
-            xQueueSend(xQueueHumiHdlr, &ucSendHumiData, pdMS_TO_TICKS(10));
-        } else
-        {
-            ucSendTempData = ucSendHumiData = 0xAB;
-        }        
+            ucQueueTempData = xDHT11Data.ucTemp;
+            ucQueueHumiData = xDHT11Data.ucHumi;
+            /* å†™é˜Ÿåˆ—ã€‚ç¬¬ä¸€ä¸ªå‚æ•°æ˜¯é˜Ÿåˆ—å¥æŸ„ï¼Œç¬¬äºŒä¸ªæ˜¯å†™å…¥é˜Ÿåˆ—çš„åœ°å€ï¼ˆå¦‚æ•°ç»„ï¼‰ï¼Œç¬¬ä¸‰ä¸ªæ˜¯å› é˜Ÿåˆ—æ»¡é€ æˆé˜»å¡æ—¶çš„ç­‰å¾…æ—¶é•¿ï¼Œä¹Ÿå°±æ˜¯æ— æ³•å†™å…¥æ•°æ®æ—¶çš„ç­‰å¾…æ—¶é•¿ï¼Œä»¥æ“ä½œç³»ç»Ÿé»˜è®¤æ—¶é’ŸèŠ‚æ‹ä¸ºå‡†ã€‚ */
+            xQueueSend(xQueueTempHdlr, &ucQueueTempData, pdMS_TO_TICKS(10));
+            xQueueSend(xQueueHumiHdlr, &ucQueueHumiData, pdMS_TO_TICKS(10));
+        }
     }
 }
 
 /**
-  * @brief  LoRaÊı¾İ·¢ËÍÈÎÎñº¯Êı
-  * @note   ´ÓÎÂÊª¶È¶ÓÁĞ½ÓÊÕÊı¾İ£¬²¢Í¨¹ıLoRaÄ£¿é·¢ËÍµ½Íø¹Ø¡£Í¬Ê±´¦ÀíÖ´ĞĞÆ÷µÄ¿ØÖÆĞÅºÅ¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬Î´Ê¹ÓÃ£¬´«ÈëNULL¡£
+  * @brief  LoRaæ•°æ®å‘é€ä»»åŠ¡å‡½æ•°
+  * @note   ä»æ¸©æ¹¿åº¦é˜Ÿåˆ—æ¥æ”¶æ•°æ®ï¼Œå¹¶é€šè¿‡LoRaæ¨¡å—å‘é€åˆ°ç½‘å…³ã€‚åŒæ—¶å¤„ç†æ‰§è¡Œå™¨çš„æ§åˆ¶ä¿¡å·ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œæœªä½¿ç”¨ï¼Œä¼ å…¥NULLã€‚
   * @retval None
   */
-void vTaskLoRaToGatePkt(void *pvParameters)
+void vTaskLoRaSend(void *pvParameters)
 {
-    char cBuffer[50];
-    uint8_t ucRecTempData = 0, ucRecHumiData = 0;
-    /* ¶¨ÒåÒ»¸ö·µ»ØÖµÅĞ¶ÏÊÇ·ñ½ÓÊÕ³É¹¦ */
+    /* å®šä¹‰ä¸€ä¸ªè¿”å›å€¼åˆ¤æ–­æ˜¯å¦æ¥æ”¶æˆåŠŸ */
     BaseType_t xRetvalQueueTemp, xRetvalQueueHumi;
+    uint8_t ucRecTempData = 0, ucRecHumiData = 0;
+    uint8_t ucCommand = LORA_EXECUTOR_COMMAND_OFF;
     while (1)
     {
-        /* code */
-        /* ½ÓÊÕ¶ÓÁĞ£º¶ÓÁĞ¾ä±ú¡¢´«Êä×ª´æµÄÄ¿±ê±äÁ¿»òÊı×éºÍÎ´½ÓÊÕµ½Êı¾İµÄµÈ´ıÊ±³¤£¬·Ö3ÖÖÇé¿ö£¬·Ö±ğÎª0¡¢0~portMAX_DELAYºÍportMAX_DELAYÈıÖÖ£¬·Ö±ğ¶ÔÓ¦
-         * Ò»µã²»µÈ¡¢µÈÒ»µãÊ±¼äºÍµÈ×î´óÊ±¼ä¡£ÔÚµÈ´ı¶ÓÁĞÊı¾İµÄÇé¿öÏÂ£¬¸Ã½ÓÊÕ¶ÓÁĞËùÔÚµÄÈÎÎñ»áÒ»Ö±´¦ÓÚ×èÈûÌ¬¡£
+        /* æ¥æ”¶é˜Ÿåˆ—ï¼šé˜Ÿåˆ—å¥æŸ„ã€ä¼ è¾“è½¬å­˜çš„ç›®æ ‡å˜é‡æˆ–æ•°ç»„å’Œæœªæ¥æ”¶åˆ°æ•°æ®çš„ç­‰å¾…æ—¶é•¿ï¼Œåˆ†3ç§æƒ…å†µï¼Œåˆ†åˆ«ä¸º0ã€0~portMAX_DELAYå’ŒportMAX_DELAYä¸‰ç§ï¼Œåˆ†åˆ«å¯¹åº”
+         * ä¸€ç‚¹ä¸ç­‰ã€ç­‰ä¸€ç‚¹æ—¶é—´å’Œç­‰æœ€å¤§æ—¶é—´ã€‚åœ¨ç­‰å¾…é˜Ÿåˆ—æ•°æ®çš„æƒ…å†µä¸‹ï¼Œè¯¥æ¥æ”¶é˜Ÿåˆ—æ‰€åœ¨çš„ä»»åŠ¡ä¼šä¸€ç›´å¤„äºé˜»å¡æ€ã€‚
          */
         xRetvalQueueTemp = xQueueReceive(xQueueTempHdlr, &ucRecTempData, pdMS_TO_TICKS(10));
         xRetvalQueueHumi = xQueueReceive(xQueueHumiHdlr, &ucRecHumiData, pdMS_TO_TICKS(10));
-        /* ·¢ËÍ */
-        vLoRaConnectionPkt(xLoRaGateConfig.ucLoRaGateChannel);
-        vLoRaToGateIdPkt(xLoRaNode1Config.ucLoRaNode1Identifier);
-        vLoRaToGateSenIdPkt(xLoRaSensorID.ucIdDht11);
-        /* ¼ì²â½ÓÊÕ¶ÓÁĞÊÇ·ñ³É¹¦ */
+        /* LoRaé€šä¿¡è¿æ¥å­— */
+        vLoRaConnectionInit(xLoRaGateConfig.ucLoRaGateIdentifier);
+        /* æ£€æµ‹æ¥æ”¶é˜Ÿåˆ—æ˜¯å¦æˆåŠŸ */
         if (xRetvalQueueTemp == pdTRUE && xRetvalQueueHumi == pdTRUE)
         {
-            /* code */
-            vUsartSendArray(USART3, &ucRecTempData, 1);
-            vUsartSendArray(USART3, &ucRecHumiData, 1); 
-            snprintf(cBuffer, sizeof(cBuffer), "Temp=%d, Humi=%d\r\n", ucRecTempData, ucRecHumiData);
-            vUsartSendString(USART1, cBuffer);
+            vLoRaProtocolSend(xLoRaNode1Config.ucLoRaNode1Identifier, xLoRaSensorID.ucIdDht11, xLoRaExecutorID.ucIdLed, ucRecTempData, ucRecHumiData, ucCommand);
             vTaskDelay(1000);
         }
         if (xSemaphoreTake(xSemLedOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
-            /* code */
-            vUsartSendArray(USART3, &xLoRaExecutorID.ucIdLed, 1);
-            vUsartSendArray(USART3, &xLoRaExecutorCommand.ucCommandOn, 1);
+            ucCommand = LORA_EXECUTOR_COMMAND_ON;
         } else if (xSemaphoreTake(xSemLedOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
-            /* code */
-            vUsartSendArray(USART3, &xLoRaExecutorID.ucIdLed, 1);
-            vUsartSendArray(USART3, &xLoRaExecutorCommand.ucCommandOff, 1);
+            ucCommand = LORA_EXECUTOR_COMMAND_OFF;
         }
         vTaskDelay(500);
     }
 }
 
 /**
-  * @brief  LoRaÏûÏ¢½ÓÊÕÈÎÎñº¯Êı
-  * @note   ´ÓUSART3½ÓÊÕLoRaÄ£¿é´«ÊäµÄÖ´ĞĞÆ÷¿ØÖÆÏûÏ¢£¬²¢¸ù¾İĞÅºÅÁ¿¿ØÖÆÏàÓ¦µÄÖ´ĞĞÆ÷×´Ì¬¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬Î´Ê¹ÓÃ£¬´«ÈëNULL¡£
+  * @brief  LoRaæ¶ˆæ¯æ¥æ”¶å¹¶å¤„ç†ä»»åŠ¡å‡½æ•°
+  * @note   ä»USART3æ¥æ”¶LoRaæ¨¡å—ä¼ è¾“çš„æ‰§è¡Œå™¨æ§åˆ¶æ¶ˆæ¯ï¼Œå¹¶æ ¹æ®ä¿¡å·é‡æ§åˆ¶ç›¸åº”çš„æ‰§è¡Œå™¨çŠ¶æ€ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œæœªä½¿ç”¨ï¼Œä¼ å…¥NULLã€‚
   * @retval None
   */
-void vTaskLoRaMsgRec(void *pvParameters)
+void vTaskLoRaReceived(void *pvParameters)
 {
     uint8_t ucDataRecNodeId = 0, ucDataRecExeId = 0, ucDataRecExeSta = 0;
     uint8_t ucRetvalQueueNodeId = 0, ucRetvalQueueExeId = 0, ucRetvalQueueExeSta = 0;
@@ -195,22 +132,21 @@ void vTaskLoRaMsgRec(void *pvParameters)
         ucRetvalQueueExeSta = xQueueReceive(xQueueUsart3IrqHdlr, &ucDataRecExeSta, portMAX_DELAY);
         while (ucRetvalQueueNodeId == pdTRUE && ucRetvalQueueExeId == pdTRUE && ucRetvalQueueExeSta == pdTRUE)
         {
-            /* code */
             if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusLedOn)
             {
-                /* code */
+                vPc13LedOn();
                 xSemaphoreGive(xSemLedOnHdlr);
             } else if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusLedOff)
             {
-                /* code */
+                vPc13LedOff();
                 xSemaphoreGive(xSemLedOffHdlr);
             } else if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusFanOn)
             {
-                /* code */
+                vFanOn();
                 xSemaphoreGive(xSemFanOnHdlr);
             } else if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusFanOn)
             {
-                /* code */
+                vFanOff();
                 xSemaphoreGive(xSemFanOffHdlr);
             }
             break;
@@ -218,81 +154,86 @@ void vTaskLoRaMsgRec(void *pvParameters)
     }
 }
 
+void vTaskDebugLog(void *pvParameters)
+{
+    char cBuffer[50];
+    uint8_t ucRecTempData = 0, ucRecHumiData = 0;
+    /* å®šä¹‰ä¸€ä¸ªè¿”å›å€¼åˆ¤æ–­æ˜¯å¦æ¥æ”¶æˆåŠŸ */
+    BaseType_t xRetvalQueueTemp, xRetvalQueueHumi;
+    while (1)
+    {
+        /* æ¥æ”¶é˜Ÿåˆ—ï¼šé˜Ÿåˆ—å¥æŸ„ã€ä¼ è¾“è½¬å­˜çš„ç›®æ ‡å˜é‡æˆ–æ•°ç»„å’Œæœªæ¥æ”¶åˆ°æ•°æ®çš„ç­‰å¾…æ—¶é•¿ï¼Œåˆ†3ç§æƒ…å†µï¼Œåˆ†åˆ«ä¸º0ã€0~portMAX_DELAYå’ŒportMAX_DELAYä¸‰ç§ï¼Œåˆ†åˆ«å¯¹åº”
+         * ä¸€ç‚¹ä¸ç­‰ã€ç­‰ä¸€ç‚¹æ—¶é—´å’Œç­‰æœ€å¤§æ—¶é—´ã€‚åœ¨ç­‰å¾…é˜Ÿåˆ—æ•°æ®çš„æƒ…å†µä¸‹ï¼Œè¯¥æ¥æ”¶é˜Ÿåˆ—æ‰€åœ¨çš„ä»»åŠ¡ä¼šä¸€ç›´å¤„äºé˜»å¡æ€ã€‚
+         */
+        xRetvalQueueTemp = xQueueReceive(xQueueTempHdlr, &ucRecTempData, pdMS_TO_TICKS(10));
+        xRetvalQueueHumi = xQueueReceive(xQueueHumiHdlr, &ucRecHumiData, pdMS_TO_TICKS(10));
+        /* æ£€æµ‹æ¥æ”¶é˜Ÿåˆ—æ˜¯å¦æˆåŠŸ */
+        if (xRetvalQueueTemp == pdTRUE && xRetvalQueueHumi == pdTRUE)
+        {
+            snprintf(cBuffer, sizeof(cBuffer), "Temp=%d, Humi=%d\r\n", ucRecTempData, ucRecHumiData);
+            vDebugLogPrint(cBuffer);
+            vTaskDelay(1000);
+        }
+    }
+}
+
 /**
-  * @brief  ´´½¨ÈÎÎñÁĞ±íº¯Êı
-  * @note   ´´½¨ËùÓĞĞèÒªµÄFreeRTOSÈÎÎñ¡£
+  * @brief  åˆ›å»ºä»»åŠ¡åˆ—è¡¨å‡½æ•°
+  * @note   åˆ›å»ºæ‰€æœ‰éœ€è¦çš„FreeRTOSä»»åŠ¡ã€‚
   * @param  None
   * @retval None
   */
 void vCreateTasksList(void)
 {
-    // #if defined __LED_H__
-    #if LED_PC13_WORK_MODE == STM32_STATE_MODE
-    /* ´´½¨ÈÎÎñ£¬²ÎÊı·Ö±ğÎªÈÎÎñº¯ÊıÃû³Æ¡¢ÈÎÎñÃû×Ö¡¢Õ»´óĞ¡¡¢·µ»Ø²ÎÊıÖµ¡¢ÓÅÏÈ¼¶¡¢ÈÎÎñ¾ä±ú¡£ */
-        xTaskCreate(
-                   (TaskFunction_t        ) vTaskStateLed,
-                   (char *                ) "TaskName_StateLed", 
-                   (configSTACK_DEPTH_TYPE) 256,
-                   (void *                ) NULL, 
-                   (UBaseType_t           ) 2,
-                   (TaskHandle_t *        ) &xTaskStateLedHdlr);
-    #else
-        xTaskCreate(
-                   (TaskFunction_t        ) vTaskLedControl,
-                   (char *                ) "TaskName_LedControl", 
-                   (configSTACK_DEPTH_TYPE) 256,
-                   (void *                ) NULL, 
-                   (UBaseType_t           ) 2,
-                   (TaskHandle_t *        ) &xTaskLedCtrlHdlr);
-    #endif
-    // #endif
-    // #if defined __RELAY_H__
-        xTaskCreate(
-                   (TaskFunction_t        ) vTaskFanControl,
-                   (char *                ) "TaskName_FanControl", 
-                   (configSTACK_DEPTH_TYPE) 256,
-                   (void *                ) NULL, 
-                   (UBaseType_t           ) 2,
-                   (TaskHandle_t *        ) &xTaskFanCtrlHdlr);
-    // #endif
-    // #if defined __DHT11_H__
-        xTaskCreate(
-                   (TaskFunction_t        ) vTaskDht11,
-                   (char *                ) "TaskName_DHT11", 
-                   (configSTACK_DEPTH_TYPE) 512,
-                   (void *                ) NULL, 
-                   (UBaseType_t           ) 2,
-                   (TaskHandle_t *        ) &xTaskDht11Hdlr);
-    // #endif
-    // #if defined __LORA_H__
-        xTaskCreate(
-                   (TaskFunction_t        ) vTaskLoRaToGatePkt,
-                   (char *                ) "TaskName_LoRaSendToGateway", 
-                   (configSTACK_DEPTH_TYPE) 512,
-                   (void *                ) NULL, 
-                   (UBaseType_t           ) 2,
-                   (TaskHandle_t *        ) &xTaskLoRaToGateHdlr);
-        xTaskCreate(
-                   (TaskFunction_t        ) vTaskLoRaMsgRec,
-                   (char *                ) "TaskName_LoRaReceivedMessage", 
-                   (configSTACK_DEPTH_TYPE) 512,
-                   (void *                ) NULL, 
-                   (UBaseType_t           ) 2,
-                   (TaskHandle_t *        ) &xTaskLoRaMsgRecHdlr);
-    // #endif
+    /* åˆ›å»ºä»»åŠ¡ï¼Œå‚æ•°åˆ†åˆ«ä¸ºä»»åŠ¡å‡½æ•°åç§°ã€ä»»åŠ¡åå­—ã€æ ˆå¤§å°ã€è¿”å›å‚æ•°å€¼ã€ä¼˜å…ˆçº§ã€ä»»åŠ¡å¥æŸ„ã€‚ */
+//    xTaskCreate(
+//               (TaskFunction_t        ) vTaskStateLed,
+//               (char *                ) "TaskName_StateLed", 
+//               (configSTACK_DEPTH_TYPE) 128,
+//               (void *                ) NULL, 
+//               (UBaseType_t           ) 2,
+//               (TaskHandle_t *        ) &xTaskStateLedHdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) vTaskDht11,
+               (char *                ) "TaskName_DHT11", 
+               (configSTACK_DEPTH_TYPE) 256,
+               (void *                ) NULL, 
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &xTaskDht11Hdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) vTaskLoRaSend,
+               (char *                ) "TaskName_LoRaSendToGateNode", 
+               (configSTACK_DEPTH_TYPE) 512,
+               (void *                ) NULL, 
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &xTaskLoRaSendHdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) vTaskLoRaReceived,
+               (char *                ) "TaskName_LoRaReceivedMessage", 
+               (configSTACK_DEPTH_TYPE) 512,
+               (void *                ) NULL, 
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &xTaskLoRaRecHdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) vTaskDebugLog,
+               (char *                ) "TaskName_DebugLog", 
+               (configSTACK_DEPTH_TYPE) 512,
+               (void *                ) NULL, 
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &xTaskDebugLogHdlr);
 }
 
 /**
-  * @brief  ´´½¨¶ÓÁĞÁĞ±íº¯Êı
-  * @note   ´´½¨ËùÓĞĞèÒªµÄFreeRTOS¶ÓÁĞ¡£
+  * @brief  åˆ›å»ºé˜Ÿåˆ—åˆ—è¡¨å‡½æ•°
+  * @note   åˆ›å»ºæ‰€æœ‰éœ€è¦çš„FreeRTOSé˜Ÿåˆ—ã€‚
   * @param  None
   * @retval None
   */
 void vCreateQueuesList(void)
 {
-    /* ´´½¨¶ÓÁĞÓĞÁ½¸ö²ÎÊı£¬µÚÒ»¸öÊÇ¶ÓÁĞµÄ³¤¶È,Ò²¾ÍÊÇÕâ¸ö¶ÓÁĞÄÜ´æ·Å¶àÉÙ¸öÊı¾İ£»
-     * µÚ¶ş¸ö²ÎÊı¾ÍÊÇÃ¿¸öÊı¾İµÄ´óĞ¡£¬µ¥Î»Îª×Ö½Ú£¬ÔÚstm32ÖĞuint8_tÖ¸ÕëµÄ³¤¶ÈÒ»°ãÊÇ4×Ö½Ú¡£
-     * Ô­º¯ÊıµÄ·µ»ØÖµ¾ÍÊÇ¶ÓÁĞ¾ä±úµÄ½á¹¹Ìå£¬ËùÒÔĞèÒªÔÚÉÏÃæ¶¨ÒåÒ»¸ö±äÁ¿½ÓÊÕ¶ÓÁĞ¾ä±ú¡£ */
+    /* åˆ›å»ºé˜Ÿåˆ—æœ‰ä¸¤ä¸ªå‚æ•°ï¼Œç¬¬ä¸€ä¸ªæ˜¯é˜Ÿåˆ—çš„é•¿åº¦,ä¹Ÿå°±æ˜¯è¿™ä¸ªé˜Ÿåˆ—èƒ½å­˜æ”¾å¤šå°‘ä¸ªæ•°æ®ï¼›
+     * ç¬¬äºŒä¸ªå‚æ•°å°±æ˜¯æ¯ä¸ªæ•°æ®çš„å¤§å°ï¼Œå•ä½ä¸ºå­—èŠ‚ï¼Œåœ¨stm32ä¸­uint8_tæŒ‡é’ˆçš„é•¿åº¦ä¸€èˆ¬æ˜¯4å­—èŠ‚ã€‚
+     * åŸå‡½æ•°çš„è¿”å›å€¼å°±æ˜¯é˜Ÿåˆ—å¥æŸ„çš„ç»“æ„ä½“ï¼Œæ‰€ä»¥éœ€è¦åœ¨ä¸Šé¢å®šä¹‰ä¸€ä¸ªå˜é‡æ¥æ”¶é˜Ÿåˆ—å¥æŸ„ã€‚ */
     xQueueTempHdlr      = xQueueCreate(
                                       (UBaseType_t) 5,
                                       (UBaseType_t) sizeof(uint8_t));
@@ -302,16 +243,17 @@ void vCreateQueuesList(void)
     xQueueUsart3IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t *));
-    if (xQueueTempHdlr == NULL || xQueueHumiHdlr == NULL || xQueueUsart3IrqHdlr == NULL)
-    {
-        /* code */
-        vUsartPrintf(USART1, "Queue Init Failed.\r\n");
-    }
+//    if (xQueueTempHdlr == NULL || xQueueHumiHdlr == NULL || xQueueUsart3IrqHdlr == NULL)
+//    {
+//        /* code */
+//        vDebugLogPrint("Queue Init Failed.\r\n");
+//    }
+    configASSERT(xQueueUsart3IrqHdlr != NULL);
 }
 
 /**
-  * @brief  ´´½¨ĞÅºÅÁ¿ÁĞ±íº¯Êı
-  * @note   ´´½¨ËùÓĞĞèÒªµÄFreeRTOSĞÅºÅÁ¿¡£
+  * @brief  åˆ›å»ºä¿¡å·é‡åˆ—è¡¨å‡½æ•°
+  * @note   åˆ›å»ºæ‰€æœ‰éœ€è¦çš„FreeRTOSä¿¡å·é‡ã€‚
   * @param  None
   * @retval None
   */
@@ -324,8 +266,8 @@ void vCreateSemaphoresList(void)
 }
 
 /**
-  * @brief  Ö÷º¯Êı
-  * @note   ³õÊ¼»¯ÏµÍ³¸÷Ä£¿é£¬´´½¨¶ÓÁĞ¡¢ĞÅºÅÁ¿ºÍÈÎÎñ£¬²¢Æô¶¯µ÷¶ÈÆ÷¡£
+  * @brief  ä¸»å‡½æ•°
+  * @note   åˆå§‹åŒ–ç³»ç»Ÿå„æ¨¡å—ï¼Œåˆ›å»ºé˜Ÿåˆ—ã€ä¿¡å·é‡å’Œä»»åŠ¡ï¼Œå¹¶å¯åŠ¨è°ƒåº¦å™¨ã€‚
   * @param  None
   * @retval None
   */
@@ -334,6 +276,7 @@ int main(void)
     vFanRelayInit();
     vDelayInit();
     vPc13LedInit();
+    vPb0LedInit();
     vUsartInit(USART1, 115200);
     vUsartInit(USART3, 115200);
     vCreateQueuesList();

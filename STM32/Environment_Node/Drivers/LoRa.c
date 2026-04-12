@@ -1,119 +1,62 @@
 #include "LoRa.h"
 
 /**
-  * @brief  LoRa·¢ËÍ½ÚµãIDÊı¾İ°ü·â×°º¯Êı¡£				
-  * @note   LoRaÔÚ¶¨µãÄ£Ê½ÏÂÖ´ĞĞ½Úµã¼äÍ¨ĞÅµÄÖ÷Òªº¯Êı¡£
-  * @param  ucNodeId ½ÚµãID£¬ÈçNode1£¬Ò²¾ÍÊÇD1µÈµÈ¡£
+  * @brief  LoRaå‘é€èŠ‚ç‚¹IDæ•°æ®åŒ…å°è£…å‡½æ•°ã€‚				
+  * @note   LoRaåœ¨å®šç‚¹æ¨¡å¼ä¸‹æ‰§è¡ŒèŠ‚ç‚¹é—´é€šä¿¡çš„ä¸»è¦å‡½æ•°ã€‚
+  * @param  ucNodeId èŠ‚ç‚¹IDï¼Œå¦‚Node1ï¼Œä¹Ÿå°±æ˜¯D1ç­‰ç­‰ã€‚
   * @retval None
   */
-void vLoRaConnectionPkt(uint8_t ucNodeId)
+void vLoRaConnectionInit(uint8_t ucNodeId)
 {
     if (ucNodeId == xLoRaNode1Config.ucLoRaNode1Identifier)
     {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode1Config, 3);
+        vLoRaSendArray((uint8_t *)&xLoRaNode1Config, 3);
     }
     else if (ucNodeId == xLoRaNode2Config.ucLoRaNode2Identifier)
     {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode2Config, 3);
+        vLoRaSendArray((uint8_t *)&xLoRaNode2Config, 3);
     }
-    else
+    else if (ucNodeId == xLoRaGateConfig.ucLoRaGateIdentifier)
     {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaGateConfig, 3);
-    }
-}
-    
-/**
-  * @brief  LoRa·¢ËÍ½ÚµãIDÊı¾İ°ü·â×°º¯Êı¡£				
-  * @note   Í¨¹ı·¢ËÍ½ÚµãIDÒÔÉùÃ÷×Ô¼ºÊÇÊ²Ã´½Úµã¡£
-  * @param  ucNodeId ½ÚµãID£¬ÈçNode1£¬Ò²¾ÍÊÇD1µÈµÈ¡£
-  * @retval None
-  */
-void vLoRaToGateIdPkt(uint8_t ucNodeId)
-{
-    if (ucNodeId == xLoRaNode1Config.ucLoRaNode1Identifier)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode1Config.ucLoRaNode1Identifier, 1);
-    } else if (ucNodeId == xLoRaNode2Config.ucLoRaNode2Identifier)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaNode2Config.ucLoRaNode2Identifier, 1);
+        vLoRaSendArray((uint8_t *)&xLoRaGateConfig, 3);
     }
 }
 
-/**
-  * @brief  LoRa·¢ËÍ´«¸ĞÆ÷IDÊı¾İ°ü·â×°º¯Êı¡£				
-  * @note   Í¨¹ı·¢ËÍ´«¸ĞÆ÷IDÒÔÉùÃ÷×Ô¼ºÊÇÊ²Ã´´«¸ĞÆ÷¡£
-  * @param  ucSensorId ´«¸ĞÆ÷ID£¬ÈçDHT11ÎÂÊª¶È´«¸ĞÆ÷£¬Ò²¾ÍÊÇucIdDht11µÈµÈ¡£
-  * @retval None
-  */
-void vLoRaToGateSenIdPkt(uint8_t ucSensorId)
+void vLoRaProtocolSend(uint8_t ucNodeId, uint8_t ucSensorId, uint8_t ucExeId,
+                       uint8_t ucData1, uint8_t ucData2, uint8_t ucData3)
 {
-    if (ucSensorId == xLoRaSensorID.ucIdDht11)
+    uint8_t pucBuffer[8];                                                       // ä½¿ç”¨å±€éƒ¨æ•°ç»„ä»£æ›¿é‡æŒ‡é’ˆ
+    uint8_t ucSum = 0;
+
+    pucBuffer[0] = 0xAA;                                                        // å¸§å¤´
+    pucBuffer[1] = ucNodeId;
+    pucBuffer[2] = ucSensorId;
+    pucBuffer[3] = ucData1;
+    pucBuffer[4] = ucData2;
+    pucBuffer[5] = ucExeId;
+    pucBuffer[6] = ucData3;
+
+    /* è®¡ç®—ç´¯åŠ å’Œï¼ˆä»ç´¢å¼•0åˆ°6ç´¯åŠ ï¼Œæˆ–å°†å¸§å¤´åŒ…å«åœ¨å†…ï¼ŒæŒ‰åè®®è§„å®šï¼‰ */
+    for (int i = 0; i < 7; i++)                                                 // åªç´¯åŠ å‰7ä¸ªå­—èŠ‚
     {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdDht11, 1);
-    } else if (ucSensorId == xLoRaSensorID.ucIdMq2)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdMq2, 1);
-    } else if (ucSensorId == xLoRaSensorID.ucIdFire)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdFire, 1);  
-    } else if (ucSensorId == xLoRaSensorID.ucIdLight)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaSensorID.ucIdLight, 1);
+        ucSum += pucBuffer[i];
     }
+    pucBuffer[7] = ucSum;                                                       // å­˜å…¥æ ¡éªŒå’Œ
+
+    vLoRaSendArray(pucBuffer, 8);
 }
 
 /**
-  * @brief  LoRa·¢ËÍÖ´ĞĞÆ÷IDÊı¾İ°ü·â×°º¯Êı¡£				
-  * @note   Í¨¹ı·¢ËÍÖ´ĞĞÆ÷IDÒÔÉùÃ÷×Ô¼ºÊÇÊ²Ã´Ö´ĞĞÆ÷¡£
-  * @param  ucExeId Ö´ĞĞÆ÷ID£¬ÈçLEDµÆ£¬Ò²¾ÍÊÇucIdLedµÈµÈ¡£
-  * @retval None
+  * @brief  LoRaèŠ‚ç‚¹æ¥æ”¶è¿”å›æ•°æ®å°è£…å‡½æ•°ã€‚				
+  * @note   é€šè¿‡ä»ä¸²å£æ¶ˆæ¯é˜Ÿåˆ—æ¥æ”¶ä»€ä¹ˆæ•°æ®åˆ¤æ–­æ˜¯ä»€ä¹ˆæŒ‡ä»¤ã€‚
+  * @param  *pucData          æ¥æ”¶åˆ°çš„æ•°æ®ã€‚
+  * @retval eLoRaRecvStatus_t æšä¸¾ï¼ŒåŒ…æ‹¬èŠ‚ç‚¹IDã€ä¼ æ„Ÿå™¨IDã€æ‰§è¡Œå™¨IDå’Œå¼€å…³æŒ‡ä»¤ã€‚
   */
-void vLoRaToGateExeIdPkt(uint8_t ucExeId)
-{
-    if (ucExeId == xLoRaExecutorID.ucIdLed)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdLed, 1);
-    } else if (ucExeId == xLoRaExecutorID.ucIdFan)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdFan, 1);
-    } else if (ucExeId == xLoRaExecutorID.ucIdHumidifier)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdHumidifier, 1);
-    } else if (ucExeId == xLoRaExecutorID.ucIdBuzzer)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdBuzzer, 1);
-    } else if (ucExeId == xLoRaExecutorID.ucIdServo)
-    {
-        /* code */
-        vUsartSendArray(USART3, (uint8_t *)&xLoRaExecutorID.ucIdServo, 1);
-    }
-}
-
-/**
-  * @brief  LoRa½Úµã½ÓÊÕ·µ»ØÊı¾İ·â×°º¯Êı¡£				
-  * @note   Í¨¹ı´Ó´®¿ÚÏûÏ¢¶ÓÁĞ½ÓÊÕÊ²Ã´Êı¾İÅĞ¶ÏÊÇÊ²Ã´Ö¸Áî¡£
-  * @param  *pucData          ½ÓÊÕµ½µÄÊı¾İ¡£
-  * @retval eLoRaMsgRecStatus Ã¶¾Ù£¬°üÀ¨½ÚµãID¡¢´«¸ĞÆ÷ID¡¢Ö´ĞĞÆ÷IDºÍ¿ª¹ØÖ¸Áî¡£
-  */
-eLoRaMsgRecStatus xLoRaMessageReceived(uint8_t *pucData)
+eLoRaRecvStatus_t xLoRaMessageReceived(uint8_t *pucData)
 {
     switch (*pucData)
     {
         case 0xD1:
-        /* code */
         return statusNode1;
     
         case 0xD2:
@@ -146,50 +89,45 @@ eLoRaMsgRecStatus xLoRaMessageReceived(uint8_t *pucData)
 }
 
 /**
-  * @brief  LoRa½Úµã´¦Àí·µ»ØÊı¾İ·â×°º¯Êı¡£				
-  * @note   Í¨¹ıLoRa½Úµã½ÓÊÕ·µ»ØÊı¾İ·â×°º¯ÊıÅĞ¶ÏÊÇÊ²Ã´Ö¸Áî£¬²¢Ï¸»¯´¦Àí£¬¿É¼õÉÙ´úÂë¸´ÔÓ¶È¡£¸ÃAPI¿ÉÖ±½Ó±»ÆäËûº¯Êıµ÷ÓÃ¡£
-  * @param  ucDataRecNodeId    ÒªÅĞ¶ÏµÄ½ÚµãID¡£
-  * @param  ucDataRecExeId     ÒªÅĞ¶ÏµÄÖ´ĞĞÆ÷ID¡£
-  * @param  ucDataRecExeStatus ÒªÅĞ¶ÏµÄ´«¸ĞÆ÷ID¡£
-  * @retval eLoRaMsgRecStatus  Ã¶¾Ù£¬°üÀ¨½ÚµãID¡¢´«¸ĞÆ÷ID¡¢Ö´ĞĞÆ÷IDºÍ¿ª¹ØÖ¸Áî¡£
+  * @brief  LoRaèŠ‚ç‚¹å¤„ç†è¿”å›æ•°æ®å°è£…å‡½æ•°ã€‚				
+  * @note   é€šè¿‡LoRaèŠ‚ç‚¹æ¥æ”¶è¿”å›æ•°æ®å°è£…å‡½æ•°åˆ¤æ–­æ˜¯ä»€ä¹ˆæŒ‡ä»¤ï¼Œå¹¶ç»†åŒ–å¤„ç†ï¼Œå¯å‡å°‘ä»£ç å¤æ‚åº¦ã€‚è¯¥APIå¯ç›´æ¥è¢«å…¶ä»–å‡½æ•°è°ƒç”¨ã€‚
+  * @param  ucDataRecNodeId    è¦åˆ¤æ–­çš„èŠ‚ç‚¹IDã€‚
+  * @param  ucDataRecExeId     è¦åˆ¤æ–­çš„æ‰§è¡Œå™¨IDã€‚
+  * @param  ucDataRecExeStatus è¦åˆ¤æ–­çš„ä¼ æ„Ÿå™¨IDã€‚
+  * @retval eLoRaRecvStatus_t  æšä¸¾ï¼ŒåŒ…æ‹¬èŠ‚ç‚¹IDã€ä¼ æ„Ÿå™¨IDã€æ‰§è¡Œå™¨IDå’Œå¼€å…³æŒ‡ä»¤ã€‚
   */
-eLoRaMsgRecStatus xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeId, uint8_t ucDataRecExeStatus)
+eLoRaRecvStatus_t xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeId, uint8_t ucDataRecExeStatus)
 {
     switch (xLoRaMessageReceived(&ucDataRecNodeId))
     {
         case statusNode1:
-        /* code */
         while (xLoRaMessageReceived(&ucDataRecExeStatus) == statusExeOn)
         {
-            /* code */
             if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeLed)
             {
-                /* code */
                 return statusLedOn;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeFan)
+            } 
+            else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeFan)
             {
-                /* code */
                 return statusFanOn;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeHumidifier)
+            } 
+            else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeHumidifier)
             {
-                /* code */
                 return statusHumidifierOn;
             }
         }
         while (xLoRaMessageReceived(&ucDataRecExeStatus) == statusExeOff)
         {
-            /* code */
             if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeLed)
             {
-                /* code */
                 return statusLedOff;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeFan)
+            } 
+            else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeFan)
             {
-                /* code */
                 return statusFanOff;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeHumidifier)
+            } 
+            else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeHumidifier)
             {
-                /* code */
                 return statusHumidifierOff;
             }
         }
@@ -197,27 +135,23 @@ eLoRaMsgRecStatus xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeI
         case statusNode2:
         while (xLoRaMessageReceived(&ucDataRecExeStatus) == statusExeOn)
         {
-            /* code */
             if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeBuzzer)
             {
-                /* code */
                 return statusBuzzerOn;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeServo)
+            } 
+            else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeServo)
             {
-                /* code */
                 return statusServoOn;
             }
         }
         while (xLoRaMessageReceived(&ucDataRecExeStatus) == statusExeOff)
         {
-            /* code */
             if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeBuzzer)
             {
-                /* code */
                 return statusBuzzerOff;
-            } else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeServo)
+            } 
+            else if (xLoRaMessageReceived(&ucDataRecExeId) == statusExeServo)
             {
-                /* code */
                 return statusServoOff;
             }
         }

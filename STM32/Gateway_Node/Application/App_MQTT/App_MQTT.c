@@ -1,75 +1,38 @@
 #include "App_MQTT.h"
 
 /**
-  * @brief  bMqttPublish
-  * @note   Í¨¹ıESP8266Ä£¿éÏòMQTT·şÎñÆ÷·¢²¼ÏûÏ¢£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  pcTopic£º·¢²¼µÄÖ÷Ìâ×Ö·û´®
-  * @param  pcMessage£º·¢²¼µÄÏûÏ¢×Ö·û´®
-  * @retval true£º·¢²¼³É¹¦
-  * @retval false£º·¢²¼Ê§°Ü
-  */
-bool bMqttPublish(char *pcTopic, char *pcMessage)
-{
-    char cCmd[256] = {0};
-    uint8_t ucLen = strlen(pcMessage);
-    snprintf(cCmd, sizeof(cCmd), "AT+MQTTPUBRAW=0,\"%s\",%d,1,0", pcTopic, ucLen);
-    return bEsp8266Command(cCmd, "OK", ">", 3000) && bEsp8266Command(pcMessage, "OK", NULL, 3000);
-}
-
-/**
-  * @brief  bMqttSubMsgFormat
-  * @note   ½âÎöMQTT¶©ÔÄÏûÏ¢£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  pcTopic£º¶©ÔÄµÄÖ÷Ìâ×Ö·û´®
-  * @param  pcMessage£º¶©ÔÄµÄÏûÏ¢×Ö·û´®
-  * @retval true£º½âÎö³É¹¦
-  * @retval false£º½âÎöÊ§°Ü
-  */
-bool bMqttSubMsgFormat(char *pcTopic, char *pcMessage)
-{
-    // ´Ëº¯ÊıÓÃÓÚ½âÎö¶©ÔÄÏûÏ¢£¬¸ù¾İ²»Í¬µÄÄ£Ê½ÌáÈ¡Ö÷ÌâºÍÏûÏ¢ÄÚÈİ
-    // ¾ßÌåÊµÏÖ¸ù¾İÊµ¼ÊµÄÏûÏ¢¸ñÊ½½øĞĞ±àĞ´
-    char *pcSubRecMsg;
-    pcSubRecMsg = strstr(xSerialFrameRecord.cSerialReceivedBuffer, pcMessage);
-    if (strstr(xSerialFrameRecord.cSerialReceivedBuffer, pcTopic), pcSubRecMsg)
-    {
-        /* code */
-        vUsartPrintf(USART1, "MQTT Subscribe Message Matched: %s\r\n", pcSubRecMsg);
-        return true;
-    }
-    return false; // Õ¼Î»·û£¬Êµ¼ÊÊµÏÖĞèÒª·µ»Ø½âÎö½á¹û
-}
-
-/**
   * @brief  xMqttCmdParse
-  * @note   ½âÎöMQTTÃüÁî£¬¸Ãº¯Êı±»Íâ²¿µ÷ÓÃ¡£
-  * @param  pcTopic£º¶©ÔÄµÄÖ÷Ìâ×Ö·û´®
-  * @retval eMqttCmd_t£º½âÎöµÃµ½µÄÃüÁîÃ¶¾ÙÖµ
+  * @note   è§£æMQTTå‘½ä»¤ï¼Œè¯¥å‡½æ•°è¢«å¤–éƒ¨è°ƒç”¨ã€‚
+  * @param  pcTopicï¼šè®¢é˜…çš„ä¸»é¢˜å­—ç¬¦ä¸²
+  * @retval eMqttCmd_tï¼šè§£æå¾—åˆ°çš„å‘½ä»¤æšä¸¾å€¼
   */
 eMqttCmd_t xMqttCmdParse(char *pcTopic)
 {
-    if (bMqttSubMsgFormat(pcTopic, "{\"cmd\":{\"led\":\"on\"}}") == true)
+    if (bMqttSubscribe(pcTopic, "{\"cmd\":{\"led\":\"on\"}}") == true)
     {
         return MQTT_CMD_LED_ON;
     }
-    else if (bMqttSubMsgFormat(pcTopic, "{\"cmd\":{\"led\":\"off\"}}") == true)
+    else if (bMqttSubscribe(pcTopic, "{\"cmd\":{\"led\":\"off\"}}") == true)
     {
         return MQTT_CMD_LED_OFF;
     }
-    else if (bMqttSubMsgFormat(pcTopic, "{\"cmd\":{\"fan\":\"on\"}}") == true)
+    else if (bMqttSubscribe(pcTopic, "{\"cmd\":{\"fan\":\"on\"}}") == true)
     {
         return MQTT_CMD_FAN_ON;
     }
-    else if (bMqttSubMsgFormat(pcTopic, "{\"cmd\":{\"fan\":\"off\"}}") == true)
+    else if (bMqttSubscribe(pcTopic, "{\"cmd\":{\"fan\":\"off\"}}") == true)
     {
         return MQTT_CMD_FAN_OFF;
     }
-    else if (bMqttSubMsgFormat(pcTopic, "{\"cmd\":{\"humidifier\":\"on\"}}") == true)
+    else if (bMqttSubscribe(pcTopic, "{\"cmd\":{\"humidifier\":\"on\"}}") == true)
     {
         return MQTT_CMD_HUMIDIFIER_ON;
     }
-    else if (bMqttSubMsgFormat(pcTopic, "{\"cmd\":{\"humidifier\":\"off\"}}") == true)
+    else if (bMqttSubscribe(pcTopic, "{\"cmd\":{\"humidifier\":\"off\"}}") == true)
     {
         return MQTT_CMD_HUMIDIFIER_OFF;
     }
-    return MQTT_CMD_UNKNOWN; // Î´Ê¶±ğµÄÃüÁî
+    return MQTT_CMD_UNKNOWN; // æœªè¯†åˆ«çš„å‘½ä»¤
 }
+
+

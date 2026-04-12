@@ -1,11 +1,13 @@
 #include "ESP8266.h"
 
+NetFifoBuffer_t *pxEspBuffer;
+
 /**
-  * @brief  »Ö¸´ESP8266µ½³ö³§ÉèÖÃ
+  * @brief  æ¢å¤ESP8266åˆ°å‡ºå‚è®¾ç½®
   * @param  None
   * @retval None
   */
-void vEsp8266Restore(NetFifoBuffer_t *pxEspBuffer)
+void vEsp8266Restore()
 {
     vUsartPrintf(USART2, "AT+RESTORE\r\n");
     // if (ucEsp8266ResHandler(pxEspBuffer) == ESP8266_RESPONSE_READY)
@@ -19,7 +21,7 @@ void vEsp8266Restore(NetFifoBuffer_t *pxEspBuffer)
 }
 
 /**
-  * @brief  ÖØÖÃESP8266Ä£¿é
+  * @brief  é‡ç½®ESP8266æ¨¡å—
   * @param  None
   * @retval None
   */
@@ -37,9 +39,9 @@ void vEsp8266Reset(void)
 }
 
 /**
-  * @brief  ÉèÖÃESP8266¹¤×÷Ä£Ê½
-  * @param  ucMode: ¹¤×÷Ä£Ê½£¨0£ºSoftAPÄ£Ê½£¬1£ºStationÄ£Ê½£©
-  * @retval ÉèÖÃºóµÄ¹¤×÷Ä£Ê½
+  * @brief  è®¾ç½®ESP8266å·¥ä½œæ¨¡å¼
+  * @param  ucMode: å·¥ä½œæ¨¡å¼ï¼ˆ0ï¼šSoftAPæ¨¡å¼ï¼Œ1ï¼šStationæ¨¡å¼ï¼‰
+  * @retval è®¾ç½®åçš„å·¥ä½œæ¨¡å¼
   */
 eEsp8266Mode_t ucEsp8266SetMode(uint8_t ucMode)
 {
@@ -54,14 +56,14 @@ eEsp8266Mode_t ucEsp8266SetMode(uint8_t ucMode)
         return ESP8266_MODE_SOFTAP;
     } else
     {
-        return INVALID_MODE; // ÎŞĞ§Ä£Ê½
+        return INVALID_MODE; // æ— æ•ˆæ¨¡å¼
     }
 }
 
 /**
-  * @brief  Á¬½Óµ½Ö¸¶¨µÄWiFiÈÈµã
-  * @param  *pcSsid:     WiFiÃû³Æ
-  * @param  *pcPassword: WiFiÃÜÂë
+  * @brief  è¿æ¥åˆ°æŒ‡å®šçš„WiFiçƒ­ç‚¹
+  * @param  *pcSsid:     WiFiåç§°
+  * @param  *pcPassword: WiFiå¯†ç 
   * @retval None
   */
 void vEsp8266JoinAp(const char *pcSsid, const char *pcPassword)
@@ -70,61 +72,61 @@ void vEsp8266JoinAp(const char *pcSsid, const char *pcPassword)
 }
 
 /**
-  * @brief  ´¦ÀíESP8266ÏìÓ¦
-  * @param  *pxEspBuffer ESP8266»º³åÇøÖ¸Õë
-  * @retval 0: ¼ÌĞøµÈ´ı, 1: ³É¹¦, 2: Ê§°Ü
+  * @brief  å¤„ç†ESP8266å“åº”
+  * @param  *pxEspBuffer ESP8266ç¼“å†²åŒºæŒ‡é’ˆ
+  * @retval 0: ç»§ç»­ç­‰å¾…, 1: æˆåŠŸ, 2: å¤±è´¥
   */
-eEsp8266Status_t ucEsp8266ResHandler(NetFifoBuffer_t *pxEspBuffer)
+eEsp8266Status_t ucEsp8266ResHandler()
 {
-    // ¼ì²éÊÇ·ñÊÕµ½ÍêÕûÏìÓ¦
+    // æ£€æŸ¥æ˜¯å¦æ”¶åˆ°å®Œæ•´å“åº”
     if (strstr(pxEspBuffer->cNetFifoBuffer, "ready") != NULL)
     {
         vNetBufferClear(pxEspBuffer);
-        return ESP8266_RESPONSE_READY; // ³É¹¦
+        return ESP8266_RESPONSE_READY; // æˆåŠŸ
     } else if (strstr(pxEspBuffer->cNetFifoBuffer, "OK") != NULL)
     {
         vNetBufferClear(pxEspBuffer);
-        return ESP8266_RESPONSE_OK; // ³É¹¦
+        return ESP8266_RESPONSE_OK; // æˆåŠŸ
     } else if (strstr(pxEspBuffer->cNetFifoBuffer, "ERROR") != NULL || 
              strstr(pxEspBuffer->cNetFifoBuffer, "FAIL") != NULL)
     {
         vNetBufferClear(pxEspBuffer);
-        return ESP8266_RESPONSE_ERROR; // Ê§°Ü
+        return ESP8266_RESPONSE_ERROR; // å¤±è´¥
     } else
     {
         /* code */
         vNetBufferClear(pxEspBuffer);
-        return ESP8266_RESPONSE_TIMEOUT; // ¼ÌĞøµÈ´ı
+        return ESP8266_RESPONSE_TIMEOUT; // ç»§ç»­ç­‰å¾…
     }
 }
 
 // /**
-//   * @brief  µÈ´ıESP8266ÏìÓ¦
-//   * @param  *pxEspBuffer ESP8266»º³åÇøÖ¸Õë
-//   * @param  xTimeout    ³¬Ê±Ê±¼ä£¨ÒÔTickType_tÎªµ¥Î»£©
-//   * @retval ÏìÓ¦×´Ì¬
+//   * @brief  ç­‰å¾…ESP8266å“åº”
+//   * @param  *pxEspBuffer ESP8266ç¼“å†²åŒºæŒ‡é’ˆ
+//   * @param  xTimeout    è¶…æ—¶æ—¶é—´ï¼ˆä»¥TickType_tä¸ºå•ä½ï¼‰
+//   * @retval å“åº”çŠ¶æ€
 //   */
-// eEsp8266Status_t xEsp8266WaitForResponse(NetFifoBuffer_t *pxEspBuffer, TickType_t xTimeout)
+// eEsp8266Status_t xEsp8266WaitForResponse(TickType_t xTimeout)
 // {
 //     TickType_t startTime = xTaskGetTickCount();
 //     while ((xTaskGetTickCount() - startTime) < xTimeout)
 //     {
-//         // ¼ì²éÏìÓ¦
+//         // æ£€æŸ¥å“åº”
 //         eEsp8266Status_t status = ucEsp8266ResHandler(pxEspBuffer);
 //         if (status != ESP8266_RESPONSE_READY)
 //         {
-//             return status; // ·µ»ØÏìÓ¦×´Ì¬
+//             return status; // è¿”å›å“åº”çŠ¶æ€
 //         }
 //     }
-//     return ESP8266_RESPONSE_TIMEOUT; // ³¬Ê±£¬¼ÌĞøµÈ´ı
+//     return ESP8266_RESPONSE_TIMEOUT; // è¶…æ—¶ï¼Œç»§ç»­ç­‰å¾…
 // }
 
 /**
-  * @brief  ¼ÇÂ¼ESP8266ÏìÓ¦ÈÕÖ¾
-  * @param  *pxEspBuffer ESP8266»º³åÇøÖ¸Õë
+  * @brief  è®°å½•ESP8266å“åº”æ—¥å¿—
+  * @param  *pxEspBuffer ESP8266ç¼“å†²åŒºæŒ‡é’ˆ
   * @retval None
   */
-void ucEsp8266Log(NetFifoBuffer_t *pxEspBuffer)
+void ucEsp8266Log()
 {
     if (ucEsp8266ResHandler(pxEspBuffer) == ESP8266_RESPONSE_READY)
     {
@@ -152,10 +154,10 @@ void ucEsp8266Log(NetFifoBuffer_t *pxEspBuffer)
 }
 
 /**
-  * @brief  Á¬½ÓWiFiÈÎÎñ         
-  * @note   ÀûÓÃFreeRTOSÖĞ¶ÏÏûÏ¢¶ÓÁĞ»úÖÆ£¬½ÓÊÕESP8266µÄÏìÓ¦Êı¾İ£¬²¢½«ÏìÓ¦Êı¾İ´æµ½ÄÚÖÃµÄFIFO»º³åÇøÄÚ¡£
-  * @note   ÎÊÌâ£º½«½ÓÊÕÏûÏ¢¶ÓÁĞº¯ÊıºÍ´¦ÀíÏìÓ¦Êı¾İº¯Êı»ìµ½Ò»¿éÁË£¬Ôì³ÉÁË´úÂëµÄÈßÓà¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬ÈôÃ»ÓĞÌØ¶¨µÄ²ÎÊıÔòÉèÖÃÎª¿ÕÖ¸Õë
+  * @brief  è¿æ¥WiFiä»»åŠ¡         
+  * @note   åˆ©ç”¨FreeRTOSä¸­æ–­æ¶ˆæ¯é˜Ÿåˆ—æœºåˆ¶ï¼Œæ¥æ”¶ESP8266çš„å“åº”æ•°æ®ï¼Œå¹¶å°†å“åº”æ•°æ®å­˜åˆ°å†…ç½®çš„FIFOç¼“å†²åŒºå†…ã€‚
+  * @note   é—®é¢˜ï¼šå°†æ¥æ”¶æ¶ˆæ¯é˜Ÿåˆ—å‡½æ•°å’Œå¤„ç†å“åº”æ•°æ®å‡½æ•°æ··åˆ°ä¸€å—äº†ï¼Œé€ æˆäº†ä»£ç çš„å†—ä½™ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œè‹¥æ²¡æœ‰ç‰¹å®šçš„å‚æ•°åˆ™è®¾ç½®ä¸ºç©ºæŒ‡é’ˆ
   * @retval None
   */
 void vTaskWifiConnection(void *pvParameters)
@@ -176,9 +178,9 @@ void vTaskWifiConnection(void *pvParameters)
                                              pdMS_TO_TICKS(100));
             if (ucRetvalQueueWifiSta == pdTRUE)
             {
-                // ½«½ÓÊÕµ½µÄ×Ö½Ú´¦Àíµ½»º³åÇø
+                // å°†æ¥æ”¶åˆ°çš„å­—èŠ‚å¤„ç†åˆ°ç¼“å†²åŒº
                 vNetBufferWrite(&espBuffer, (char)ucRetvalQueueByte);
-                // ´¦ÀíÏìÓ¦Êı¾İ
+                // å¤„ç†å“åº”æ•°æ®
                 uint8_t ucResponseStatus = ucEsp8266ResHandler(&espBuffer);
                 if (strstr(espBuffer.cNetFifoBuffer, "ready") != NULL)
                 {
@@ -221,7 +223,7 @@ void vTaskBufferRx(void *pvParameters)
                                              pdMS_TO_TICKS(100));
             if (ucRetvalQueueWifiSta == pdTRUE)
             {
-                // ½«½ÓÊÕµ½µÄ×Ö½Ú´¦Àíµ½»º³åÇø
+                // å°†æ¥æ”¶åˆ°çš„å­—èŠ‚å¤„ç†åˆ°ç¼“å†²åŒº
                 vNetBufferWrite(&espBuffer, (char)ucRetvalQueueByte);
 
             }
@@ -231,9 +233,9 @@ void vTaskBufferRx(void *pvParameters)
 }
 
 /**
-  * @brief  Á¬½ÓWiFiÈÎÎñ         
-  * @note   ÖØÖÃESP8266Ä£¿é¡£
-  * @param  *pvParameters ÈÎÎñ²ÎÊı£¬ÈôÃ»ÓĞÌØ¶¨µÄ²ÎÊıÔòÉèÖÃÎª¿ÕÖ¸Õë
+  * @brief  è¿æ¥WiFiä»»åŠ¡         
+  * @note   é‡ç½®ESP8266æ¨¡å—ã€‚
+  * @param  *pvParameters ä»»åŠ¡å‚æ•°ï¼Œè‹¥æ²¡æœ‰ç‰¹å®šçš„å‚æ•°åˆ™è®¾ç½®ä¸ºç©ºæŒ‡é’ˆ
   * @retval None
   */
 void vTaskWifiConnection(void *pvParameters)
