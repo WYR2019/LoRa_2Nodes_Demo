@@ -15,9 +15,9 @@
 #define LED_PC13_GPIO_PIN                            GPIO_Pin_13
 
 /* 变量声明 */
-void vPc13LedInit(void);
-void vPc13LedOn(void);
-void vPc13LedOff(void);
-void vPc13LedTurn(void);
+void pc13LedInit(void);
+void pc13LedOn(void);
+void pc13LedOff(void);
+void pc13LedTurn(void);
 
 #endif

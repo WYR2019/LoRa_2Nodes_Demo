@@ -3,5 +3,7 @@
     <style name="Base.Theme.LoRaEnvAssistant_AndroidApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
     </style>
 </resources>

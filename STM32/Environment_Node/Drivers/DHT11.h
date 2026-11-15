@@ -18,16 +18,16 @@
 
 typedef struct
 {
-    uint8_t ucTemp;
-    uint8_t ucHumi;
+    uint8_t temp;
+    uint8_t humi;
 } DHT11Data_t;
 
-void vDht11Mode(uint8_t ucMode);                            // DHT11引脚输出模式控制
-void vDht11Rst(void);                                       // 复位DHT11
-uint8_t vDht11Init(void);                                   // 初始化DHT11
-uint8_t vDht11Check(void);                                  // 检测DHT11
-uint8_t vDht11ReadBit(void);                                // 读取一位的数据
-uint8_t vDht11ReadByte(void);                               // 读取一个字节的数据
-uint8_t vDht11ReadData(uint8_t *pucTemp, uint8_t *pucHumi); // 读取温湿度数据
+void dht11Mode(uint8_t mode);                               // DHT11引脚输出模式控制
+void dht11Rst(void);                                        // 复位DHT11
+uint8_t dht11Init(void);                                    // 初始化DHT11
+uint8_t dht11Check(void);                                   // 检测DHT11
+uint8_t dht11ReadBit(void);                                 // 读取一位的数据
+uint8_t dht11ReadByte(void);                                // 读取一个字节的数据
+uint8_t dht11ReadData(uint8_t *temp, uint8_t *humi);        // 读取温湿度数据
 
 #endif

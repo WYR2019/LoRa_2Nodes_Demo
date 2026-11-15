@@ -23,18 +23,18 @@
 
 typedef struct 
 {
-    uint8_t ucFacUs;
-    int16_t usFacMs;
-} UcFacInit_t;
+    uint8_t facUs;
+    int16_t facMs;
+} FacInit_t;
 
-static UcFacInit_t xUcFacInit = 
+static FacInit_t facInit = 
 {
-    .ucFacUs = 0,
-    .usFacMs = 0
+    .facUs = 0,
+    .facMs = 0
 };
 
-void vDelayInit(void);
-void vDelayUs(uint32_t ulNus);
-void vDelayMs(uint16_t usNms);
+void delayInit(void);
+void delayUs(uint32_t us);
+void delayMs(uint16_t ms);
 
 #endif

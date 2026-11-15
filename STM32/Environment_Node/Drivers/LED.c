@@ -6,12 +6,12 @@
   * @param  None
   * @retval None
   */
-void vPc13LedInit(void)
+void pc13LedInit(void)
 {
     RCC_APB2PeriphClockCmd(LED_PC13_GPIO_CLOCK, ENABLE);
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Pin = LED_PC13_GPIO_PIN;                        //PC13
+    GPIO_InitStructure.GPIO_Pin = LED_PC13_GPIO_PIN;                //PC13
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(LED_PC13_GPIO_PORT, &GPIO_InitStructure);
 
@@ -24,18 +24,12 @@ void vPc13LedInit(void)
   * @param  None
   * @retval None
   */
-void vPc13LedOn(void)
+void pc13LedOn(void)
 {
     GPIO_ResetBits(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN);
 }
 
-/**
-  * @brief  熄灭PC13引脚上的LED
-  * @note   将PC13引脚输出高电平，熄灭LED。
-  * @param  None
-  * @retval None
-  */
-void vPc13LedOff(void)
+void pc13LedOff(void)
 {
     GPIO_SetBits(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN);
 }
@@ -46,15 +40,26 @@ void vPc13LedOff(void)
  * @param  None
  * @retval None
  */
-void vPc13LedTurn(void)
+void pc13LedTurn(void)
 {
-    if(GPIO_ReadOutputDataBit(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN) == 0)  //如果PC13的输出寄存器为0
+    if(GPIO_ReadOutputDataBit(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN) == 0)  //如果PA0的输出寄存器为0
     {
-        GPIO_SetBits(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN);                //将PC13置1
-    }else
+        GPIO_SetBits(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN);                //将PA0置1
+    } else
     {
         GPIO_ResetBits(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN);
     }
+}
+
+/**
+  * @brief  判断PC13电平状态
+  * @note   
+  * @param  None
+  * @retval None
+  */
+bool getPc13LedStatus(void)
+{
+    return (GPIO_ReadInputDataBit(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN) == Bit_SET);
 }
 
 /**
@@ -63,14 +68,14 @@ void vPc13LedTurn(void)
   * @param  None
   * @retval None
   */
-void vPb0LedInit(void)
+void pb0LedInit(void)
 {
     RCC_APB2PeriphClockCmd(LED_PB0_GPIO_CLOCK, ENABLE);
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Pin = LED_PB0_GPIO_PIN;                         //PB0
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(LED_PB0_GPIO_PORT,   &GPIO_InitStructure);
+    GPIO_Init(LED_PB0_GPIO_PORT, &GPIO_InitStructure);
 }
 
 /**
@@ -79,7 +84,7 @@ void vPb0LedInit(void)
   * @param  None
   * @retval None
   */
-void vPb0LedOn(void)
+void pb0LedOn(void)
 {
     GPIO_ResetBits(LED_PB0_GPIO_PORT, LED_PB0_GPIO_PIN);
 }
@@ -90,7 +95,7 @@ void vPb0LedOn(void)
   * @param  None
   * @retval None
   */
-void vPb0LedOff(void)
+void pb0LedOff(void)
 {
     GPIO_SetBits(LED_PB0_GPIO_PORT, LED_PB0_GPIO_PIN);
 }
@@ -101,7 +106,7 @@ void vPb0LedOff(void)
  * @param  None
  * @retval None
  */
-void vPb0LedTurn(void)
+void pb0LedTurn(void)
 {
     if(GPIO_ReadOutputDataBit(LED_PB0_GPIO_PORT, LED_PB0_GPIO_PIN) == 0)    //如果PB0的输出寄存器为0
     {
@@ -110,4 +115,15 @@ void vPb0LedTurn(void)
     {
         GPIO_ResetBits(LED_PB0_GPIO_PORT, LED_PB0_GPIO_PIN);
     }
+}
+
+/**
+  * @brief  判断PB0电平状态
+  * @note   
+  * @param  None
+  * @retval None
+  */
+bool getPb0LedStatus(void)
+{
+    return (GPIO_ReadInputDataBit(LED_PB0_GPIO_PORT, LED_PB0_GPIO_PIN) == Bit_SET);
 }

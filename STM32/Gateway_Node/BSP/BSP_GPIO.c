@@ -6,7 +6,7 @@
   * @param  无
   * @retval 无
   */
-void vEsp8266GpioConfig(void)
+void esp8266GpioConfig(void)
 {
     /* 定义一个GPIO_InitTypeDef类型的结构体 */
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -23,12 +23,12 @@ void vEsp8266GpioConfig(void)
 }
 
 /**
-  * @brief  vLoRaGpioConfig
+  * @brief  loRaGpioConfig
   * @note   初始化LoRa MD0引脚，以便进行参数设置。
   * @param  无
   * @retval 无
   */
-void vLoRaGpioConfig(void)
+void loRaGpioConfig(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     RCC_APB2PeriphClockCmd(LORA_MD0_CLK, ENABLE);

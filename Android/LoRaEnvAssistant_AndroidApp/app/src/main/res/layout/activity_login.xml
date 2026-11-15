@@ -16,7 +16,7 @@
             android:layout_gravity="center"
             android:layout_margin="30dp"
             android:text="欢迎使用APP"
-            android:textSize="30dp" />
+            android:textSize="30sp" />
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -29,7 +29,7 @@
         app:endIconMode="clear_text">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_tnumber"
+            android:id="@+id/et_tel_number_or_username"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -65,20 +65,19 @@
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/sw_rememberpwd"
+            android:id="@+id/sw_autologin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginEnd="30dp"
             android:layout_marginBottom="30dp"
-            android:text="记住密码" />
+            android:text="自动登录" />
 
     </RelativeLayout>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/btn_login"
@@ -88,7 +87,7 @@
             android:layout_marginRight="30dp"
             android:layout_weight="1"
             android:text="登录"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -100,10 +99,21 @@
             android:id="@+id/tv_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="30dp"
             android:layout_marginTop="15dp"
             android:text="使用账号密码注册"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tv_forgot_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="30dp"
+            android:layout_marginTop="15dp"
+            android:text="忘记密码"
+            android:textSize="15sp" />
 
     </RelativeLayout>
 

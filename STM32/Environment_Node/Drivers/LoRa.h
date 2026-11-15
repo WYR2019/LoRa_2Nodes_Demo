@@ -169,8 +169,8 @@ static LoRaExecutorID_t xLoRaExecutorID =
     .ucIdServo             = LORA_EXECUTOR_SERVO
 };
 
-void vLoRaConnectionInit(uint8_t ucNodeId);
-void vLoRaProtocolSend(uint8_t ucNodeId, uint8_t ucSensorId, uint8_t ucExeId, uint8_t ucData1, uint8_t ucData2, uint8_t ucData3);
+void vLoRaFrameHeaderSend(uint8_t ucNodeId);
+void vLoRaDataSend(uint8_t ucNodeId, uint8_t ucSensorId, uint8_t ucData1, uint8_t ucData2, uint8_t ucExeId1, uint8_t ucData3, uint8_t ucExeId2, uint8_t ucData4, uint8_t ucExeId3, uint8_t ucData5);
 eLoRaRecvStatus_t xLoRaMessageReceived(uint8_t *pucData);
 eLoRaRecvStatus_t xLoRaMsgProcess(uint8_t ucDataRecNodeId, uint8_t ucDataRecExeId, uint8_t ucDataRecExeStatus);
 

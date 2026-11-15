@@ -6,7 +6,7 @@
   * @param  None
   * @retval None
   */
-void vPc13LedInit(void)
+void pc13LedInit(void)
 {
     RCC_APB2PeriphClockCmd(LED_PC13_GPIO_CLOCK, ENABLE);
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -24,12 +24,12 @@ void vPc13LedInit(void)
   * @param  None
   * @retval None
   */
-void vPc13LedOn(void)
+void pc13LedOn(void)
 {
     GPIO_ResetBits(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN);
 }
 
-void vPc13LedOff(void)
+void pc13LedOff(void)
 {
     GPIO_SetBits(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN);
 }
@@ -40,12 +40,12 @@ void vPc13LedOff(void)
  * @param  None
  * @retval None
  */
-void vPc13LedTurn(void)
+void pc13LedTurn(void)
 {
     if(GPIO_ReadOutputDataBit(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN) == 0)  //如果PA0的输出寄存器为0
     {
         GPIO_SetBits(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN);                //将PA0置1
-    }else
+    } else
     {
         GPIO_ResetBits(LED_PC13_GPIO_PORT, LED_PC13_GPIO_PIN);
     }

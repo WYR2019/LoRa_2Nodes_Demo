@@ -1,42 +1,103 @@
 #include "Relay.h"
 
 /**
-  * @brief  PA0????????         
-  * @note   ???PA0???????????????????????
+  * @brief  PA0初始化
+  * @note   
   * @param  None
   * @retval None
   */
-void vPa0RelayInit(void)
+void pa0RelayInit(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd(PA0_RELAY_CLK, ENABLE);  //����ʱ��
-	
-    GPIO_InitStructure.GPIO_Pin = PA0_RELAY_GPIO_PIN;
+    RCC_APB2PeriphClockCmd(RELAY_PA0_CLOCK, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = RELAY_PA0_GPIO_PIN;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(PA0_RELAY_GPIO_PORT,&GPIO_InitStructure);
+    GPIO_Init(RELAY_PA0_GPIO_PORT, &GPIO_InitStructure);
 
-    vPa0RelayOff();
+    pa0RelayOff();
 }
 
 /**
-  * @brief  PA0???????         
-  * @note   ?PA0???????????????
+  * @brief  PA1初始化
+  * @note   
   * @param  None
   * @retval None
   */
-void vPa0RelayOn(void)
+void pa1RelayInit(void)
 {
-    GPIO_SetBits(PA0_RELAY_GPIO_PORT,PA0_RELAY_GPIO_PIN);
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RELAY_PA1_CLOCK, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = RELAY_PA1_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(RELAY_PA1_GPIO_PORT, &GPIO_InitStructure);
+
+    pa1RelayOff();    
 }
 
 /**
-  * @brief  PA0???????         
-  * @note   ?PA0???????????????
+  * @brief  PA0拉高电平
+  * @note   
   * @param  None
   * @retval None
   */
-void vPa0RelayOff()
+void pa0RelayOn(void)
 {
-    GPIO_ResetBits(PA0_RELAY_GPIO_PORT,PA0_RELAY_GPIO_PIN);
+    GPIO_SetBits(RELAY_PA0_GPIO_PORT, RELAY_PA0_GPIO_PIN);
+}
+
+/**
+  * @brief  PA0拉低电平
+  * @note   
+  * @param  None
+  * @retval None
+  */
+void pa0RelayOff(void)
+{
+    GPIO_ResetBits(RELAY_PA0_GPIO_PORT, RELAY_PA0_GPIO_PIN);
+}
+
+/**
+  * @brief  判断PA0电平状态
+  * @note   
+  * @param  None
+  * @retval None
+  */
+bool getPa0RelayStatus(void)
+{
+    return (GPIO_ReadInputDataBit(RELAY_PA0_GPIO_PORT, RELAY_PA0_GPIO_PIN) == Bit_SET);
+}
+
+/**
+  * @brief  PA1拉高电平
+  * @note   
+  * @param  None
+  * @retval None
+  */
+void pa1RelayOn(void)
+{
+    GPIO_SetBits(RELAY_PA1_GPIO_PORT, RELAY_PA1_GPIO_PIN);
+}
+
+/**
+  * @brief  PA1拉低电平
+  * @note   
+  * @param  None
+  * @retval None
+  */
+void pa1RelayOff(void)
+{
+    GPIO_ResetBits(RELAY_PA1_GPIO_PORT, RELAY_PA1_GPIO_PIN);
+}
+
+/**
+  * @brief  判断PA1电平状态
+  * @note   
+  * @param  None
+  * @retval None
+  */
+bool getPa1RelayStatus(void)
+{
+    return (GPIO_ReadInputDataBit(RELAY_PA1_GPIO_PORT, RELAY_PA1_GPIO_PIN) == Bit_SET);
 }

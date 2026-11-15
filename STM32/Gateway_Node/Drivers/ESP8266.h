@@ -3,8 +3,8 @@
 
 /* ESP8266 函数宏定义 */
 
-#define vEsp8266IrqHandler(void)            USART2_IRQHandler(void)
-#define vEsp8266DataTransmit(format, ...)   vUsartPrintf(USART2, format, ##__VA_ARGS__)
+#define esp8266IrqHandler(void)             USART2_IRQHandler(void)
+#define esp8266DataTransmit(format, ...)    usartPrintf(USART2, format, ##__VA_ARGS__)
 
 #define ESP8266_CH_ENABLE()                 GPIO_SetBits(ESP8266_CH_PD_PORT, ESP8266_CH_PD_PIN)
 #define ESP8266_CH_DISABLE()                GPIO_ResetBits(ESP8266_CH_PD_PORT, ESP8266_CH_PD_PIN)
@@ -13,6 +13,8 @@
 
 #define ESP8266_APSSID                      "CMCC-5bjx"                                                                                                 // 要连接的热点的名称
 #define ESP8266_APPWD                       "jp7qpqn3"                                                                                                  // 要连接的热点的密钥
+// #define ESP8266_APSSID                      "manbu"                                                                                                         // 要连接的热点的名称
+// #define ESP8266_APPWD                       "197059dlg"                                                                                                     // 要连接的热点的密钥
 #define ESP8266_ALIYUN_MQTT_IP              "iot-06z00by9al78fmz.mqtt.iothub.aliyuncs.com"
 #define ESP8266_ALIYUN_MQTT_PORT            1883
 #define ESP8266_ALIYUN_MQTT_PRODUCTKEY      "k11ilf46LJ0"
@@ -31,24 +33,26 @@
 #include "BSP_Delay.h"
 #include "BSP_GPIO.h"
 #include "BSP_USART.h"
+#include "App_LinearBuffer.h"
 
-/******************************* ESP8266 数据类型定义 ***************************/
+/******************************* ESP8266 数据类型定义 *********************************/
 typedef enum
 {
     STA,
     AP,
     STA_AP
-} eNetMode_t;
+} NetMode_t;
 
 /* ESP8266 函数声明 */
-void vEsp8266Rst(void);
-bool bEsp8266Command(char *pcCmd, char *pcAck1, char *pcAck2, uint32_t ulWaittime);
-void vEsp8266AtTest(void);
-bool bEsp8266NetModeChoose(eNetMode_t xMode);
-bool bEsp8266JoinAp(char *pcSsid, char *pcPassWord);
-bool bEsp8266MqttInit(char *pcMqttUserName, char *pcMqttPassword, char *pcMqttClientId, char *pcMqttServerIp, uint16_t usMqttServerPort, char *pcMqttSubscribeTopic);
-bool bMqttPublish(char *pcTopic, char *pcMessage);
-bool bMqttSubscribe(char *pcTopic, char *pcMessage);
+void esp8266Reset(void);
+bool isATCommandExists(char *cmd, char *ack1, char *ack2, uint32_t waitTime);
+void esp8266AtTest(void);
+bool esp8266NetModeChoose(NetMode_t mode);
+bool esp8266JoinAp(char *ssid, char *password);
+bool esp8266MqttInit(char *mqttUsername, char *mqttPassword, char *mqttClientId, 
+    char *mqttServerIp, uint16_t mqttServerPort, char *mqttSubscribeTopic);
+bool mqttPublish(char *topic, char *message);
+bool mqttSubscribe(char *topic, char *message);
 
 /* 外部全局变量 */
 

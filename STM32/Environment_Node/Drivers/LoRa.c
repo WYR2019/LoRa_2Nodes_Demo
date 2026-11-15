@@ -6,7 +6,7 @@
   * @param  ucNodeId 节点ID，如Node1，也就是D1等等。
   * @retval None
   */
-void vLoRaConnectionInit(uint8_t ucNodeId)
+void vLoRaFrameHeaderSend(uint8_t ucNodeId)
 {
     if (ucNodeId == xLoRaNode1Config.ucLoRaNode1Identifier)
     {
@@ -22,10 +22,13 @@ void vLoRaConnectionInit(uint8_t ucNodeId)
     }
 }
 
-void vLoRaProtocolSend(uint8_t ucNodeId, uint8_t ucSensorId, uint8_t ucExeId,
-                       uint8_t ucData1, uint8_t ucData2, uint8_t ucData3)
+void vLoRaDataSend(uint8_t ucNodeId, uint8_t ucSensorId,
+                   uint8_t ucData1, uint8_t ucData2, 
+                   uint8_t ucExeId1, uint8_t ucData3,
+                   uint8_t ucExeId2, uint8_t ucData4,
+                   uint8_t ucExeId3, uint8_t ucData5)
 {
-    uint8_t pucBuffer[8];                                                       // 使用局部数组代替野指针
+    uint8_t pucBuffer[13];                                                       // 使用局部数组代替野指针
     uint8_t ucSum = 0;
 
     pucBuffer[0] = 0xAA;                                                        // 帧头
@@ -33,17 +36,20 @@ void vLoRaProtocolSend(uint8_t ucNodeId, uint8_t ucSensorId, uint8_t ucExeId,
     pucBuffer[2] = ucSensorId;
     pucBuffer[3] = ucData1;
     pucBuffer[4] = ucData2;
-    pucBuffer[5] = ucExeId;
+    pucBuffer[5] = ucExeId1;
     pucBuffer[6] = ucData3;
-
+    pucBuffer[7] = ucExeId2;
+    pucBuffer[8] = ucData4;
+    pucBuffer[9] = ucExeId3;
+    pucBuffer[10] = ucData5;
     /* 计算累加和（从索引0到6累加，或将帧头包含在内，按协议规定） */
-    for (int i = 0; i < 7; i++)                                                 // 只累加前7个字节
+    for (int i = 0; i < 10; i++)                                                 // 只累加前7个字节
     {
         ucSum += pucBuffer[i];
     }
-    pucBuffer[7] = ucSum;                                                       // 存入校验和
-
-    vLoRaSendArray(pucBuffer, 8);
+    pucBuffer[11] = ucSum;                                                       // 存入校验和
+    pucBuffer[12] = 0xAB;
+    vLoRaSendArray(pucBuffer, 12);
 }
 
 /**
@@ -56,31 +62,31 @@ eLoRaRecvStatus_t xLoRaMessageReceived(uint8_t *pucData)
 {
     switch (*pucData)
     {
-        case 0xD1:
+        case LORA_NODE1_IDENTIFIER:
         return statusNode1;
     
-        case 0xD2:
+        case LORA_NODE2_IDENTIFIER:
         return statusNode2;
 
-        case 0xFA:
+        case LORA_EXECUTOR_LED:
         return statusExeLed;
 
-        case 0xFB:
+        case LORA_EXECUTOR_FAN:
         return statusExeFan;
 
-        case 0xFC:
+        case LORA_EXECUTOR_HUMIDIFIER:
         return statusExeHumidifier;
 
-        case 0xFD:
+        case LORA_EXECUTOR_BUZZER:
         return statusExeBuzzer;
 
-        case 0xFE:
+        case LORA_EXECUTOR_SERVO:
         return statusExeServo;
 
-        case 0x01:
+        case LORA_EXECUTOR_COMMAND_ON:
         return statusExeOn;
 
-        case 0x00:
+        case LORA_EXECUTOR_COMMAND_OFF:
         return statusExeOff;
 
         default:

@@ -11,17 +11,40 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 用于写入缓存数据到扩展存储卡 -->
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" /> <!-- 用于申请调用A-GPS模块 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 如果设置了target >= 28 如果需要启动后台定位则必须声明这个权限 -->
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> <!-- 如果您的应用需要后台定位权限，且有可能运行在Android Q设备上,并且设置了target>28，必须增加这个权限声明 -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="LoRaEnvAssistant_AndroidApp"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LoRaEnvAssistant_AndroidApp">
+        <activity
+            android:name=".Settings.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Accounts.VersionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Accounts.UserManualActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Accounts.ContactToDeveloperActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Accounts.AboutUsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Login.ForgotPasswordActivity"
+            android:exported="false" />
         <activity
             android:name=".Login.RegisterActivity"
             android:exported="false" />

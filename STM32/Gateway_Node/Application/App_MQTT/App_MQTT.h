@@ -17,8 +17,8 @@ typedef enum
     MQTT_CMD_HUMIDIFIER_ON,
     MQTT_CMD_HUMIDIFIER_OFF,
     MQTT_CMD_UNKNOWN = -1,
-} eMqttCmd_t;
+} MqttCmd_t;
 
-eMqttCmd_t xMqttCmdParse(char *pcTopic);
+MqttCmd_t mqttCmdParse(char *topic);
 
 #endif /* __APP_MQTT_H__ */

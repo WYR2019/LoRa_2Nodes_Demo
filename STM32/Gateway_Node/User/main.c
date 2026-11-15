@@ -10,33 +10,33 @@
 #include "App_MQTT.h"
 
 /* 创建一个新任务，需要创建任务句柄,任务句柄与任务函数一一对应。 */
-TaskHandle_t xTaskWorkStatusLedHdlr;
-TaskHandle_t xTaskNetworkInitHdlr;
-TaskHandle_t xTaskMqttPublishHdlr;
-TaskHandle_t xTaskMqttSubscribeHdlr;
-TaskHandle_t xTaskLoRaConfigQueryHdlr;
-TaskHandle_t xTaskGetDht11DataHdlr;
+TaskHandle_t taskWorkStatusLedHdlr;
+TaskHandle_t taskNetworkInitHdlr;
+TaskHandle_t taskMqttPublishHdlr;
+TaskHandle_t taskMqttSubscribeHdlr;
+TaskHandle_t taskLoRaConfigQueryHdlr;
+TaskHandle_t taskLoRaRecvFromNodesHdlr;
 
 /* 创建队列句柄 */
-QueueHandle_t xQueueUsart1IrqHdlr;
-QueueHandle_t xQueueUsart2IrqHdlr;
-QueueHandle_t xQueueUsart3IrqHdlr;
+QueueHandle_t queueUsart1IrqHdlr;
+QueueHandle_t queueUsart2IrqHdlr;
+QueueHandle_t queueUsart3IrqHdlr;
 
-extern LoRaMsgRecvData_t xLoRaMsgRecvData;
+QueueHandle_t queueLoRaRecvFromNodesHdlr;
 
 /**
   * @brief  状态指示LED任务
   * @note   通过控制PC13引脚的LED灯，实现系统状态的指示功能。
-  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @param  *parameters 任务参数，若没有特定的参数则设置为空指针
   * @retval None
   */
-void vTaskWorkStatusLed(void *pvParameters)
+void taskWorkStatusLed(void *parameters)
 {
     while(1)
     {
-        vPc13LedOn();
+        pc13LedOn();
         vTaskDelay(1000);
-        vPc13LedOff();
+        pc13LedOff();
         vTaskDelay(1000);
     }
 }
@@ -44,41 +44,38 @@ void vTaskWorkStatusLed(void *pvParameters)
 /**
   * @brief  初始化Wi-Fi模块网络任务
   * @note   通过ESP8266模块初始化MQTT协议连接。
-  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @param  *parameters 任务参数，若没有特定的参数则设置为空指针
   * @retval None
   */
-void vTaskNetworkInit(void *pvParameters)
+void taskNetworkInit(void *parameters)
 {
     while (1)
     {
-        vEsp8266AtTest();
-        if (bEsp8266NetModeChoose(STA) == pdTRUE)
+        esp8266AtTest();
+        if (esp8266NetModeChoose(STA) == pdTRUE)
         {
-            vDebugLogPrint("Set ESP8266 Net Mode Successfully.\r\n");
+            trace("Set ESP8266 Net Mode Successfully.\r\n");
         } else
         {
-            // vDebugLogPrint("Set ESP8266 Net Mode Failed.\r\n");
             continue;
         } 
-        if (bEsp8266JoinAp(ESP8266_APSSID, ESP8266_APPWD) == pdTRUE)
+        if (esp8266JoinAp(ESP8266_APSSID, ESP8266_APPWD) == pdTRUE)
         {
-            vDebugLogPrint("Wifi Join To AP Successfully.\r\n");
+            trace("Wifi Join To AP Successfully.\r\n");
         } else
         {
-            // vDebugLogPrint("Wifi Join To AP Failed.\r\n");
             continue;
         }
-        if (bEsp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENTID, 
+        if (esp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENTID, 
             ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == pdTRUE)
         {
-            vDebugLogPrint("Aliyun MQTT Init Successfully.\r\n");
+            trace("Aliyun MQTT Init Successfully.\r\n");
             /* 通知MQTT发布任务 */
-            xTaskNotifyGive(xTaskMqttPublishHdlr);
-            xTaskNotifyGive(xTaskMqttSubscribeHdlr);
+            xTaskNotifyGive(taskMqttPublishHdlr);
+            xTaskNotifyGive(taskMqttSubscribeHdlr);
             vTaskDelete(NULL);
         } else
         {
-            // vDebugLogPrint("Aliyun MQTT Init Failed.\r\n");
             continue;
         }
     }
@@ -87,124 +84,170 @@ void vTaskNetworkInit(void *pvParameters)
 /**
   * @brief  MQTT发布测试任务
   * @note   通过ESP8266模块向MQTT服务器发布测试消息。
-  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @param  *parameters 任务参数，若没有特定的参数则设置为空指针
   * @retval None
   */
-void vTaskMqttPublish(void *pvParameters)
+void taskMqttPublish(void *parameters)
 {
     /* 任务通知接收函数 */
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    char cMsg[128] = {0};
+    char msg[128] = {0};
+    BaseType_t getTemperature = 0L, getHumidity = 0L;
+    uint8_t temperature = 0, humidity = 0;
     while (1)
     {
-        vLoRaParseDataTest();
-        vTaskDelay(500);
-        snprintf(cMsg, sizeof(cMsg), "{\"node1\": [{ \"temperature\":\"%d\" , \"humidity\":\"%d\" },{ \"led\":\"off\" }]}", 
-                                        xLoRaMsgRecvData.Sensor_t.ucTemperature, xLoRaMsgRecvData.Sensor_t.ucHumidity);
-        vDebugLogPrint("Node1 Sensor:temperature:%d⁰C, humidity:%d%\r\n", xLoRaMsgRecvData.Sensor_t.ucTemperature, xLoRaMsgRecvData.Sensor_t.ucHumidity);
-        if (bMqttPublish(ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC, cMsg) == pdTRUE)
+        getTemperature = xQueueReceive(queueLoRaRecvFromNodesHdlr, &temperature, portMAX_DELAY);
+        getHumidity = xQueueReceive(queueLoRaRecvFromNodesHdlr, &humidity, portMAX_DELAY);
+        trace("MQTT temperature:%d C, humidity:%d%%\r\n", temperature, humidity);
+        vTaskDelay(300);
+        snprintf(msg, sizeof(msg), "{\"node1_info\": {\"temperature\":\"%d\" , \"humidity\":\"%d\" },{ \"led\":\"off\" }}", 
+                                        temperature, humidity);
+        if (mqttPublish(ESP8266_ALIYUN_MQTT_PUBLISH_TOPIC, msg) == pdTRUE)
         {
-            vDebugLogPrint("MQTT Publish Successfully.\r\n");
+            trace("MQTT Publish Successfully.\r\n");
         }
-//        vDebugLogPrint("MQTT Publish Failed.\r\n");
     }
 }
 
 /**
   * @brief  MQTT订阅任务
   * @note   通过ESP8266模块订阅MQTT主题并处理接收到的命令。
-  * @param  *pvParameters 任务参数，若没有特定的参数则设置为空指针
+  * @param  *parameters 任务参数，若没有特定的参数则设置为空指针
   * @retval None
   */
-void vTaskMqttSubscribe(void *pvParameters)
+void taskMqttSubscribe(void *parameters)
 {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     while (1)
     {
-        if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_ON)
+        if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_ON)
         {
-            vDebugLogPrint("Lights on\r\n");
+            trace("Lights on\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_OFF)
+        else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_OFF)
         {
-            vDebugLogPrint("Lights off\r\n");
+            trace("Lights off\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_ON)
+        else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_ON)
         {
-            vDebugLogPrint("Fan on\r\n");
+            trace("Fan on\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_OFF)
+        else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_OFF)
         {
-            vDebugLogPrint("Fan off\r\n");
+            trace("Fan off\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_ON)
+        else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_ON)
         {
-            vDebugLogPrint("Humidifier on\r\n");
+            trace("Humidifier on\r\n");
         }
-        else if (xMqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_OFF)
+        else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_OFF)
         {
-            vDebugLogPrint("Humidifier off\r\n");
+            trace("Humidifier off\r\n");
         }
         vTaskDelay(1000);
     }
 }
 
-void vTaskLoRaConfigQuery(void *pvParameters)
+void taskLoRaRecvFromNodes(void *parameters)
 {
+    LoRaRecvData_t loRaRecvData;
+    uint8_t temperature = 0, humidity = 0;
+    bool getNode1OnlineState = false, getNode2OnlineState = false;
     while (1)
     {
-        for (size_t i = 0; i < 3; i++)
+        receiveFromNodes(&loRaRecvData);
+        vTaskDelay(300);
+        getNode1OnlineState = loRaRecvData.NodeOnlineState_t.Node1OnlineState;
+        getNode2OnlineState = loRaRecvData.NodeOnlineState_t.Node2OnlineState;
+        if (getNode1OnlineState)
         {
-            vLoRaConfigQuery();
-            vTaskDelay(500);
+            trace("Node1 is online.\r\n");
+        } else
+        {
+            trace("Node1 is offline.\r\n");
         }
-        vTaskDelete(NULL);
+        if (getNode2OnlineState)
+        {
+            trace("Node2 is online.\r\n");
+        } else
+        {
+            trace("Node2 is offline.\r\n");
+        }
+        temperature = loRaRecvData.SensorData_t.temperature;
+        humidity = loRaRecvData.SensorData_t.humidity;
+        trace("temperature:%d C, humidity:%d%%\r\n", loRaRecvData.SensorData_t.temperature, loRaRecvData.SensorData_t.humidity);
+        switch (loRaRecvData.ExecutorData_t.lightStatus)
+        {
+            case 0:
+                trace("lightStatus:off\r");
+                break;
+            case 1:
+                trace("lightStatus:on\r");
+                break;
+            default:
+                trace("lightStatus:unknown\r");
+                break;
+        }
+        switch (loRaRecvData.ExecutorData_t.fanStatus)
+        {
+            case 0:
+                trace("fanStatus:off\r\n");
+                break;
+            case 1:
+                trace("fanStatus:on\r\n");
+                break;
+            default:
+                trace("fanStatus:unknown\r\n");
+                break;
+        }
+        xQueueSend(queueLoRaRecvFromNodesHdlr, &temperature, portMAX_DELAY);
+        xQueueSend(queueLoRaRecvFromNodesHdlr, &humidity, portMAX_DELAY);
     }
 }
 
-/**
+/** 
   * @brief  创建所有任务列表
   * @note   在此函数中创建所有需要的任务，并为每个任务分配适当的堆栈大小和优先级。
   * @param  None
   * @retval None
   */
-void vCreateTasksList(void)
+void createTasksList(void)
 {
-    // xTaskCreate(
-    //            (TaskFunction_t        ) vTaskWorkStatusLed,
-    //            (char *                ) "TaskName_StateLed", 
-    //            (configSTACK_DEPTH_TYPE) 128,
-    //            (void *                ) NULL, 
-    //            (UBaseType_t           ) 2,
-    //            (TaskHandle_t *        ) &xTaskWorkStatusLedHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskNetworkInit,
+               (TaskFunction_t        ) taskWorkStatusLed,
+               (char *                ) "TaskName_StateLed", 
+               (configSTACK_DEPTH_TYPE) 128,
+               (void *                ) NULL, 
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &taskWorkStatusLedHdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) taskNetworkInit,
                (char *                ) "TaskName_WifiInitMQTTProtocol", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL,
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskNetworkInitHdlr);
+               (TaskHandle_t *        ) &taskNetworkInitHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskMqttPublish,
+               (TaskFunction_t        ) taskMqttPublish,
                (char *                ) "TaskName_MqttPublishTest", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL,
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskMqttPublishHdlr);
+               (TaskHandle_t *        ) &taskMqttPublishHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskMqttSubscribe,
+               (TaskFunction_t        ) taskMqttSubscribe,
                (char *                ) "TaskName_MqttSubscribe", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL,
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskMqttSubscribeHdlr);
-//    xTaskCreate(
-//               (TaskFunction_t        ) vTaskLoRaConfigQuery,
-//               (char *                ) "TaskName_LoRaQueryTest", 
-//               (configSTACK_DEPTH_TYPE) 128,
-//               (void *                ) NULL,
-//               (UBaseType_t           ) 2,
-//               (TaskHandle_t *        ) &xTaskLoRaConfigQueryHdlr);
+               (TaskHandle_t *        ) &taskMqttSubscribeHdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) taskLoRaRecvFromNodes,
+               (char *                ) "TaskName_LoRaReceiveFromNodes", 
+               (configSTACK_DEPTH_TYPE) 512,
+               (void *                ) NULL,
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &taskLoRaRecvFromNodesHdlr);
 }
 
 /**
@@ -213,23 +256,26 @@ void vCreateTasksList(void)
   * @param  None
   * @retval None
   */
-void vCreateQueuesList(void)
+void createQueuesList(void)
 {
 #if (ENABLE_FREERTOS_API_QUEUE_USART1_IRQ == 1)
-    xQueueUsart1IrqHdlr = xQueueCreate(
+    queueUsart1IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t *));
 #endif
 #if (ENABLE_FREERTOS_API_QUEUE_USART2_IRQ == 1)
-    xQueueUsart2IrqHdlr = xQueueCreate(
+    queueUsart2IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 1024,
-                                      (UBaseType_t) sizeof(char *));
+                                      (UBaseType_t) sizeof(uint8_t *));
 #endif
 #if (ENABLE_FREERTOS_API_QUEUE_USART3_IRQ == 1)
-    xQueueUsart3IrqHdlr = xQueueCreate(
+    queueUsart3IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t *));
 #endif
+    queueLoRaRecvFromNodesHdlr = xQueueCreate(
+                                      (UBaseType_t) 64,
+                                      (UBaseType_t) sizeof(uint8_t));
 }
 
 /**
@@ -238,7 +284,7 @@ void vCreateQueuesList(void)
   * @param  None
   * @retval None
   */
-void vCreateSemaphoresList(void)
+void createSemaphoresList(void)
 {
     
 }
@@ -251,14 +297,14 @@ void vCreateSemaphoresList(void)
   */
 int main(void)
 {
-    vUsartInit(USART1, 115200);
-    vUsartInit(USART2, 115200);
-    vUsartInit(USART3, 115200);
-    vDelayInit();
-    vPc13LedInit();
-    vEsp8266GpioConfig();
-    vCreateTasksList();
-    vCreateQueuesList();
-    vCreateSemaphoresList();
+    usartInit(USART1, 115200);
+    usartInit(USART2, 115200);
+    usartInit(USART3, 115200);
+    delayInit();
+    pc13LedInit();
+    esp8266GpioConfig();
+    createTasksList();
+    createQueuesList();
+    createSemaphoresList();
     vTaskStartScheduler();
 }

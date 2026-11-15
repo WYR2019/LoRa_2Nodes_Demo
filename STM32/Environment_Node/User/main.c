@@ -10,15 +10,15 @@
 #include "semphr.h"
 
 /* 在创建任务前，需要创建一个任务句柄，每个任务句柄与任务一一对应。 */
-TaskHandle_t xTaskStateLedHdlr;
-TaskHandle_t xTaskDht11Hdlr;
-TaskHandle_t xTaskLoRaSendHdlr;
-TaskHandle_t xTaskLoRaRecHdlr;
-TaskHandle_t xTaskDebugLogHdlr;
+TaskHandle_t taskWorkStateLedHdlr;
+TaskHandle_t taskDht11Hdlr;
+TaskHandle_t taskLoRaSendHdlr;
+TaskHandle_t taskLoRaReceiveHdlr;
+TaskHandle_t taskTraceHdlr;
 
 /* 创建队列句柄 */
-QueueHandle_t xQueueTempHdlr;
-QueueHandle_t xQueueHumiHdlr;
+QueueHandle_t queueTempHdlr;
+QueueHandle_t queueHumiHdlr;
 #if ENABLE_FREERTOS_API_QUEUE_USART1_IRQ
     QueueHandle_t xQueueUsart1IrqHdlr;
 #endif
@@ -30,24 +30,26 @@ QueueHandle_t xQueueHumiHdlr;
 #endif
 
 /* 创建二值信号量句柄 */
-SemaphoreHandle_t xSemLedOnHdlr;
-SemaphoreHandle_t xSemLedOffHdlr;
-SemaphoreHandle_t xSemFanOnHdlr;
-SemaphoreHandle_t xSemFanOffHdlr;
+SemaphoreHandle_t semLedOnHdlr;
+SemaphoreHandle_t semLedOffHdlr;
+SemaphoreHandle_t semFanOnHdlr;
+SemaphoreHandle_t semFanOffHdlr;
+SemaphoreHandle_t semHumidifierOnHdlr;
+SemaphoreHandle_t semHumidifierOffHdlr;
 
 /**
   * @brief  LED状态指示任务函数
   * @note   通过LED的闪烁状态指示系统运行状态。
-  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @param  *parameters 任务参数，未使用，传入NULL。
   * @retval None
   */
-void vTaskStateLed(void *pvParameters)
+void taskWorkStateLed(void *parameters)
 {
     while(1)
     {
-        vPc13LedOn();
+        pc13LedOn();
         vTaskDelay(1000);
-        vPc13LedOff();
+        pc13LedOff();
         vTaskDelay(1000);
     }
 }
@@ -55,24 +57,24 @@ void vTaskStateLed(void *pvParameters)
 /**
   * @brief  DHT11数据读取任务函数
   * @note   定期读取DHT11传感器的数据，并将温度和湿度数据发送到相应的队列。
-  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @param  *parameters 任务参数，未使用，传入NULL。
   * @retval None
   */
-void vTaskDht11(void *pvParameters)
+void taskDht11(void *parameters)
 {
-    DHT11Data_t xDHT11Data;
+    DHT11Data_t dht11Data;
     /* 数据存储数组。要求与队列参数设置大小一一对应。 */
-    uint8_t ucQueueTempData = 0, ucQueueHumiData = 0;
+    uint8_t putTemp = 0, putHumi = 0;
     while (1)
     {
         /* 读取成功处理 */
-        if (vDht11ReadData(&xDHT11Data.ucTemp, &xDHT11Data.ucHumi) == 0)
+        if (dht11ReadData(&dht11Data.temp, &dht11Data.humi) == 0)
         {
-            ucQueueTempData = xDHT11Data.ucTemp;
-            ucQueueHumiData = xDHT11Data.ucHumi;
+            putTemp = dht11Data.temp;
+            putHumi = dht11Data.humi;
             /* 写队列。第一个参数是队列句柄，第二个是写入队列的地址（如数组），第三个是因队列满造成阻塞时的等待时长，也就是无法写入数据时的等待时长，以操作系统默认时钟节拍为准。 */
-            xQueueSend(xQueueTempHdlr, &ucQueueTempData, pdMS_TO_TICKS(10));
-            xQueueSend(xQueueHumiHdlr, &ucQueueHumiData, pdMS_TO_TICKS(10));
+            xQueueSend(queueTempHdlr, &putTemp, pdMS_TO_TICKS(10));
+            xQueueSend(queueHumiHdlr, &putHumi, pdMS_TO_TICKS(10));
         }
     }
 }
@@ -80,36 +82,51 @@ void vTaskDht11(void *pvParameters)
 /**
   * @brief  LoRa数据发送任务函数
   * @note   从温湿度队列接收数据，并通过LoRa模块发送到网关。同时处理执行器的控制信号。
-  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @param  *parameters 任务参数，未使用，传入NULL。
   * @retval None
   */
-void vTaskLoRaSend(void *pvParameters)
+void taskLoRaSend(void *parameters)
 {
     /* 定义一个返回值判断是否接收成功 */
-    BaseType_t xRetvalQueueTemp, xRetvalQueueHumi;
-    uint8_t ucRecTempData = 0, ucRecHumiData = 0;
-    uint8_t ucCommand = LORA_EXECUTOR_COMMAND_OFF;
+    BaseType_t getTemp = 0, getHumi = 0;
+    uint8_t temp = 0, humi = 0;
+    uint8_t commandLed = LORA_EXECUTOR_COMMAND_OFF;
+    uint8_t commandFan = LORA_EXECUTOR_COMMAND_OFF;
+    uint8_t commandHumidifier = LORA_EXECUTOR_COMMAND_OFF;
     while (1)
     {
         /* 接收队列：队列句柄、传输转存的目标变量或数组和未接收到数据的等待时长，分3种情况，分别为0、0~portMAX_DELAY和portMAX_DELAY三种，分别对应
          * 一点不等、等一点时间和等最大时间。在等待队列数据的情况下，该接收队列所在的任务会一直处于阻塞态。
          */
-        xRetvalQueueTemp = xQueueReceive(xQueueTempHdlr, &ucRecTempData, pdMS_TO_TICKS(10));
-        xRetvalQueueHumi = xQueueReceive(xQueueHumiHdlr, &ucRecHumiData, pdMS_TO_TICKS(10));
+        getTemp = xQueueReceive(queueTempHdlr, &temp, pdMS_TO_TICKS(10));
+        getHumi = xQueueReceive(queueHumiHdlr, &humi, pdMS_TO_TICKS(10));
         /* LoRa通信连接字 */
-        vLoRaConnectionInit(xLoRaGateConfig.ucLoRaGateIdentifier);
+        vLoRaFrameHeaderSend(xLoRaGateConfig.ucLoRaGateIdentifier);
         /* 检测接收队列是否成功 */
-        if (xRetvalQueueTemp == pdTRUE && xRetvalQueueHumi == pdTRUE)
+        if (getTemp == pdTRUE && getHumi == pdTRUE)
         {
-            vLoRaProtocolSend(xLoRaNode1Config.ucLoRaNode1Identifier, xLoRaSensorID.ucIdDht11, xLoRaExecutorID.ucIdLed, ucRecTempData, ucRecHumiData, ucCommand);
+            vLoRaDataSend(xLoRaNode1Config.ucLoRaNode1Identifier, xLoRaSensorID.ucIdDht11, temp, humi, xLoRaExecutorID.ucIdLed, commandLed, xLoRaExecutorID.ucIdFan, commandFan, xLoRaExecutorID.ucIdHumidifier, commandHumidifier);
             vTaskDelay(1000);
         }
-        if (xSemaphoreTake(xSemLedOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
+        if (xSemaphoreTake(semLedOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
-            ucCommand = LORA_EXECUTOR_COMMAND_ON;
-        } else if (xSemaphoreTake(xSemLedOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
+            commandLed = LORA_EXECUTOR_COMMAND_ON;
+        } else if (xSemaphoreTake(semLedOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
-            ucCommand = LORA_EXECUTOR_COMMAND_OFF;
+            commandLed = LORA_EXECUTOR_COMMAND_OFF;
+        } 
+        else if (xSemaphoreTake(semFanOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
+        {
+            commandFan = LORA_EXECUTOR_COMMAND_ON;
+        } else if (xSemaphoreTake(semFanOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
+        {
+            commandFan = LORA_EXECUTOR_COMMAND_OFF;
+        } else if (xSemaphoreTake(semHumidifierOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
+        {
+            commandHumidifier = LORA_EXECUTOR_COMMAND_ON;
+        } else if (xSemaphoreTake(semHumidifierOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
+        {
+            commandHumidifier = LORA_EXECUTOR_COMMAND_OFF;
         }
         vTaskDelay(500);
     }
@@ -118,60 +135,104 @@ void vTaskLoRaSend(void *pvParameters)
 /**
   * @brief  LoRa消息接收并处理任务函数
   * @note   从USART3接收LoRa模块传输的执行器控制消息，并根据信号量控制相应的执行器状态。
-  * @param  *pvParameters 任务参数，未使用，传入NULL。
+  * @param  *parameters 任务参数，未使用，传入NULL。
   * @retval None
   */
-void vTaskLoRaReceived(void *pvParameters)
+void taskLoRaReceived(void *parameters)
 {
-    uint8_t ucDataRecNodeId = 0, ucDataRecExeId = 0, ucDataRecExeSta = 0;
-    uint8_t ucRetvalQueueNodeId = 0, ucRetvalQueueExeId = 0, ucRetvalQueueExeSta = 0;
+    uint8_t gatewayId = 0, executorId = 0, executorState = 0;
+    uint8_t getGatewayId = 0, getGatewayExecutorId = 0, getGatewayExecutorState = 0;
     while (1)
     {
-        ucRetvalQueueNodeId = xQueueReceive(xQueueUsart3IrqHdlr, &ucDataRecNodeId, portMAX_DELAY);
-        ucRetvalQueueExeId = xQueueReceive(xQueueUsart3IrqHdlr, &ucDataRecExeId, portMAX_DELAY);
-        ucRetvalQueueExeSta = xQueueReceive(xQueueUsart3IrqHdlr, &ucDataRecExeSta, portMAX_DELAY);
-        while (ucRetvalQueueNodeId == pdTRUE && ucRetvalQueueExeId == pdTRUE && ucRetvalQueueExeSta == pdTRUE)
+        getGatewayId = xQueueReceive(xQueueUsart3IrqHdlr, &gatewayId, portMAX_DELAY);
+        getGatewayExecutorId = xQueueReceive(xQueueUsart3IrqHdlr, &executorId, portMAX_DELAY);
+        getGatewayExecutorState = xQueueReceive(xQueueUsart3IrqHdlr, &executorState, portMAX_DELAY);
+        while (getGatewayId == pdTRUE && getGatewayExecutorId == pdTRUE && getGatewayExecutorState == pdTRUE)
         {
-            if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusLedOn)
+            if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusLedOn)
             {
-                vPc13LedOn();
-                xSemaphoreGive(xSemLedOnHdlr);
-            } else if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusLedOff)
+                pc13LedOn();
+                if (getPc13LedStatus())
+                {
+                    xSemaphoreGive(semLedOnHdlr);
+                } else
+                {
+                    vDebugLogPrint("Can't turn on the LED.");
+                }
+            } else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusLedOff)
             {
-                vPc13LedOff();
-                xSemaphoreGive(xSemLedOffHdlr);
-            } else if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusFanOn)
+                pc13LedOff();
+                if (!getPc13LedStatus())
+                {
+                    xSemaphoreGive(semLedOffHdlr);
+                } else
+                {
+                    vDebugLogPrint("Can't turn off the LED.");
+                }
+            } 
+            else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusFanOn)
             {
-                vFanOn();
-                xSemaphoreGive(xSemFanOnHdlr);
-            } else if (xLoRaMsgProcess(ucDataRecNodeId, ucDataRecExeId, ucDataRecExeSta) == statusFanOn)
+                fanOn();
+                if (getPa0RelayStatus())
+                {
+                    xSemaphoreGive(semFanOnHdlr);
+                } else
+                {
+                    vDebugLogPrint("Can't turn on the fan.");
+                }
+            } else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusFanOff)
             {
-                vFanOff();
-                xSemaphoreGive(xSemFanOffHdlr);
+                fanOff();
+                if (!getPa0RelayStatus())
+                {
+                    xSemaphoreGive(semFanOffHdlr);
+                } else
+                {
+                    vDebugLogPrint("Can't turn off the fan.");
+                }
+            } else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusHumidifierOn)
+            {
+                xSemaphoreGive(semHumidifierOnHdlr);
+                if (!getPa0RelayStatus())
+                {
+                    xSemaphoreGive(semHumidifierOnHdlr);
+                } else
+                {
+                    vDebugLogPrint("Can't turn on the humifidier.");
+                }
+            } else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusHumidifierOff)
+            {
+                if (!getPa0RelayStatus())
+                {
+                    xSemaphoreGive(semHumidifierOffHdlr);
+                } else
+                {
+                    vDebugLogPrint("Can't turn off the humifidier.");
+                }
             }
             break;
         }
     }
 }
 
-void vTaskDebugLog(void *pvParameters)
+void taskTrace(void *parameters)
 {
-    char cBuffer[50];
-    uint8_t ucRecTempData = 0, ucRecHumiData = 0;
+    char buffer[50];
+    uint8_t temp = 0, humi = 0;
     /* 定义一个返回值判断是否接收成功 */
-    BaseType_t xRetvalQueueTemp, xRetvalQueueHumi;
+    BaseType_t getTemp = 0L, getHumi = 0L;
     while (1)
     {
         /* 接收队列：队列句柄、传输转存的目标变量或数组和未接收到数据的等待时长，分3种情况，分别为0、0~portMAX_DELAY和portMAX_DELAY三种，分别对应
          * 一点不等、等一点时间和等最大时间。在等待队列数据的情况下，该接收队列所在的任务会一直处于阻塞态。
          */
-        xRetvalQueueTemp = xQueueReceive(xQueueTempHdlr, &ucRecTempData, pdMS_TO_TICKS(10));
-        xRetvalQueueHumi = xQueueReceive(xQueueHumiHdlr, &ucRecHumiData, pdMS_TO_TICKS(10));
+        getTemp = xQueueReceive(queueTempHdlr, &temp, pdMS_TO_TICKS(10));
+        getHumi = xQueueReceive(queueHumiHdlr, &humi, pdMS_TO_TICKS(10));
         /* 检测接收队列是否成功 */
-        if (xRetvalQueueTemp == pdTRUE && xRetvalQueueHumi == pdTRUE)
+        if (getTemp == pdTRUE && getHumi == pdTRUE)
         {
-            snprintf(cBuffer, sizeof(cBuffer), "Temp=%d, Humi=%d\r\n", ucRecTempData, ucRecHumiData);
-            vDebugLogPrint(cBuffer);
+            snprintf(buffer, sizeof(buffer), "Temp=%d, Humi=%d\r\n", temp, humi);
+            vDebugLogPrint(buffer);
             vTaskDelay(1000);
         }
     }
@@ -183,44 +244,44 @@ void vTaskDebugLog(void *pvParameters)
   * @param  None
   * @retval None
   */
-void vCreateTasksList(void)
+void createTasksList(void)
 {
     /* 创建任务，参数分别为任务函数名称、任务名字、栈大小、返回参数值、优先级、任务句柄。 */
 //    xTaskCreate(
-//               (TaskFunction_t        ) vTaskStateLed,
+//               (TaskFunction_t        ) taskWorkStateLed,
 //               (char *                ) "TaskName_StateLed", 
 //               (configSTACK_DEPTH_TYPE) 128,
 //               (void *                ) NULL, 
 //               (UBaseType_t           ) 2,
-//               (TaskHandle_t *        ) &xTaskStateLedHdlr);
+//               (TaskHandle_t *        ) &taskWorkStateLedHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskDht11,
+               (TaskFunction_t        ) taskDht11,
                (char *                ) "TaskName_DHT11", 
                (configSTACK_DEPTH_TYPE) 256,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskDht11Hdlr);
+               (TaskHandle_t *        ) &taskDht11Hdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskLoRaSend,
+               (TaskFunction_t        ) taskLoRaSend,
                (char *                ) "TaskName_LoRaSendToGateNode", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskLoRaSendHdlr);
+               (TaskHandle_t *        ) &taskLoRaSendHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskLoRaReceived,
+               (TaskFunction_t        ) taskLoRaReceived,
                (char *                ) "TaskName_LoRaReceivedMessage", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskLoRaRecHdlr);
+               (TaskHandle_t *        ) &taskLoRaReceiveHdlr);
     xTaskCreate(
-               (TaskFunction_t        ) vTaskDebugLog,
-               (char *                ) "TaskName_DebugLog", 
+               (TaskFunction_t        ) taskTrace,
+               (char *                ) "TaskName_DebugTrace", 
                (configSTACK_DEPTH_TYPE) 512,
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &xTaskDebugLogHdlr);
+               (TaskHandle_t *        ) &taskTraceHdlr);
 }
 
 /**
@@ -229,25 +290,20 @@ void vCreateTasksList(void)
   * @param  None
   * @retval None
   */
-void vCreateQueuesList(void)
+void createQueuesList(void)
 {
     /* 创建队列有两个参数，第一个是队列的长度,也就是这个队列能存放多少个数据；
      * 第二个参数就是每个数据的大小，单位为字节，在stm32中uint8_t指针的长度一般是4字节。
      * 原函数的返回值就是队列句柄的结构体，所以需要在上面定义一个变量接收队列句柄。 */
-    xQueueTempHdlr      = xQueueCreate(
+    queueTempHdlr      = xQueueCreate(
                                       (UBaseType_t) 5,
                                       (UBaseType_t) sizeof(uint8_t));
-    xQueueHumiHdlr      = xQueueCreate(
+    queueHumiHdlr      = xQueueCreate(
                                       (UBaseType_t) 5,
                                       (UBaseType_t) sizeof(uint8_t));
     xQueueUsart3IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
-                                      (UBaseType_t) sizeof(uint8_t *));
-//    if (xQueueTempHdlr == NULL || xQueueHumiHdlr == NULL || xQueueUsart3IrqHdlr == NULL)
-//    {
-//        /* code */
-//        vDebugLogPrint("Queue Init Failed.\r\n");
-//    }
+                                      (UBaseType_t) sizeof(uint8_t));
     configASSERT(xQueueUsart3IrqHdlr != NULL);
 }
 
@@ -257,12 +313,12 @@ void vCreateQueuesList(void)
   * @param  None
   * @retval None
   */
-void vCreateSemaphoresList(void)
+void createSemaphoresList(void)
 {
-    xSemLedOnHdlr  = xSemaphoreCreateBinary();
-    xSemLedOffHdlr = xSemaphoreCreateBinary();
-    xSemFanOnHdlr  = xSemaphoreCreateBinary();
-    xSemFanOffHdlr = xSemaphoreCreateBinary();
+    semLedOnHdlr  = xSemaphoreCreateBinary();
+    semLedOffHdlr = xSemaphoreCreateBinary();
+    semFanOnHdlr  = xSemaphoreCreateBinary();
+    semFanOffHdlr = xSemaphoreCreateBinary();
 }
 
 /**
@@ -273,15 +329,16 @@ void vCreateSemaphoresList(void)
   */
 int main(void)
 {
-    vFanRelayInit();
-    vDelayInit();
-    vPc13LedInit();
-    vPb0LedInit();
+    fanRelayInit();
+    humidifierRelayInit();
+    delayInit();
+    pc13LedInit();
+    pb0LedInit();
     vUsartInit(USART1, 115200);
     vUsartInit(USART3, 115200);
-    vCreateQueuesList();
-    vCreateSemaphoresList();
-    vCreateTasksList();
+    createQueuesList();
+    createSemaphoresList();
+    createTasksList();
     vTaskStartScheduler();
     while(1)
     {

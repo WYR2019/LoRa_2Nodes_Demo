@@ -3,6 +3,7 @@
 #define __LED_H__
 
 #include "stm32f10x.h"                              // Device header
+#include <stdbool.h>
 
 /* PC13LED的设置 */
 #define LED_PC13_GPIO_CLOCK                         RCC_APB2Periph_GPIOC
@@ -15,13 +16,15 @@
 #define LED_PB0_GPIO_PIN                            GPIO_Pin_0
 
 /* 变量声明 */
-void vPc13LedInit(void);
-void vPc13LedOn(void);
-void vPc13LedOff(void);
-void vPc13LedTurn(void);
-void vPb0LedInit(void);
-void vPb0LedOn(void);
-void vPb0LedOff(void);
-void vPb0LedTurn(void);
+void pc13LedInit(void);
+void pc13LedOn(void);
+void pc13LedOff(void);
+void pc13LedTurn(void);
+bool getPc13LedStatus(void);
+void pb0LedInit(void);
+void pb0LedOn(void);
+void pb0LedOff(void);
+void pb0LedTurn(void);
+bool getPb0LedStatus(void);
 
 #endif

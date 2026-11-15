@@ -3,6 +3,9 @@
     <style name="Base.Theme.LoRaEnvAssistant_AndroidApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+<!--        <item name="colorPrimary">@color/colorPrimary</item>-->
+<!--        <item name="android:windowBackground">@color/colorBackground</item>-->
     </style>
 
     <style name="Theme.LoRaEnvAssistant_AndroidApp" parent="Base.Theme.LoRaEnvAssistant_AndroidApp" />

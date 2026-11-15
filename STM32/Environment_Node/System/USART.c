@@ -106,7 +106,7 @@ void vUsartInit(USART_TypeDef *xUsartId, uint32_t ulBaudrate)
         USART_Init(USART3, &USART_InitStructure);
                                                                                                             // 上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
         USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);                                                      // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
-        USART_ITConfig(USART3, USART_IT_IDLE, ENABLE);                                                      // 使能串口总线空闲中断    
+        // USART_ITConfig(USART3, USART_IT_IDLE, ENABLE);                                                      // 使能串口总线空闲中断    
         NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);                                                     // 分组，分组4为4bit抢占优先级和0bit响应优先级，抢占优先级可设置为0-15。由于FreeRTOS没有响应优先级，而优先级分组4相当于4位抢占优先级和0位响应优先级。
         NVIC_InitTypeDef NVIC_InitStructure;                                                                // 初始化NVIC的USART1通道
         NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;                                                   // 中断通道

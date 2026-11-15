@@ -341,7 +341,7 @@
               <MiscControls>--no-multibyte-chars</MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\SystemFiles;.\Libraries\inc;.\User;.\BSP;.\Drivers;.\FreeRTOS\inc;.\FreeRTOS\portable\RVDS\ARM_CM3;.\FreeRTOS\config;.\Application\NetFIFO;.\Application\App_MQTT</IncludePath>
+              <IncludePath>.\SystemFiles;.\Libraries\inc;.\User;.\BSP;.\Drivers;.\FreeRTOS\inc;.\FreeRTOS\portable\RVDS\ARM_CM3;.\FreeRTOS\config;.\Application\NetFIFO;.\Application\App_MQTT;.\Application\App_CircularBuffer;.\Application\App_LinearBuffer</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -745,6 +745,11 @@
               <FileType>5</FileType>
               <FilePath>.\Drivers\LoRa.h</FilePath>
             </File>
+            <File>
+              <FileName>LoRa_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\LoRa_cfg.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -924,6 +929,21 @@
               <FileName>App_MQTT.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Application\App_MQTT\App_MQTT.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/App_LinearBuffer</GroupName>
+          <Files>
+            <File>
+              <FileName>App_LinearBuffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\App_LinearBuffer\App_LinearBuffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_LinearBuffer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Application\App_LinearBuffer\App_LinearBuffer.h</FilePath>
             </File>
           </Files>
         </Group>

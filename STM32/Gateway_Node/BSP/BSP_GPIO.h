@@ -13,7 +13,7 @@
 
 #include "stm32f10x.h"                  // Device header
 
-void vEsp8266GpioConfig(void);
-void vLoRaGpioConfig(void);
+void esp8266GpioConfig(void);
+void loRaGpioConfig(void);
 
 #endif
