@@ -15,10 +15,15 @@ TaskHandle_t taskDht11Hdlr;
 TaskHandle_t taskLoRaSendHdlr;
 TaskHandle_t taskLoRaReceiveHdlr;
 TaskHandle_t taskTraceHdlr;
+TaskHandle_t taskTempAndHumiCtrlHdlr;
 
 /* 创建队列句柄 */
 QueueHandle_t queueTempHdlr;
 QueueHandle_t queueHumiHdlr;
+QueueHandle_t queueTempMaxHdlr;
+QueueHandle_t queueTempMinHdlr;
+QueueHandle_t queueHumiMaxHdlr;
+QueueHandle_t queueHumiMinHdlr;
 #if ENABLE_FREERTOS_API_QUEUE_USART1_IRQ
     QueueHandle_t xQueueUsart1IrqHdlr;
 #endif
@@ -38,9 +43,9 @@ SemaphoreHandle_t semHumidifierOnHdlr;
 SemaphoreHandle_t semHumidifierOffHdlr;
 
 /**
-  * @brief  LED状态指示任务函数
-  * @note   通过LED的闪烁状态指示系统运行状态。
-  * @param  *parameters 任务参数，未使用，传入NULL。
+  * @brief  LED 状态指示任务函数
+  * @note   通过 LED 的闪烁状态指示系统运行状态。
+  * @param  *parameters 任务参数，未使用，传入 NULL 。
   * @retval None
   */
 void taskWorkStateLed(void *parameters)
@@ -55,26 +60,26 @@ void taskWorkStateLed(void *parameters)
 }
 
 /**
-  * @brief  DHT11数据读取任务函数
-  * @note   定期读取DHT11传感器的数据，并将温度和湿度数据发送到相应的队列。
-  * @param  *parameters 任务参数，未使用，传入NULL。
+  * @brief  DHT11 数据读取任务函数
+  * @note   定期读取 DHT11 传感器的数据，并将温度和湿度数据发送到相应的队列。
+  * @param  *parameters 任务参数，未使用，传入 NULL 。
   * @retval None
   */
 void taskDht11(void *parameters)
 {
     DHT11Data_t dht11Data;
     /* 数据存储数组。要求与队列参数设置大小一一对应。 */
-    uint8_t putTemp = 0, putHumi = 0;
+    uint8_t temp = 0, humi = 0;
     while (1)
     {
         /* 读取成功处理 */
         if (dht11ReadData(&dht11Data.temp, &dht11Data.humi) == 0)
         {
-            putTemp = dht11Data.temp;
-            putHumi = dht11Data.humi;
+            temp = dht11Data.temp;
+            humi = dht11Data.humi;
             /* 写队列。第一个参数是队列句柄，第二个是写入队列的地址（如数组），第三个是因队列满造成阻塞时的等待时长，也就是无法写入数据时的等待时长，以操作系统默认时钟节拍为准。 */
-            xQueueSend(queueTempHdlr, &putTemp, pdMS_TO_TICKS(10));
-            xQueueSend(queueHumiHdlr, &putHumi, pdMS_TO_TICKS(10));
+            xQueueSend(queueTempHdlr, &temp, pdMS_TO_TICKS(10));
+            xQueueSend(queueHumiHdlr, &humi, pdMS_TO_TICKS(10));
         }
     }
 }
@@ -88,19 +93,19 @@ void taskDht11(void *parameters)
 void taskLoRaSend(void *parameters)
 {
     /* 定义一个返回值判断是否接收成功 */
-    BaseType_t getTemp = 0, getHumi = 0;
+    BaseType_t getTemp = 0L, getHumi = 0L;
     uint8_t temp = 0, humi = 0;
     uint8_t commandLed = LORA_EXECUTOR_COMMAND_OFF;
     uint8_t commandFan = LORA_EXECUTOR_COMMAND_OFF;
     uint8_t commandHumidifier = LORA_EXECUTOR_COMMAND_OFF;
     while (1)
     {
-        /* 接收队列：队列句柄、传输转存的目标变量或数组和未接收到数据的等待时长，分3种情况，分别为0、0~portMAX_DELAY和portMAX_DELAY三种，分别对应
+        /* 接收队列：队列句柄、传输转存的目标变量或数组和未接收到数据的等待时长，分3种情况，分别为 0 、0 ~ portMAX_DELAY 和 portMAX_DELAY 三种，分别对应
          * 一点不等、等一点时间和等最大时间。在等待队列数据的情况下，该接收队列所在的任务会一直处于阻塞态。
          */
         getTemp = xQueueReceive(queueTempHdlr, &temp, pdMS_TO_TICKS(10));
         getHumi = xQueueReceive(queueHumiHdlr, &humi, pdMS_TO_TICKS(10));
-        /* LoRa通信连接字 */
+        /* LoRa 通信连接字 */
         vLoRaFrameHeaderSend(xLoRaGateConfig.ucLoRaGateIdentifier);
         /* 检测接收队列是否成功 */
         if (getTemp == pdTRUE && getHumi == pdTRUE)
@@ -114,8 +119,7 @@ void taskLoRaSend(void *parameters)
         } else if (xSemaphoreTake(semLedOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
             commandLed = LORA_EXECUTOR_COMMAND_OFF;
-        } 
-        else if (xSemaphoreTake(semFanOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
+        } else if (xSemaphoreTake(semFanOnHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
         {
             commandFan = LORA_EXECUTOR_COMMAND_ON;
         } else if (xSemaphoreTake(semFanOffHdlr, pdMS_TO_TICKS(10)) == pdTRUE)
@@ -133,15 +137,25 @@ void taskLoRaSend(void *parameters)
 }
 
 /**
-  * @brief  LoRa消息接收并处理任务函数
-  * @note   从USART3接收LoRa模块传输的执行器控制消息，并根据信号量控制相应的执行器状态。
-  * @param  *parameters 任务参数，未使用，传入NULL。
+  * @brief  LoRa 消息接收并处理任务函数
+  * @note   从 USART3 接收 LoRa 模块传输的执行器控制消息，并根据信号量控制相应的执行器状态。
+  * @param  *parameters 任务参数，未使用，传入 NULL 。
   * @retval None
   */
 void taskLoRaReceived(void *parameters)
 {
     uint8_t gatewayId = 0, executorId = 0, executorState = 0;
     uint8_t getGatewayId = 0, getGatewayExecutorId = 0, getGatewayExecutorState = 0;
+    
+    /* 温度自动控制配置 */
+    uint8_t tempControlEnabled = 0;
+    uint8_t tempMin = 0;
+    uint8_t tempMax = 0;
+
+    /* 湿度自动控制配置 */
+    uint8_t humiControlEnabled = 0;
+    uint8_t humiMin = 0;
+    uint8_t humiMax = 0;
     while (1)
     {
         getGatewayId = xQueueReceive(xQueueUsart3IrqHdlr, &gatewayId, portMAX_DELAY);
@@ -152,22 +166,22 @@ void taskLoRaReceived(void *parameters)
             if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusLedOn)
             {
                 pc13LedOn();
-                if (getPc13LedStatus())
+                if (!getPc13LedStatus())
                 {
                     xSemaphoreGive(semLedOnHdlr);
                 } else
                 {
-                    vDebugLogPrint("Can't turn on the LED.");
+                    trace("Can't turn on the LED.\r\n");
                 }
             } else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusLedOff)
             {
                 pc13LedOff();
-                if (!getPc13LedStatus())
+                if (getPc13LedStatus())
                 {
                     xSemaphoreGive(semLedOffHdlr);
                 } else
                 {
-                    vDebugLogPrint("Can't turn off the LED.");
+                    trace("Can't turn off the LED.\r\n");
                 }
             } 
             else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusFanOn)
@@ -178,7 +192,7 @@ void taskLoRaReceived(void *parameters)
                     xSemaphoreGive(semFanOnHdlr);
                 } else
                 {
-                    vDebugLogPrint("Can't turn on the fan.");
+                    trace("Can't turn on the fan.\r\n");
                 }
             } else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusFanOff)
             {
@@ -188,7 +202,7 @@ void taskLoRaReceived(void *parameters)
                     xSemaphoreGive(semFanOffHdlr);
                 } else
                 {
-                    vDebugLogPrint("Can't turn off the fan.");
+                    trace("Can't turn off the fan.\r\n");
                 }
             } else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusHumidifierOn)
             {
@@ -198,7 +212,7 @@ void taskLoRaReceived(void *parameters)
                     xSemaphoreGive(semHumidifierOnHdlr);
                 } else
                 {
-                    vDebugLogPrint("Can't turn on the humifidier.");
+                    trace("Can't turn on the humifidier.\r\n");
                 }
             } else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusHumidifierOff)
             {
@@ -207,11 +221,113 @@ void taskLoRaReceived(void *parameters)
                     xSemaphoreGive(semHumidifierOffHdlr);
                 } else
                 {
-                    vDebugLogPrint("Can't turn off the humifidier.");
+                    trace("Can't turn off the humifidier.\r\n");
+                }
+            } else if (xLoRaMsgProcess(gatewayId, executorId, executorState) == statusExeEnvControlOn)
+            {
+                /*
+                 * extra[0]：目标执行器
+                 * extra[1]：下限
+                 * extra[2]：上限
+                 */
+                uint8_t extra[3];
+                uint8_t i;
+                BaseType_t complete = pdTRUE;
+
+                for (i = 0; i < 3; i++)
+                {
+                    if (xQueueReceive(xQueueUsart3IrqHdlr,
+                          &extra[i],
+                          pdMS_TO_TICKS(100)) != pdTRUE)
+                    {
+                        complete = pdFALSE;
+                        trace("Data receive failed!\r\n");
+                        break;
+                    }
+                }
+
+                /* 必须收齐参数并校验成功，才更新原来的配置。 */
+                if (complete == pdTRUE && extra[1] < extra[2])
+                {
+                    if (extra[0] == LORA_EXECUTOR_FAN)
+                    {
+                        /*
+                         * 这里以 DHT11 的常见温度量程为例。
+                         * 应根据实际传感器规格确认边界。
+                         */
+                        if (extra[2] <= 50)
+                        {
+                            tempMin = extra[1];
+                            tempMax = extra[2];
+                            tempControlEnabled = 1;
+                            xQueueSend(queueTempMaxHdlr, &tempMax, pdMS_TO_TICKS(10));
+                            xQueueSend(queueTempMinHdlr, &tempMin, pdMS_TO_TICKS(10));
+                            trace("Executor:Fan,tempmin:%d,tempmax:%d\r\n", tempMin, tempMax);
+                        }
+                    }
+                    else if (extra[0] == LORA_EXECUTOR_HUMIDIFIER)
+                    {
+                        if (extra[2] <= 100)
+                        {
+                            humiMin = extra[1];
+                            humiMax = extra[2];
+                            humiControlEnabled = 1;
+                            xQueueSend(queueHumiMaxHdlr, &humiMax, pdMS_TO_TICKS(10));
+                            xQueueSend(queueHumiMinHdlr, &humiMin, pdMS_TO_TICKS(10));
+                            trace("Executor:humidifier,humimin:%d,humimax:%d\r\n", humiMin, humiMax);
+                        }
+                    }
                 }
             }
             break;
         }
+    }
+}
+
+void taskTempAndHumiCtrl(void *parameters)
+{
+    uint8_t temp = 0, humi = 0;
+    uint8_t tempMax = 0, tempMin = 0;
+    uint8_t humiMax = 0, humiMin = 0;
+    while (1)
+    {
+        if (xQueueReceive(queueTempHdlr, &temp, pdMS_TO_TICKS(10)) == pdTRUE)
+        {
+            if (xQueueReceive(queueTempMaxHdlr, &tempMax, pdMS_TO_TICKS(10)) == pdTRUE &&
+                xQueueReceive(queueTempMinHdlr, &tempMin, pdMS_TO_TICKS(10)) == pdTRUE)
+            {
+                if (temp > tempMax)
+                {
+                    fanOn();
+                    xSemaphoreGive(semFanOnHdlr);
+                }
+                else if (temp < tempMin)
+                {
+                    fanOff();
+                    xSemaphoreGive(semFanOffHdlr);
+                }
+            }
+        }
+
+        if (xQueueReceive(queueHumiHdlr, &humi, pdMS_TO_TICKS(10)) == pdTRUE)
+        {
+            if (xQueueReceive(queueHumiMaxHdlr, &humiMax, pdMS_TO_TICKS(10)) == pdTRUE &&
+                xQueueReceive(queueHumiMinHdlr, &humiMin, pdMS_TO_TICKS(10)) == pdTRUE)
+            {
+                if (humi > humiMax)
+                {
+                    humidifierOff();
+                    xSemaphoreGive(semHumidifierOffHdlr);
+                }
+                else if (humi < humiMin)
+                {
+                    humidifierOn();
+                    xSemaphoreGive(semHumidifierOnHdlr);
+                }
+            }
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
@@ -223,7 +339,7 @@ void taskTrace(void *parameters)
     BaseType_t getTemp = 0L, getHumi = 0L;
     while (1)
     {
-        /* 接收队列：队列句柄、传输转存的目标变量或数组和未接收到数据的等待时长，分3种情况，分别为0、0~portMAX_DELAY和portMAX_DELAY三种，分别对应
+        /* 接收队列：队列句柄、传输转存的目标变量或数组和未接收到数据的等待时长，分3种情况，分别为 0 、0 ~ portMAX_DELAY 和 portMAX_DELAY 三种，分别对应
          * 一点不等、等一点时间和等最大时间。在等待队列数据的情况下，该接收队列所在的任务会一直处于阻塞态。
          */
         getTemp = xQueueReceive(queueTempHdlr, &temp, pdMS_TO_TICKS(10));
@@ -232,7 +348,7 @@ void taskTrace(void *parameters)
         if (getTemp == pdTRUE && getHumi == pdTRUE)
         {
             snprintf(buffer, sizeof(buffer), "Temp=%d, Humi=%d\r\n", temp, humi);
-            vDebugLogPrint(buffer);
+            trace(buffer);
             vTaskDelay(1000);
         }
     }
@@ -282,6 +398,13 @@ void createTasksList(void)
                (void *                ) NULL, 
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &taskTraceHdlr);
+    xTaskCreate(
+               (TaskFunction_t        ) taskTempAndHumiCtrl,
+               (char *                ) "TaskName_TempAndHumiCtrl",
+               (configSTACK_DEPTH_TYPE) 512,
+               (void *                ) NULL,
+               (UBaseType_t           ) 2,
+               (TaskHandle_t *        ) &taskTempAndHumiCtrlHdlr);
 }
 
 /**
@@ -295,16 +418,28 @@ void createQueuesList(void)
     /* 创建队列有两个参数，第一个是队列的长度,也就是这个队列能存放多少个数据；
      * 第二个参数就是每个数据的大小，单位为字节，在stm32中uint8_t指针的长度一般是4字节。
      * 原函数的返回值就是队列句柄的结构体，所以需要在上面定义一个变量接收队列句柄。 */
-    queueTempHdlr      = xQueueCreate(
+    queueTempHdlr       = xQueueCreate(
                                       (UBaseType_t) 5,
                                       (UBaseType_t) sizeof(uint8_t));
-    queueHumiHdlr      = xQueueCreate(
+    queueHumiHdlr       = xQueueCreate(
                                       (UBaseType_t) 5,
                                       (UBaseType_t) sizeof(uint8_t));
     xQueueUsart3IrqHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t));
     configASSERT(xQueueUsart3IrqHdlr != NULL);
+    queueTempMaxHdlr    = xQueueCreate(
+                                      (UBaseType_t) 64,
+                                      (UBaseType_t) sizeof(uint8_t));
+    queueTempMinHdlr    = xQueueCreate(
+                                      (UBaseType_t) 64,
+                                      (UBaseType_t) sizeof(uint8_t));
+    queueHumiMaxHdlr    = xQueueCreate(
+                                      (UBaseType_t) 64,
+                                      (UBaseType_t) sizeof(uint8_t));
+    queueHumiMinHdlr    = xQueueCreate(
+                                      (UBaseType_t) 64,
+                                      (UBaseType_t) sizeof(uint8_t));
 }
 
 /**
@@ -319,6 +454,8 @@ void createSemaphoresList(void)
     semLedOffHdlr = xSemaphoreCreateBinary();
     semFanOnHdlr  = xSemaphoreCreateBinary();
     semFanOffHdlr = xSemaphoreCreateBinary();
+    semHumidifierOnHdlr  = xSemaphoreCreateBinary();
+    semHumidifierOffHdlr = xSemaphoreCreateBinary();
 }
 
 /**

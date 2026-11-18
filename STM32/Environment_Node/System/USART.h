@@ -45,7 +45,7 @@
 #define vUsart1IrqHandler(void)                                 USART1_IRQHandler(void)
 #define vEsp8266IrqHandler(void)                                USART2_IRQHandler(void)
 #define vLoRaIrqHandler(void)                                   USART3_IRQHandler(void)
-#define vDebugLogPrint(format, ...)                             vUsartPrintf(USART1, format, ##__VA_ARGS__)
+#define trace(format, ...)                                        vUsartPrintf(USART1, format, ##__VA_ARGS__)
 
 #define BUFFER_MAX_LENGTH                                       512                         // 接收缓冲区最大字节数
 typedef struct                                                                              // 串口数据帧的处理结构体

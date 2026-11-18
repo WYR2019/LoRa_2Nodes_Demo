@@ -19,24 +19,6 @@ void pa0RelayInit(void)
 }
 
 /**
-  * @brief  PA1初始化
-  * @note   
-  * @param  None
-  * @retval None
-  */
-void pa1RelayInit(void)
-{
-    GPIO_InitTypeDef GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd(RELAY_PA1_CLOCK, ENABLE);
-    GPIO_InitStructure.GPIO_Pin = RELAY_PA1_GPIO_PIN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(RELAY_PA1_GPIO_PORT, &GPIO_InitStructure);
-
-    pa1RelayOff();    
-}
-
-/**
   * @brief  PA0拉高电平
   * @note   
   * @param  None
@@ -67,6 +49,24 @@ void pa0RelayOff(void)
 bool getPa0RelayStatus(void)
 {
     return (GPIO_ReadInputDataBit(RELAY_PA0_GPIO_PORT, RELAY_PA0_GPIO_PIN) == Bit_SET);
+}
+
+/**
+  * @brief  PA1初始化
+  * @note   
+  * @param  None
+  * @retval None
+  */
+void pa1RelayInit(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RELAY_PA1_CLOCK, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = RELAY_PA1_GPIO_PIN;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(RELAY_PA1_GPIO_PORT, &GPIO_InitStructure);
+
+    pa1RelayOff();    
 }
 
 /**

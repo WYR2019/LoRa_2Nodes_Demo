@@ -45,7 +45,7 @@
 #define vUsart1IrqHandler(void)                                 USART1_IRQHandler(void)
 #define vEsp8266IrqHandler(void)                                USART2_IRQHandler(void)
 #define vLoRaIrqHandler(void)                                   USART3_IRQHandler(void)
-#define vDebugLogPrint(format, ...)                             vUsartPrintf(USART1, format, ##__VA_ARGS__)
+#define trace(format, ...)                                        vUsartPrintf(USART1, format, ##__VA_ARGS__)
 #define vEsp8266DataTransmit(format, ...)                       vUsartPrintf(USART2, format, ##__VA_ARGS__)
 #define vLoRaDataTransmit(format, ...)                          vUsartPrintf(USART3, format, ##__VA_ARGS__)
 #define vLoRaHexNumTransmit(pucArray, usLength)                 vUsartSendArray(USART3, pucArray, usLength)

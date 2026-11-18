@@ -31,29 +31,30 @@
 //#define LORA_EXECUTOR_SERVO                                     0xFE
 //#define LORA_EXECUTOR_COMMAND_ON                                0x01
 //#define LORA_EXECUTOR_COMMAND_OFF                               0x00
-#define LORA_GATE_ADDR_HIGH                                 0x03
-#define LORA_GATE_ADDR_LOW                                  0xE9
-#define LORA_GATE_CHANNEL                                   0x17
-#define LORA_GATE_IDENTIFIER                                0xA0
-#define LORA_NODE1_ADDR_HIGH                                0x03
-#define LORA_NODE1_ADDR_LOW                                 0xEA
-#define LORA_NODE1_CHANNEL                                  0x17
-#define LORA_NODE1_IDENTIFIER                               0xA1
-#define LORA_NODE2_ADDR_HIGH                                0x03
-#define LORA_NODE2_ADDR_LOW                                 0xEB
-#define LORA_NODE2_CHANNEL                                  0x17
-#define LORA_NODE2_IDENTIFIER                               0xA2
-#define LORA_SENSOR_DHT11                                   0xB1
-#define LORA_SENSOR_MQ2                                     0xB2
-#define LORA_SENSOR_LIGHT                                   0xB3
-#define LORA_SENSOR_FIRE                                    0xB4
-#define LORA_EXECUTOR_LED                                   0xC1
-#define LORA_EXECUTOR_FAN                                   0xC2
-#define LORA_EXECUTOR_HUMIDIFIER                            0xC3
-#define LORA_EXECUTOR_BUZZER                                0xC4
-#define LORA_EXECUTOR_SERVO                                 0xC5
-#define LORA_EXECUTOR_COMMAND_ON                            0x01
-#define LORA_EXECUTOR_COMMAND_OFF                           0x00
+#define LORA_GATE_ADDR_HIGH                                     0x03
+#define LORA_GATE_ADDR_LOW                                      0xE9
+#define LORA_GATE_CHANNEL                                       0x17
+#define LORA_GATE_IDENTIFIER                                    0xA0
+#define LORA_NODE1_ADDR_HIGH                                    0x03
+#define LORA_NODE1_ADDR_LOW                                     0xEA
+#define LORA_NODE1_CHANNEL                                      0x17
+#define LORA_NODE1_IDENTIFIER                                   0xA1
+#define LORA_NODE2_ADDR_HIGH                                    0x03
+#define LORA_NODE2_ADDR_LOW                                     0xEB
+#define LORA_NODE2_CHANNEL                                      0x17
+#define LORA_NODE2_IDENTIFIER                                   0xA2
+#define LORA_SENSOR_DHT11                                       0xB1
+#define LORA_SENSOR_MQ2                                         0xB2
+#define LORA_SENSOR_LIGHT                                       0xB3
+#define LORA_SENSOR_FIRE                                        0xB4
+#define LORA_EXECUTOR_LED                                       0xC1
+#define LORA_EXECUTOR_FAN                                       0xC2
+#define LORA_EXECUTOR_HUMIDIFIER                                0xC3
+#define LORA_EXECUTOR_ENV_CONTROL                               0xC4
+#define LORA_EXECUTOR_BUZZER                                    0xC5
+#define LORA_EXECUTOR_SERVO                                     0xC6
+#define LORA_EXECUTOR_COMMAND_ON                                0x01
+#define LORA_EXECUTOR_COMMAND_OFF                               0x00
 
 #define vLoRaDataTransmit(format, ...)                          vUsartPrintf(USART3, format, ##__VA_ARGS__)
 #define vLoRaSendArray(pucArray, usLength)                      vUsartSendArray(USART3, pucArray, usLength)
@@ -70,6 +71,7 @@ typedef enum
     statusExeLed,
     statusExeFan,
     statusExeHumidifier,
+    statusExeEnvControl,
     statusExeBuzzer,
     statusExeServo,
     statusExeOn,
@@ -80,6 +82,8 @@ typedef enum
     statusFanOff,
     statusHumidifierOn,
     statusHumidifierOff,
+    statusExeEnvControlOn,
+    statusExeEnvControlOff,
     statusBuzzerOn,
     statusBuzzerOff,
     statusServoOn,
