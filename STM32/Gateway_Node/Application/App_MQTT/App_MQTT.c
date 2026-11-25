@@ -32,6 +32,14 @@ MqttCmd_t mqttCmdParse(char *topic)
     {
         return MQTT_CMD_HUMIDIFIER_OFF;
     }
+    else if (mqttSubscribe(topic, "{\"cmd\":{\"anto_control\":\"on\"}}") == true)
+    {
+        return MQTT_CMD_AUTOCONTROL_ON;
+    }
+    else if (mqttSubscribe(topic, "{\"cmd\":{\"anto_control\":\"off\"}}") == true)
+    {
+        return MQTT_CMD_AUTOCONTROL_OFF;
+    }
     return MQTT_CMD_UNKNOWN; // 未识别的命令
 }
 

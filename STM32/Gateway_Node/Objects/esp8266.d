@@ -47,4 +47,4 @@
 .\objects\esp8266.o: .\FreeRTOS\inc\task.h
 .\objects\esp8266.o: .\FreeRTOS\inc\list.h
 .\objects\esp8266.o: D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdarg.h
-.\objects\esp8266.o: .\Application\App_LinearBuffer\App_LinearBuffer.h
+.\objects\esp8266.o: .\Application\App_CircularBuffer\App_CircularBuffer.h

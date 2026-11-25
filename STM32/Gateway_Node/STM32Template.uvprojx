@@ -341,7 +341,7 @@
               <MiscControls>--no-multibyte-chars</MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\SystemFiles;.\Libraries\inc;.\User;.\BSP;.\Drivers;.\FreeRTOS\inc;.\FreeRTOS\portable\RVDS\ARM_CM3;.\FreeRTOS\config;.\Application\NetFIFO;.\Application\App_MQTT;.\Application\App_CircularBuffer;.\Application\App_LinearBuffer</IncludePath>
+              <IncludePath>.\SystemFiles;.\Libraries\inc;.\User;.\BSP;.\Drivers;.\FreeRTOS\inc;.\FreeRTOS\portable\RVDS\ARM_CM3;.\FreeRTOS\config;.\Application\NetFIFO;.\Application\App_MQTT;.\Application\App_CircularBuffer;.\Application\App_LinearBuffer;.\Application\App_CircularBuffer</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -711,6 +711,16 @@
               <FilePath>.\BSP\BSP_LED.h</FilePath>
             </File>
             <File>
+              <FileName>BSP_RTC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\BSP\BSP_RTC.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_RTC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\BSP\BSP_RTC.h</FilePath>
+            </File>
+            <File>
               <FileName>BSP_USART.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\BSP\BSP_USART.c</FilePath>
@@ -933,17 +943,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Application/App_LinearBuffer</GroupName>
+          <GroupName>Application/App_CircularBuffer</GroupName>
           <Files>
             <File>
-              <FileName>App_LinearBuffer.c</FileName>
+              <FileName>App_CircularBuffer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\App_LinearBuffer\App_LinearBuffer.c</FilePath>
+              <FilePath>.\Application\App_CircularBuffer\App_CircularBuffer.c</FilePath>
             </File>
             <File>
-              <FileName>App_LinearBuffer.h</FileName>
+              <FileName>App_CircularBuffer.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Application\App_LinearBuffer\App_LinearBuffer.h</FilePath>
+              <FilePath>.\Application\App_CircularBuffer\App_CircularBuffer.h</FilePath>
             </File>
           </Files>
         </Group>

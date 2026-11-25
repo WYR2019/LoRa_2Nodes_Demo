@@ -30,6 +30,7 @@
 ".\objects\bsp_delay.o"
 ".\objects\bsp_gpio.o"
 ".\objects\bsp_led.o"
+".\objects\bsp_rtc.o"
 ".\objects\bsp_usart.o"
 ".\objects\esp8266.o"
 ".\objects\lora.o"
@@ -43,7 +44,7 @@
 ".\objects\heap_4.o"
 ".\objects\port.o"
 ".\objects\app_mqtt.o"
-".\objects\app_linearbuffer.o"
+".\objects\app_circularbuffer.o"
 --library_type=microlib --strict --scatter ".\Objects\STM32Template.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

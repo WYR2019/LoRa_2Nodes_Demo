@@ -1,11 +1,11 @@
 Dependencies for Project 'STM32Template', Target 'Target 1': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARM_Compiler_5.06u7
-F (.\SystemFiles\core_cm3.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\core_cm3.o --omf_browse .\objects\core_cm3.crf --depend .\objects\core_cm3.d)
+F (.\SystemFiles\core_cm3.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\core_cm3.o --omf_browse .\objects\core_cm3.crf --depend .\objects\core_cm3.d)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdint.h)(0x5E8E3CC2)
 F (.\SystemFiles\core_cm3.h)(0x69805709)()
 F (.\SystemFiles\startup_stm32f10x_md.s)(0x69805709)(--cpu Cortex-M3 -g --apcs=interwork --pd "__MICROLIB SETA 1"-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include--pd "__UVISION_VERSION SETA 543" --pd "STM32F10X_MD SETA 1"--list .\listings\startup_stm32f10x_md.lst --xref -o .\objects\startup_stm32f10x_md.o --depend .\objects\startup_stm32f10x_md.d)
 F (.\SystemFiles\stm32f10x.h)(0x69805709)()
-F (.\SystemFiles\system_stm32f10x.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\system_stm32f10x.o --omf_browse .\objects\system_stm32f10x.crf --depend .\objects\system_stm32f10x.d)
+F (.\SystemFiles\system_stm32f10x.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\system_stm32f10x.o --omf_browse .\objects\system_stm32f10x.crf --depend .\objects\system_stm32f10x.d)
 I (SystemFiles\stm32f10x.h)(0x69805709)
 I (SystemFiles\core_cm3.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdint.h)(0x5E8E3CC2)
@@ -36,7 +36,7 @@ I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
 F (.\SystemFiles\system_stm32f10x.h)(0x69805709)()
-F (.\User\main.c)(0x6AF9A390)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+F (.\User\main.c)(0x6B045D41)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdint.h)(0x5E8E3CC2)
@@ -67,7 +67,7 @@ I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
 I (.\BSP\BSP_Delay.h)(0x6AB6370E)
 I (.\BSP\BSP_LED.h)(0x6AB63863)
-I (.\BSP\BSP_USART.h)(0x6AC89F46)
+I (.\BSP\BSP_USART.h)(0x6B042F6B)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
 I (.\FreeRTOS\config\FreeRTOSConfig.h)(0x69805709)
@@ -82,15 +82,15 @@ I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdio.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdarg.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
-I (.\Drivers\ESP8266.h)(0x6AB7F364)
+I (.\Drivers\ESP8266.h)(0x6B069AA1)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdbool.h)(0x5E8E3CC2)
 I (.\BSP\BSP_GPIO.h)(0x6AB63743)
-I (.\Application\App_LinearBuffer\App_LinearBuffer.h)(0x6AC21FEF)
-I (.\Drivers\LoRa.h)(0x6AC89D93)
+I (.\Application\App_CircularBuffer\App_CircularBuffer.h)(0x6B0466EF)
+I (.\Drivers\LoRa.h)(0x6B045D33)
 I (.\Drivers\LoRa_cfg.h)(0x6AC5E311)
-I (.\Application\App_MQTT\App_MQTT.h)(0x6AAE112E)
+I (.\Application\App_MQTT\App_MQTT.h)(0x6AFD781F)
 F (.\User\stm32f10x_conf.h)(0x69805709)()
-F (.\User\stm32f10x_it.c)(0x69AADF1A)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_it.o --omf_browse .\objects\stm32f10x_it.crf --depend .\objects\stm32f10x_it.d)
+F (.\User\stm32f10x_it.c)(0x69AADF1A)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_it.o --omf_browse .\objects\stm32f10x_it.crf --depend .\objects\stm32f10x_it.d)
 I (User\stm32f10x_it.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -131,7 +131,7 @@ I (.\FreeRTOS\inc\mpu_wrappers.h)(0x69805709)
 I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 F (.\User\stm32f10x_it.h)(0x69805709)()
-F (.\Libraries\src\misc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\misc.o --omf_browse .\objects\misc.crf --depend .\objects\misc.d)
+F (.\Libraries\src\misc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\misc.o --omf_browse .\objects\misc.crf --depend .\objects\misc.d)
 I (.\Libraries\inc\misc.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -160,7 +160,7 @@ I (.\Libraries\inc\stm32f10x_spi.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_adc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_adc.o --omf_browse .\objects\stm32f10x_adc.crf --depend .\objects\stm32f10x_adc.d)
+F (.\Libraries\src\stm32f10x_adc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_adc.o --omf_browse .\objects\stm32f10x_adc.crf --depend .\objects\stm32f10x_adc.d)
 I (.\Libraries\inc\stm32f10x_adc.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -189,7 +189,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_bkp.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_bkp.o --omf_browse .\objects\stm32f10x_bkp.crf --depend .\objects\stm32f10x_bkp.d)
+F (.\Libraries\src\stm32f10x_bkp.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_bkp.o --omf_browse .\objects\stm32f10x_bkp.crf --depend .\objects\stm32f10x_bkp.d)
 I (.\Libraries\inc\stm32f10x_bkp.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -218,7 +218,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_can.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_can.o --omf_browse .\objects\stm32f10x_can.crf --depend .\objects\stm32f10x_can.d)
+F (.\Libraries\src\stm32f10x_can.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_can.o --omf_browse .\objects\stm32f10x_can.crf --depend .\objects\stm32f10x_can.d)
 I (.\Libraries\inc\stm32f10x_can.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -247,7 +247,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_cec.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_cec.o --omf_browse .\objects\stm32f10x_cec.crf --depend .\objects\stm32f10x_cec.d)
+F (.\Libraries\src\stm32f10x_cec.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_cec.o --omf_browse .\objects\stm32f10x_cec.crf --depend .\objects\stm32f10x_cec.d)
 I (.\Libraries\inc\stm32f10x_cec.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -276,7 +276,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_crc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_crc.o --omf_browse .\objects\stm32f10x_crc.crf --depend .\objects\stm32f10x_crc.d)
+F (.\Libraries\src\stm32f10x_crc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_crc.o --omf_browse .\objects\stm32f10x_crc.crf --depend .\objects\stm32f10x_crc.d)
 I (.\Libraries\inc\stm32f10x_crc.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -305,7 +305,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_dac.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_dac.o --omf_browse .\objects\stm32f10x_dac.crf --depend .\objects\stm32f10x_dac.d)
+F (.\Libraries\src\stm32f10x_dac.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_dac.o --omf_browse .\objects\stm32f10x_dac.crf --depend .\objects\stm32f10x_dac.d)
 I (.\Libraries\inc\stm32f10x_dac.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -334,7 +334,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_dbgmcu.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_dbgmcu.o --omf_browse .\objects\stm32f10x_dbgmcu.crf --depend .\objects\stm32f10x_dbgmcu.d)
+F (.\Libraries\src\stm32f10x_dbgmcu.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_dbgmcu.o --omf_browse .\objects\stm32f10x_dbgmcu.crf --depend .\objects\stm32f10x_dbgmcu.d)
 I (.\Libraries\inc\stm32f10x_dbgmcu.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -363,7 +363,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_dma.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_dma.o --omf_browse .\objects\stm32f10x_dma.crf --depend .\objects\stm32f10x_dma.d)
+F (.\Libraries\src\stm32f10x_dma.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_dma.o --omf_browse .\objects\stm32f10x_dma.crf --depend .\objects\stm32f10x_dma.d)
 I (.\Libraries\inc\stm32f10x_dma.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -392,7 +392,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_exti.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_exti.o --omf_browse .\objects\stm32f10x_exti.crf --depend .\objects\stm32f10x_exti.d)
+F (.\Libraries\src\stm32f10x_exti.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_exti.o --omf_browse .\objects\stm32f10x_exti.crf --depend .\objects\stm32f10x_exti.d)
 I (.\Libraries\inc\stm32f10x_exti.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -421,7 +421,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_flash.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_flash.o --omf_browse .\objects\stm32f10x_flash.crf --depend .\objects\stm32f10x_flash.d)
+F (.\Libraries\src\stm32f10x_flash.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_flash.o --omf_browse .\objects\stm32f10x_flash.crf --depend .\objects\stm32f10x_flash.d)
 I (.\Libraries\inc\stm32f10x_flash.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -450,7 +450,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_fsmc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_fsmc.o --omf_browse .\objects\stm32f10x_fsmc.crf --depend .\objects\stm32f10x_fsmc.d)
+F (.\Libraries\src\stm32f10x_fsmc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_fsmc.o --omf_browse .\objects\stm32f10x_fsmc.crf --depend .\objects\stm32f10x_fsmc.d)
 I (.\Libraries\inc\stm32f10x_fsmc.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -479,7 +479,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_gpio.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_gpio.o --omf_browse .\objects\stm32f10x_gpio.crf --depend .\objects\stm32f10x_gpio.d)
+F (.\Libraries\src\stm32f10x_gpio.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_gpio.o --omf_browse .\objects\stm32f10x_gpio.crf --depend .\objects\stm32f10x_gpio.d)
 I (.\Libraries\inc\stm32f10x_gpio.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -508,7 +508,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_i2c.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_i2c.o --omf_browse .\objects\stm32f10x_i2c.crf --depend .\objects\stm32f10x_i2c.d)
+F (.\Libraries\src\stm32f10x_i2c.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_i2c.o --omf_browse .\objects\stm32f10x_i2c.crf --depend .\objects\stm32f10x_i2c.d)
 I (.\Libraries\inc\stm32f10x_i2c.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -537,7 +537,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_iwdg.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_iwdg.o --omf_browse .\objects\stm32f10x_iwdg.crf --depend .\objects\stm32f10x_iwdg.d)
+F (.\Libraries\src\stm32f10x_iwdg.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_iwdg.o --omf_browse .\objects\stm32f10x_iwdg.crf --depend .\objects\stm32f10x_iwdg.d)
 I (.\Libraries\inc\stm32f10x_iwdg.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -566,7 +566,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_pwr.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_pwr.o --omf_browse .\objects\stm32f10x_pwr.crf --depend .\objects\stm32f10x_pwr.d)
+F (.\Libraries\src\stm32f10x_pwr.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_pwr.o --omf_browse .\objects\stm32f10x_pwr.crf --depend .\objects\stm32f10x_pwr.d)
 I (.\Libraries\inc\stm32f10x_pwr.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -595,7 +595,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_rcc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_rcc.o --omf_browse .\objects\stm32f10x_rcc.crf --depend .\objects\stm32f10x_rcc.d)
+F (.\Libraries\src\stm32f10x_rcc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_rcc.o --omf_browse .\objects\stm32f10x_rcc.crf --depend .\objects\stm32f10x_rcc.d)
 I (.\Libraries\inc\stm32f10x_rcc.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -624,7 +624,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_rtc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_rtc.o --omf_browse .\objects\stm32f10x_rtc.crf --depend .\objects\stm32f10x_rtc.d)
+F (.\Libraries\src\stm32f10x_rtc.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_rtc.o --omf_browse .\objects\stm32f10x_rtc.crf --depend .\objects\stm32f10x_rtc.d)
 I (.\Libraries\inc\stm32f10x_rtc.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -653,7 +653,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_sdio.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_sdio.o --omf_browse .\objects\stm32f10x_sdio.crf --depend .\objects\stm32f10x_sdio.d)
+F (.\Libraries\src\stm32f10x_sdio.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_sdio.o --omf_browse .\objects\stm32f10x_sdio.crf --depend .\objects\stm32f10x_sdio.d)
 I (.\Libraries\inc\stm32f10x_sdio.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -682,7 +682,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_spi.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_spi.o --omf_browse .\objects\stm32f10x_spi.crf --depend .\objects\stm32f10x_spi.d)
+F (.\Libraries\src\stm32f10x_spi.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_spi.o --omf_browse .\objects\stm32f10x_spi.crf --depend .\objects\stm32f10x_spi.d)
 I (.\Libraries\inc\stm32f10x_spi.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -711,7 +711,7 @@ I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_tim.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_tim.o --omf_browse .\objects\stm32f10x_tim.crf --depend .\objects\stm32f10x_tim.d)
+F (.\Libraries\src\stm32f10x_tim.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_tim.o --omf_browse .\objects\stm32f10x_tim.crf --depend .\objects\stm32f10x_tim.d)
 I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -740,7 +740,7 @@ I (.\Libraries\inc\stm32f10x_spi.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_usart.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_usart.o --omf_browse .\objects\stm32f10x_usart.crf --depend .\objects\stm32f10x_usart.d)
+F (.\Libraries\src\stm32f10x_usart.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_usart.o --omf_browse .\objects\stm32f10x_usart.crf --depend .\objects\stm32f10x_usart.d)
 I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -769,7 +769,7 @@ I (.\Libraries\inc\stm32f10x_spi.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
-F (.\Libraries\src\stm32f10x_wwdg.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_wwdg.o --omf_browse .\objects\stm32f10x_wwdg.crf --depend .\objects\stm32f10x_wwdg.d)
+F (.\Libraries\src\stm32f10x_wwdg.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stm32f10x_wwdg.o --omf_browse .\objects\stm32f10x_wwdg.crf --depend .\objects\stm32f10x_wwdg.d)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -821,7 +821,7 @@ F (.\Libraries\inc\stm32f10x_spi.h)(0x69805709)()
 F (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)()
 F (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)()
 F (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)()
-F (.\BSP\BSP_Delay.c)(0x6ABF2381)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\bsp_delay.o --omf_browse .\objects\bsp_delay.crf --depend .\objects\bsp_delay.d)
+F (.\BSP\BSP_Delay.c)(0x6ABF2381)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\bsp_delay.o --omf_browse .\objects\bsp_delay.crf --depend .\objects\bsp_delay.d)
 I (BSP\BSP_Delay.h)(0x6AB6370E)
 I (.\User\stm32f10x_conf.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_adc.h)(0x69805709)
@@ -852,7 +852,7 @@ I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
 F (.\BSP\BSP_Delay.h)(0x6AB6370E)()
-F (.\BSP\BSP_GPIO.c)(0x6AB63743)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\bsp_gpio.o --omf_browse .\objects\bsp_gpio.crf --depend .\objects\bsp_gpio.d)
+F (.\BSP\BSP_GPIO.c)(0x6AB63743)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\bsp_gpio.o --omf_browse .\objects\bsp_gpio.crf --depend .\objects\bsp_gpio.d)
 I (BSP\BSP_GPIO.h)(0x6AB63743)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -883,7 +883,7 @@ I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
 F (.\BSP\BSP_GPIO.h)(0x6AB63743)()
-F (.\BSP\BSP_LED.c)(0x6AB63863)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\bsp_led.o --omf_browse .\objects\bsp_led.crf --depend .\objects\bsp_led.d)
+F (.\BSP\BSP_LED.c)(0x6AB63863)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\bsp_led.o --omf_browse .\objects\bsp_led.crf --depend .\objects\bsp_led.d)
 I (BSP\BSP_LED.h)(0x6AB63863)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
@@ -914,8 +914,10 @@ I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
 F (.\BSP\BSP_LED.h)(0x6AB63863)()
-F (.\BSP\BSP_USART.c)(0x6AC5E3AE)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\bsp_usart.o --omf_browse .\objects\bsp_usart.crf --depend .\objects\bsp_usart.d)
-I (BSP\BSP_USART.h)(0x6AC89F46)
+F (.\BSP\BSP_RTC.c)(0x6AFD668C)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\bsp_rtc.o --omf_browse .\objects\bsp_rtc.crf --depend .\objects\bsp_rtc.d)
+F (.\BSP\BSP_RTC.h)(0x6AFD6694)()
+F (.\BSP\BSP_USART.c)(0x6B0699C4)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\bsp_usart.o --omf_browse .\objects\bsp_usart.crf --depend .\objects\bsp_usart.d)
+I (BSP\BSP_USART.h)(0x6B042F6B)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdint.h)(0x5E8E3CC2)
@@ -958,9 +960,9 @@ I (.\Libraries\inc\misc.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdio.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdarg.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
-F (.\BSP\BSP_USART.h)(0x6AC89F46)()
-F (.\Drivers\ESP8266.c)(0x6AC89F66)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\esp8266.o --omf_browse .\objects\esp8266.crf --depend .\objects\esp8266.d)
-I (Drivers\ESP8266.h)(0x6AB7F364)
+F (.\BSP\BSP_USART.h)(0x6B042F6B)()
+F (.\Drivers\ESP8266.c)(0x6B06A0B7)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\esp8266.o --omf_browse .\objects\esp8266.crf --depend .\objects\esp8266.d)
+I (Drivers\ESP8266.h)(0x6B069AA1)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdint.h)(0x5E8E3CC2)
@@ -994,7 +996,7 @@ I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdbool.h)(0x5E8E3
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
 I (.\BSP\BSP_Delay.h)(0x6AB6370E)
 I (.\BSP\BSP_GPIO.h)(0x6AB63743)
-I (.\BSP\BSP_USART.h)(0x6AC89F46)
+I (.\BSP\BSP_USART.h)(0x6B042F6B)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
 I (.\FreeRTOS\config\FreeRTOSConfig.h)(0x69805709)
@@ -1007,10 +1009,10 @@ I (.\FreeRTOS\inc\queue.h)(0x69805709)
 I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdarg.h)(0x5E8E3CC2)
-I (.\Application\App_LinearBuffer\App_LinearBuffer.h)(0x6AC21FEF)
-F (.\Drivers\ESP8266.h)(0x6AB7F364)()
-F (.\Drivers\LoRa.c)(0x6AC89F55)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\lora.o --omf_browse .\objects\lora.crf --depend .\objects\lora.d)
-I (Drivers\LoRa.h)(0x6AC89D93)
+I (.\Application\App_CircularBuffer\App_CircularBuffer.h)(0x6B0466EF)
+F (.\Drivers\ESP8266.h)(0x6B069AA1)()
+F (.\Drivers\LoRa.c)(0x6B069FAD)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\lora.o --omf_browse .\objects\lora.crf --depend .\objects\lora.d)
+I (Drivers\LoRa.h)(0x6B045D33)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdbool.h)(0x5E8E3CC2)
 I (.\BSP\BSP_Delay.h)(0x6AB6370E)
 I (.\User\stm32f10x_conf.h)(0x69805709)
@@ -1042,7 +1044,7 @@ I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
 I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
 I (.\BSP\BSP_GPIO.h)(0x6AB63743)
-I (.\BSP\BSP_USART.h)(0x6AC89F46)
+I (.\BSP\BSP_USART.h)(0x6B042F6B)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
 I (.\FreeRTOS\config\FreeRTOSConfig.h)(0x69805709)
@@ -1057,9 +1059,9 @@ I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdio.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdarg.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
-I (.\Application\App_LinearBuffer\App_LinearBuffer.h)(0x6AC21FEF)
+I (.\Application\App_CircularBuffer\App_CircularBuffer.h)(0x6B0466EF)
 I (Drivers\LoRa_cfg.h)(0x6AC5E311)
-F (.\Drivers\LoRa.h)(0x6AC89D93)()
+F (.\Drivers\LoRa.h)(0x6B045D33)()
 F (.\Drivers\LoRa_cfg.h)(0x6AC5E311)()
 F (.\FreeRTOS\inc\atomic.h)(0x69805709)()
 F (.\FreeRTOS\inc\croutine.h)(0x69805709)()
@@ -1079,7 +1081,7 @@ F (.\FreeRTOS\inc\StackMacros.h)(0x69805709)()
 F (.\FreeRTOS\inc\stream_buffer.h)(0x69805709)()
 F (.\FreeRTOS\inc\task.h)(0x69805709)()
 F (.\FreeRTOS\inc\timers.h)(0x69805709)()
-F (.\FreeRTOS\src\croutine.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\croutine.o --omf_browse .\objects\croutine.crf --depend .\objects\croutine.d)
+F (.\FreeRTOS\src\croutine.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\croutine.o --omf_browse .\objects\croutine.crf --depend .\objects\croutine.d)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdint.h)(0x5E8E3CC2)
@@ -1092,7 +1094,7 @@ I (.\FreeRTOS\inc\mpu_wrappers.h)(0x69805709)
 I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (.\FreeRTOS\inc\croutine.h)(0x69805709)
-F (.\FreeRTOS\src\event_groups.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\event_groups.o --omf_browse .\objects\event_groups.crf --depend .\objects\event_groups.d)
+F (.\FreeRTOS\src\event_groups.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\event_groups.o --omf_browse .\objects\event_groups.crf --depend .\objects\event_groups.d)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdlib.h)(0x5E8E3CC2)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
@@ -1107,7 +1109,7 @@ I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (.\FreeRTOS\inc\timers.h)(0x69805709)
 I (.\FreeRTOS\inc\event_groups.h)(0x69805709)
-F (.\FreeRTOS\src\list.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\list.o --omf_browse .\objects\list.crf --depend .\objects\list.d)
+F (.\FreeRTOS\src\list.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\list.o --omf_browse .\objects\list.crf --depend .\objects\list.d)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdlib.h)(0x5E8E3CC2)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
@@ -1119,7 +1121,7 @@ I (.\FreeRTOS\inc\deprecated_definitions.h)(0x69805709)
 I (.\FreeRTOS\portable\RVDS\ARM_CM3\portmacro.h)(0x69805709)
 I (.\FreeRTOS\inc\mpu_wrappers.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
-F (.\FreeRTOS\src\queue.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\queue.o --omf_browse .\objects\queue.crf --depend .\objects\queue.d)
+F (.\FreeRTOS\src\queue.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\queue.o --omf_browse .\objects\queue.crf --depend .\objects\queue.d)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdlib.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
@@ -1134,7 +1136,7 @@ I (.\FreeRTOS\inc\mpu_wrappers.h)(0x69805709)
 I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (.\FreeRTOS\inc\queue.h)(0x69805709)
-F (.\FreeRTOS\src\stream_buffer.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stream_buffer.o --omf_browse .\objects\stream_buffer.crf --depend .\objects\stream_buffer.d)
+F (.\FreeRTOS\src\stream_buffer.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\stream_buffer.o --omf_browse .\objects\stream_buffer.crf --depend .\objects\stream_buffer.d)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
@@ -1148,7 +1150,7 @@ I (.\FreeRTOS\inc\mpu_wrappers.h)(0x69805709)
 I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (.\FreeRTOS\inc\stream_buffer.h)(0x69805709)
-F (.\FreeRTOS\src\tasks.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\tasks.o --omf_browse .\objects\tasks.crf --depend .\objects\tasks.d)
+F (.\FreeRTOS\src\tasks.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\tasks.o --omf_browse .\objects\tasks.crf --depend .\objects\tasks.d)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdlib.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
@@ -1164,7 +1166,7 @@ I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (.\FreeRTOS\inc\timers.h)(0x69805709)
 I (.\FreeRTOS\inc\stack_macros.h)(0x69805709)
-F (.\FreeRTOS\src\timers.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\timers.o --omf_browse .\objects\timers.crf --depend .\objects\timers.d)
+F (.\FreeRTOS\src\timers.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\timers.o --omf_browse .\objects\timers.crf --depend .\objects\timers.d)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdlib.h)(0x5E8E3CC2)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
@@ -1179,7 +1181,7 @@ I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (.\FreeRTOS\inc\queue.h)(0x69805709)
 I (.\FreeRTOS\inc\timers.h)(0x69805709)
-F (.\FreeRTOS\portable\MemMang\heap_4.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\heap_4.o --omf_browse .\objects\heap_4.crf --depend .\objects\heap_4.d)
+F (.\FreeRTOS\portable\MemMang\heap_4.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\heap_4.o --omf_browse .\objects\heap_4.crf --depend .\objects\heap_4.d)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdlib.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
@@ -1193,7 +1195,7 @@ I (.\FreeRTOS\portable\RVDS\ARM_CM3\portmacro.h)(0x69805709)
 I (.\FreeRTOS\inc\mpu_wrappers.h)(0x69805709)
 I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
-F (.\FreeRTOS\portable\RVDS\ARM_CM3\port.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\port.o --omf_browse .\objects\port.crf --depend .\objects\port.d)
+F (.\FreeRTOS\portable\RVDS\ARM_CM3\port.c)(0x69805709)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\port.o --omf_browse .\objects\port.crf --depend .\objects\port.d)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdint.h)(0x5E8E3CC2)
@@ -1207,13 +1209,13 @@ I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 F (.\FreeRTOS\portable\RVDS\ARM_CM3\portmacro.h)(0x69805709)()
 F (.\FreeRTOS\config\FreeRTOSConfig.h)(0x69805709)()
-F (.\Application\App_MQTT\App_MQTT.c)(0x6AB6375D)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\app_mqtt.o --omf_browse .\objects\app_mqtt.crf --depend .\objects\app_mqtt.d)
-I (Application\App_MQTT\App_MQTT.h)(0x6AAE112E)
+F (.\Application\App_MQTT\App_MQTT.c)(0x6B06943F)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\app_mqtt.o --omf_browse .\objects\app_mqtt.crf --depend .\objects\app_mqtt.d)
+I (Application\App_MQTT\App_MQTT.h)(0x6AFD781F)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdbool.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdint.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdio.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
-I (.\Drivers\ESP8266.h)(0x6AB7F364)
+I (.\Drivers\ESP8266.h)(0x6B069AA1)
 I (.\SystemFiles\stm32f10x.h)(0x69805709)
 I (.\SystemFiles\core_cm3.h)(0x69805709)
 I (.\SystemFiles\system_stm32f10x.h)(0x69805709)
@@ -1243,7 +1245,7 @@ I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
 I (.\Libraries\inc\misc.h)(0x69805709)
 I (.\BSP\BSP_Delay.h)(0x6AB6370E)
 I (.\BSP\BSP_GPIO.h)(0x6AB63743)
-I (.\BSP\BSP_USART.h)(0x6AC89F46)
+I (.\BSP\BSP_USART.h)(0x6B042F6B)
 I (.\FreeRTOS\inc\FreeRTOS.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stddef.h)(0x5E8E3CC2)
 I (.\FreeRTOS\config\FreeRTOSConfig.h)(0x69805709)
@@ -1256,37 +1258,11 @@ I (.\FreeRTOS\inc\queue.h)(0x69805709)
 I (.\FreeRTOS\inc\task.h)(0x69805709)
 I (.\FreeRTOS\inc\list.h)(0x69805709)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdarg.h)(0x5E8E3CC2)
-I (.\Application\App_LinearBuffer\App_LinearBuffer.h)(0x6AC21FEF)
-F (.\Application\App_MQTT\App_MQTT.h)(0x6AAE112E)()
-F (.\Application\App_LinearBuffer\App_LinearBuffer.c)(0x6AC21FC9)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\app_linearbuffer.o --omf_browse .\objects\app_linearbuffer.crf --depend .\objects\app_linearbuffer.d)
-I (Application\App_LinearBuffer\App_LinearBuffer.h)(0x6AC21FEF)
-I (.\SystemFiles\stm32f10x.h)(0x69805709)
-I (.\SystemFiles\core_cm3.h)(0x69805709)
-I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdint.h)(0x5E8E3CC2)
-I (.\SystemFiles\system_stm32f10x.h)(0x69805709)
-I (.\User\stm32f10x_conf.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_adc.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_bkp.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_can.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_cec.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_crc.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_dac.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_dbgmcu.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_dma.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_exti.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_flash.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_fsmc.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_gpio.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_i2c.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_iwdg.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_pwr.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_rcc.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_rtc.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_sdio.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_spi.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_tim.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_usart.h)(0x69805709)
-I (.\Libraries\inc\stm32f10x_wwdg.h)(0x69805709)
-I (.\Libraries\inc\misc.h)(0x69805709)
+I (.\Application\App_CircularBuffer\App_CircularBuffer.h)(0x6B0466EF)
+F (.\Application\App_MQTT\App_MQTT.h)(0x6AFD781F)()
+F (.\Application\App_CircularBuffer\App_CircularBuffer.c)(0x6B069660)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O1 --apcs=interwork --split_sections -I .\SystemFiles -I .\Libraries\inc -I .\User -I .\BSP -I .\Drivers -I .\FreeRTOS\inc -I .\FreeRTOS\portable\RVDS\ARM_CM3 -I .\FreeRTOS\config -I .\Application\NetFIFO -I .\Application\App_MQTT -I .\Application\App_CircularBuffer -I .\Application\App_LinearBuffer -I .\Application\App_CircularBuffer --no-multibyte-chars-ID:\ProgramData\Arm\Keil_v5\ARM\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="543" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\app_circularbuffer.o --omf_browse .\objects\app_circularbuffer.crf --depend .\objects\app_circularbuffer.d)
+I (Application\App_CircularBuffer\App_CircularBuffer.h)(0x6B0466EF)
+I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdio.h)(0x5E8E3CC2)
+I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\stdbool.h)(0x5E8E3CC2)
 I (D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\include\string.h)(0x5E8E3CC2)
-F (.\Application\App_LinearBuffer\App_LinearBuffer.h)(0x6AC21FEF)()
+F (.\Application\App_CircularBuffer\App_CircularBuffer.h)(0x6B0466EF)()

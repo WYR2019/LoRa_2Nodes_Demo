@@ -47,5 +47,5 @@
 .\objects\lora.o: D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdio.h
 .\objects\lora.o: D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdarg.h
 .\objects\lora.o: D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\string.h
-.\objects\lora.o: .\Application\App_LinearBuffer\App_LinearBuffer.h
+.\objects\lora.o: .\Application\App_CircularBuffer\App_CircularBuffer.h
 .\objects\lora.o: Drivers\LoRa_cfg.h

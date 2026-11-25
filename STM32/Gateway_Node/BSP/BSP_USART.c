@@ -33,20 +33,19 @@ void usartInit(USART_TypeDef *usartId, uint32_t baudrate)
         USART_InitStructure.USART_WordLength = USART_WordLength_8b;                                 // 字长，不需要校验，字长就选择8位
         USART_Init(USART1, &USART_InitStructure);
                                                                                                     // 上面是串口的查询模式，如果使用中断，还需要开启中断，配置NVIC
-        USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);                                              // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
-        USART_ITConfig(USART1, USART_IT_IDLE, ENABLE);                                              // 使能串口总线空闲中断
+        USART_ITConfig(USART1, USART_IT_RXNE, DISABLE);                                             // 选择RXNE的中断,并开启RXNE标志位到NVIC的输出，如果RXNE标志位置1，就会向NVIC申请中断，之后可以在中断函数中接收数据
+        USART_ITConfig(USART1, USART_IT_IDLE, DISABLE);                                             // 使能串口总线空闲中断
         NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);                                             // 分组，分组4为4bit抢占优先级和0bit响应优先级，抢占优先级可设置为0-15。由于FreeRTOS没有响应优先级，而优先级分组4相当于4位抢占优先级和0位响应优先级。
         NVIC_InitTypeDef NVIC_InitStructure;                                                        // 初始化NVIC的USART1通道
         NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;                                           // 中断通道
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;                                   // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 7;                                   // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
         // NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;                                       // 响应优先级配置，用不上了
         NVIC_Init(&NVIC_InitStructure);                                                             // 指向NVIC_InitStructure的地址
 
         USART_Cmd(USART1, ENABLE);
     } else if (usartId == USART2)
     {
-        /* code */
         RCC_APB2PeriphClockCmd(USART2_GPIO_CLOCK, ENABLE);
         GPIO_InitTypeDef GPIO_InitStructure;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
@@ -74,14 +73,13 @@ void usartInit(USART_TypeDef *usartId, uint32_t baudrate)
         NVIC_InitTypeDef NVIC_InitStructure;                                                        // 初始化NVIC的USART1通道
         NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;                                           // 中断通道
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;                                   // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;                                   // 抢占优先级配置，根据FreeRTOS设置配置，在范围内可以调用FreeRTOS的以“FromISR()”结尾的api函数。
         // NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;                                       // 响应优先级配置，用不上了
         NVIC_Init(&NVIC_InitStructure);                                                             // 指向NVIC_InitStructure的地址
 
         USART_Cmd(USART2, ENABLE);
     } else if (usartId == USART3)
     {
-        /* code */
         RCC_APB2PeriphClockCmd(USART3_GPIO_CLOCK, ENABLE);
 
         GPIO_InitTypeDef GPIO_InitStructure;
@@ -150,16 +148,25 @@ void usartSendArray(USART_TypeDef *usartId, uint8_t *array, uint16_t length)
 
 /**
   * @brief  串口发送字符串函数
-  * @note   将字符串封装成指针数组的形式，定义数组长度直到检测到字符串的末尾结束，并将字符串根据长度拆成带个字符发送。
+  * @note   将字符串封装成指针数组的形式，定义数组长度直到检测到字符串的末尾结束，并将字符串根据长度拆成单个字符发送。
   * @param  *usartId 选择串口号
   * @param  *string 要发送的数据
   * @retval None
   */
-void usartSendString(USART_TypeDef *usartId, char *string)                                          // 给uint8_t *也可以，由于字符串自带一个标志位，所以就不需要再传递长度参数了
+void usartSendString(USART_TypeDef *usartId, uint8_t *string)                                       // 给uint8_t *也可以，由于字符串自带一个标志位，所以就不需要再传递长度参数了
 {
-    for(uint8_t i = 0; string[i] != '\0'; i++)                                                      // 循环结束就可以用标志位来判断了,填'\0'是空字符的转义字符表示形式，和直接写0是一样的
+    if (string == NULL)
     {
-        usartSendByte(usartId, string[i]);                                                          // 将String字符串一个个取出来，通过SendByte发送
+        return;
+    }
+    // while (*string != '\0')
+    // {
+    //     usartSendByte(usartId, *string);
+    //     string++;
+    // }
+    for (uint8_t i = 0; string[i] != '\0'; i++)
+    {
+        usartSendByte(usartId, string[i]);
     }
 }
 
@@ -173,12 +180,12 @@ void usartSendString(USART_TypeDef *usartId, char *string)                      
   */
 void usartPrintf(USART_TypeDef *usartId, char *format, ...)
 {
-    char buffer[1024];
+    uint8_t buffer[256] = {0};                                                                      // 定义一个缓冲区，存放格式化后的字符串
     va_list arg;                                                                                    // arg是定义一个参数列表变量
     va_start(arg, format);                                                                          // 从format位置开始接收参数表，放在arg里面
-    vsprintf(buffer, format, arg);                                                                  // 封装格式要用vsprintf，因为sprintf只能接收直接写的参数；打印字符串格式是format，参数表是arg，
+    vsnprintf((char *)buffer, sizeof(buffer), format, arg);                                         // 封装格式要用vsprintf，因为sprintf只能接收直接写的参数；打印字符串格式是format，参数表是arg，
     va_end(arg);                                                                                    // 释放参数表
-    char *p = buffer;
+    uint8_t *p = buffer;
     if (usartId == USART1)
     {
         while (*p)
@@ -186,14 +193,16 @@ void usartPrintf(USART_TypeDef *usartId, char *format, ...)
             while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);                            // 等待发送缓冲区为空
             USART_SendData(USART1, *p++);
         }
-    } else if (usartId == USART2)
+    } 
+    else if (usartId == USART2)
     {
         while (*p)
         {
             while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);
             USART_SendData(USART2, *p++);
         }
-    } else if (usartId == USART3)
+    } 
+    else if (usartId == USART3)
     {
         while (*p)
         {
@@ -211,7 +220,6 @@ void usartPrintf(USART_TypeDef *usartId, char *format, ...)
   */
 void USART1_IRQHandler(void)
 {
-    /* code */
 #if ENABLE_FREERTOS_API_QUEUE_USART1_IRQ
     if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
     {

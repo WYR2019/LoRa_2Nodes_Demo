@@ -48,4 +48,4 @@
 .\objects\app_mqtt.o: .\FreeRTOS\inc\task.h
 .\objects\app_mqtt.o: .\FreeRTOS\inc\list.h
 .\objects\app_mqtt.o: D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdarg.h
-.\objects\app_mqtt.o: .\Application\App_LinearBuffer\App_LinearBuffer.h
+.\objects\app_mqtt.o: .\Application\App_CircularBuffer\App_CircularBuffer.h

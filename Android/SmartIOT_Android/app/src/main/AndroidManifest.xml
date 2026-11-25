@@ -14,6 +14,16 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+    <receiver android:name="com.rujiangiot.loraenvassistant_androidapp.BluetoothReceiver" >
+        <intent-filter android:priority="1000">
+            <action android:name="android.bluetooth.device.action.PAIRING_REQUEST"/>
+            <action android:name="android.bluetooth.device.action.FOUND" />
+        </intent-filter>
+    </receiver>
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />

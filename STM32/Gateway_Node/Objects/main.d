@@ -48,7 +48,7 @@
 .\objects\main.o: .\Drivers\ESP8266.h
 .\objects\main.o: D:\ProgramData\Arm\Keil_v5\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdbool.h
 .\objects\main.o: .\BSP\BSP_GPIO.h
-.\objects\main.o: .\Application\App_LinearBuffer\App_LinearBuffer.h
+.\objects\main.o: .\Application\App_CircularBuffer\App_CircularBuffer.h
 .\objects\main.o: .\Drivers\LoRa.h
 .\objects\main.o: .\Drivers\LoRa_cfg.h
 .\objects\main.o: .\Application\App_MQTT\App_MQTT.h

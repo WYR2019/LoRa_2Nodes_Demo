@@ -43,13 +43,13 @@
 #endif
 
 #define usart1IrqHandler(void)                                                  USART1_IRQHandler(void)
-#define trace(format, ...)                                                      usartPrintf(USART1, format, ##__VA_ARGS__)
-#define traceFromIrq(rxData)                                                    USART_SendData(USART1, rxData);
+#define trace(format, ...)                                                      usartPrintf(USART3, format, ##__VA_ARGS__)
+#define traceFromIrq(rxData)                                                    USART_SendData(USART3, rxData);
 
 void usartInit(USART_TypeDef *usartId, uint32_t baudrate);
 void usartSendByte(USART_TypeDef *usartId, uint8_t byte);
 void usartSendArray(USART_TypeDef *usartId, uint8_t *array, uint16_t length);
-void usartSendString(USART_TypeDef *usartId, char *string);
+void usartSendString(USART_TypeDef *usartId, uint8_t *string);
 void usartPrintf(USART_TypeDef *usartId, char *format, ...);
 
 #endif

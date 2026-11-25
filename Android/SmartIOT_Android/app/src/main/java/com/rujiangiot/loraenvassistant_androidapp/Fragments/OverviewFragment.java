@@ -23,10 +23,14 @@ import com.rujiangiot.loraenvassistant_androidapp.SQLite.Device.DeviceSQLiteHelp
 import java.util.List;
 
 public class OverviewFragment extends Fragment implements View.OnClickListener, OnSubscribedListener {
-    private final String PUBLISH_FAN_ON = "{\"cmd\":{\"fan\":\"on\"},\"timestamp\":\"%s\"}";
-    private final String PUBLISH_FAN_OFF = "{\"cmd\":{\"fan\":\"off\"},\"timestamp\":\"%s\"}";
+    private final String PUBLISH_FAN_ON = "{\"cmd\":{\"led\":\"on\"}}";
+    private final String PUBLISH_FAN_OFF = "{\"cmd\":{\"led\":\"off\"}}";
     private final String PUBLISH_HUMIDIFIER_ON = "{\"cmd\":{\"humidifier\":\"on\"},\"timestamp\":\"%s\"}";
     private final String PUBLISH_HUMIDIFIER_OFF = "{\"cmd\":{\"humidifier\":\"off\"},\"timestamp\":\"%s\"}";
+    private final String PUBLISH_AUTO_CONTROL_ON = "{\"cmd\":{\"anto_control\":\"on\"},\"timestamp\":\"%s\"}";
+    private final String PUBLISH_AUTO_CONTROL_OFF = "{\"cmd\":{\"anto_control\":\"off\"},\"timestamp\":\"%s\"}";
+    private final String PUBLISH_AUTO_CONTROL_TEMP = "{\"cmd\":{\"temp_min\":\"%s\",\"temp_max\":\"%s\"},\"timestamp\":\"%s\"}";
+    private final String PUBLISH_AUTO_CONTROL_HUMI = "{\"cmd\":{\"humi_min\":\"%s\",\"humi_max\":\"%s\"},\"timestamp\":\"%s\"}";
     private final String PUBLISH_TEMPERATURE_MIN = "{\"cmd\":{\"temp_min\":\"%s\"},\"timestamp\":\"%s\"}";
     private final String PUBLISH_TEMPERATURE_MAX = "{\"cmd\":{\"temp_max\":\"%s\"},\"timestamp\":\"%s\"}";
     private final String PUBLISH_HUMIDITY_MIN = "{\"cmd\":{\"humi_min\":\"%s\"},\"timestamp\":\"%s\"}";
@@ -101,10 +105,15 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
                 float humiMax = values.get(1);
                 Log.d("RangeSlider", "设置的最低湿度为：" + humiMin + "，" + "设置的最高湿度为：" + humiMax);
                 if (autoControlState) {
+                    String msgACOn = String.format(PUBLISH_AUTO_CONTROL_ON, System.currentTimeMillis());
                     String msgHumiMin = String.format(PUBLISH_HUMIDITY_MIN, humiMin, System.currentTimeMillis());
                     String msgHumiMax = String.format(PUBLISH_HUMIDITY_MAX, humiMax, System.currentTimeMillis());
+                    mqttHelper.mqttPublish(mqttHelper.MQTT_PUBLISH_TOPIC, msgACOn);
                     mqttHelper.mqttPublish(mqttHelper.MQTT_PUBLISH_TOPIC, msgHumiMin);
                     mqttHelper.mqttPublish(mqttHelper.MQTT_PUBLISH_TOPIC, msgHumiMax);
+                } else {
+                    String msgACOff = String.format(PUBLISH_AUTO_CONTROL_OFF, System.currentTimeMillis());
+                    mqttHelper.mqttPublish(mqttHelper.MQTT_PUBLISH_TOPIC, msgACOff);
                 }
             }
         });
@@ -129,7 +138,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
             } else {
                 timestamp = String.format(PUBLISH_FAN_OFF, System.currentTimeMillis());
             }
-            mqttHelper.mqttPublish(mqttHelper.MQTT_PUBLISH_TOPIC, timestamp);                                   // 发布
+            mqttHelper.mqttPublish(mqttHelper.MQTT_PUBLISH_TOPIC, timestamp);                                       // 发布
         } else if (v.getId() == R.id.sw_humidifierctl) {
             humidifierState = !humidifierState;
             swHumidifierControl.setChecked(humidifierState);

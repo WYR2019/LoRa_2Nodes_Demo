@@ -1,24 +1,7 @@
 #include "ESP8266.h"
 
 /* 初始化串口缓冲区句柄 */
-LinearBuffer_t wifiReceiver = {0};
-
-/**
-  * @brief  esp8266Reset
-  * @note   调用这个函数，就可以重启ESP8266模块，该函数被esp8266AtTest调用。
-  * @param  无
-  * @retval 无
-  */
-void esp8266Reset(void)
-{
-#if 1
-    isATCommandExists("AT+RST", "OK", "ready", 2500);
-#else
-    ESP8266_RST_LOW_LEVEL();
-    delayMs(500);
-    ESP8266_RST_HIGH_LEVEL();
-#endif
-}
+circular_buffer_t wifi_receiver = {0};
 
 /**
   * @brief  串口2接收中断处理函数
@@ -28,17 +11,17 @@ void esp8266Reset(void)
   */
 void esp8266IrqHandler(void)
 {
-    uint8_t rxData = 0;
+    uint8_t rx_data = 0;
     if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
     {
-        rxData = USART_ReceiveData(USART2);
-        writeToBuffer(&wifiReceiver, rxData);
-        // traceFromIrq(rxData);                                                                  // 打印到指定串口调试
+        rx_data = USART_ReceiveData(USART2);
+        write_to_buffer(&wifi_receiver, rx_data);
+        traceFromIrq(rx_data);                                                                   // 打印到指定串口调试
     }
     if (USART_GetITStatus(USART2, USART_IT_IDLE) == SET)                                        // 数据帧接收完毕
     {
-        rxData = USART_ReceiveData(USART2);                                                     // 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
-        wifiReceiver.buffer[wifiReceiver.bufferIndex] = '\0';
+        rx_data = USART_ReceiveData(USART2);                                                     // 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+        write_to_buffer(&wifi_receiver, '\0');
     }
 }
 
@@ -46,26 +29,61 @@ void esp8266IrqHandler(void)
  * @brief  isATCommandExists
  * @note   对ESP8266模块发送AT指令,并等待响应。该函数被外部调用。
  * @param  cmd：待发送的指令
- * @param  ack1
- * @param  ack2：期待的响应，为NULL表不需响应，两者为或逻辑关系。
- * @param  waitTime：等待响应的时间
+ * @param  ack_1：期待的响应1，为NULL表不需响应
+ * @param  ack_2：期待的响应2，为NULL表不需响应，两者为或逻辑关系。
+ * @param  wait_time：等待响应的时间
  * @retval true：指令发送成功
  * @retval false：指令发送失败
  */
-bool isATCommandExists(char *cmd, char *ack1, char *ack2, uint32_t waitTime)
+bool isATCommandExists(char *cmd, char *ack_1, char *ack_2, uint32_t wait_time)
 {
-    resetBufferIndex(&wifiReceiver);
-    esp8266DataTransmit("%s\r\n", cmd);
-    if ((ack1 == 0) && (ack2 == 0))                                                             // 不需要接收数据
+    uint8_t transmit_string[256] = {0};
+    snprintf((char *)transmit_string, sizeof(transmit_string), "%s\r\n", cmd);
+    trace("AT Command: %s\r\n", transmit_string);
+    esp8266DataTransmit(transmit_string);
+    if ((ack_1 == 0) && (ack_2 == 0))                                                           // 不需要接收数据
         return true;
-    delayMs(waitTime);                                                                          // 延时
-    if ((ack1 != 0) && (ack2 != 0))
-        return ((bool)strstr(wifiReceiver.buffer, ack1) ||
-                (bool)strstr(wifiReceiver.buffer, ack2));
-    else if (ack1 != 0)
-        return ((bool)strstr(wifiReceiver.buffer, ack1));
+    delayMs(wait_time);                                                                         // 延时
+    char data[1024] = {0};
+    if ((ack_1 != 0) && (ack_2 != 0))
+    {
+        read_all_string_from_buffer(&wifi_receiver, data);
+        return ((bool)strstr(data, ack_1) && (bool)strstr(data, ack_2));
+        // if ((!(bool)strstr(data, ack_1) && (bool)strstr(data, ack_2)))                          // 重试
+        // {
+        //     char retry[64] = {0};
+        //     read_all_string_from_buffer(&wifi_receiver, retry);
+        //     return ((bool)strstr(retry, ack_1) && (bool)strstr(retry, ack_2));
+        // }
+    }
+    else if (ack_1 != 0)
+    {
+        read_all_string_from_buffer(&wifi_receiver, data);
+        return ((bool)strstr(data, ack_1));
+    }
     else
-        return ((bool)strstr(wifiReceiver.buffer, ack2));
+    {
+        read_all_string_from_buffer(&wifi_receiver, data);
+        return ((bool)strstr(data, ack_2));
+    }
+    return false;
+}
+
+/**
+  * @brief  esp8266Reset
+  * @note   调用这个函数，就可以重启ESP8266模块，该函数被esp8266AtTest调用。
+  * @param  无
+  * @retval 无
+  */
+void esp8266Reset()
+{
+#if ESP8266_RST_MODE
+    isATCommandExists("AT+RST", "OK", "ready", 2500);
+#else
+    ESP8266_RST_LOW_LEVEL();
+    delayMs(500);
+    ESP8266_RST_HIGH_LEVEL();
+#endif
 }
 
 /**
@@ -76,35 +94,43 @@ bool isATCommandExists(char *cmd, char *ack1, char *ack2, uint32_t waitTime)
   */
 void esp8266AtTest(void)
 {
-    int count = 0;
     ESP8266_RST_HIGH_LEVEL();
     delayMs(1000);
-    while (count < 3)
-    {
-        if (isATCommandExists("AT", "OK", NULL, 500) != true)
-            return;
-        esp8266Reset();
-        count++;
-    }
+    if (isATCommandExists("AT", "OK", NULL, 500) != true)
+        return;
+    esp8266Reset();
 }
 
 /** 
-  * @brief  esp8266NetModeChoose
-  * @note   选择ESP8266模块的工作模式,该函数被外部调用。
+  * @brief  esp8266NetModeCheck
+  * @note   检查ESP8266模块的工作模式,该函数被外部调用。
   * @param  mode，工作模式
-  * @retval 1，选择成功
-  * @retval 0，选择失败
+  * @retval 1，检查成功
+  * @retval 0，检查失败
   */
-bool esp8266NetModeChoose(NetMode_t mode)
+bool esp8266NetModeCheck(NetMode_t mode)
 {
+    /* 查询现有模式是否已设置完成，若没有则重新设置模式 */
     switch (mode)
     {
     case STA:
-        return isATCommandExists("AT+CWMODE=1", "OK", "no change", 2500);
+        if (isATCommandExists("AT+CWMODE?", "+CWMODE:1", NULL, 2500) == true)
+        {
+            return true;
+        }
+        return isATCommandExists("AT+CWMODE=1", "OK", NULL, 2500);
     case AP:
-        return isATCommandExists("AT+CWMODE=2", "OK", "no change", 2500);
+        if (isATCommandExists("AT+CWMODE?", "+CWMODE:2", NULL, 2500) == true)
+        {
+            return true;
+        }
+        return isATCommandExists("AT+CWMODE=2", "OK", NULL, 2500);
     case STA_AP:
-        return isATCommandExists("AT+CWMODE=3", "OK", "no change", 2500);
+        if (isATCommandExists("AT+CWMODE?", "+CWMODE:3", NULL, 2500) == true)
+        {
+            return true;
+        }
+        return isATCommandExists("AT+CWMODE=3", "OK", NULL, 2500);
     default:
         return false;
     }
@@ -120,13 +146,9 @@ bool esp8266NetModeChoose(NetMode_t mode)
   */
 bool esp8266JoinAp(char *ssid, char *password)
 {
-    char cmd[128] = {0};
+    char cmd[64] = {0};
     sprintf(cmd, "AT+CWJAP=\"%s\",\"%s\"", ssid, password);
-    if (strstr(wifiReceiver.buffer, "WIFI CONNECTED") != NULL)
-    {
-        return true;
-    }
-    return isATCommandExists(cmd, "OK", "WIFI CONNECTED", 8000);
+    return isATCommandExists(cmd, "WIFI CONNECTED", NULL, 5000);
 }
 
 /**
@@ -149,8 +171,11 @@ bool esp8266MqttInit(char *mqttUsername, char *mqttPassword, char *mqttClientId,
     /* 1. 配置MQTT用户信息 */
     snprintf(cmd, sizeof(cmd), "AT+MQTTUSERCFG=0,1,\"%s\",\"%s\",\"%s\",0,0,\"\"",
         mqttClientId, mqttUsername, mqttPassword);
-    if (isATCommandExists(cmd, "OK", NULL, 2000) != true)
+    if (isATCommandExists(cmd, "OK", NULL, 2500) != true)
+    {
+        trace("Failed to configure MQTT user information.\r\n");
         return false;
+    }
 
     /* 2. 连接到MQTT服务器 */
     memset(cmd, 0, sizeof(cmd));
@@ -158,13 +183,19 @@ bool esp8266MqttInit(char *mqttUsername, char *mqttPassword, char *mqttClientId,
         mqttServerIp, mqttServerPort);
     if (isATCommandExists(cmd, "OK", NULL, 8000) != true && 
         isATCommandExists(cmd, "+MQTTCONN", NULL, 8000) != true)
+    {
+        trace("Failed to connect to MQTT server.\r\n");
         return false;
+    }
 
     /* 3. 订阅主题 */
     memset(cmd, 0, sizeof(cmd));
     snprintf(cmd, sizeof(cmd), "AT+MQTTSUB=0,\"%s\",1", mqttSubscribeTopic);
-    if (isATCommandExists(cmd, "OK", NULL, 2000) != true)
+    if (isATCommandExists(cmd, "OK", NULL, 2500) != true)
+    {
+        trace("Failed to subscribe to MQTT topic.\r\n");
         return false;
+    }
 
     return true;
 }
@@ -182,8 +213,8 @@ bool mqttPublish(char *topic, char *message)
     char cmd[128] = {0};
     uint8_t length = strlen(message);
     snprintf(cmd, sizeof(cmd), "AT+MQTTPUBRAW=0,\"%s\",%d,1,0", topic, length);
-    return isATCommandExists(cmd, ">", NULL, 2000)
-        && isATCommandExists(message, "OK", NULL, 2000);
+    return isATCommandExists(cmd, ">", NULL, 2500)
+        && isATCommandExists(message, "OK", NULL, 2500);
 }
 
 /**
@@ -197,9 +228,9 @@ bool mqttPublish(char *topic, char *message)
 bool mqttSubscribe(char *topic, char *message)
 {
     /* 此函数用于解析订阅消息，根据不同的模式提取主题和消息内容，具体实现根据实际的消息格式进行编写。 */
-    char *pcSubRecMsg = 0;
-    pcSubRecMsg = strstr(wifiReceiver.buffer, message);
-    if (strstr(wifiReceiver.buffer, topic), pcSubRecMsg)
+    char *subRecMsg = 0;
+    subRecMsg = strstr(wifi_receiver.buffer, message);
+    if (strstr(wifi_receiver.buffer, topic), subRecMsg)
         return true;
-    return false;                                                       // 占位符，实际实现需要返回解析结果
+    return false;                                                                               // 占位符，实际实现需要返回解析结果
 }

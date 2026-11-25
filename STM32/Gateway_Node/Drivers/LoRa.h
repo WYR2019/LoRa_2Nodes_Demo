@@ -5,7 +5,7 @@
 #include "BSP_Delay.h"
 #include "BSP_GPIO.h"
 #include "BSP_USART.h"
-#include "App_LinearBuffer.h"
+#include "App_CircularBuffer.h"
 #include "LoRa_cfg.h"
 
 /* LoRa的静态设置 */
@@ -40,7 +40,7 @@ typedef struct
     } ExecutorData_t;
 } LoRaRecvData_t;
 
-void loRaHeaderFrameSend(uint8_t ucNodeId);
-void receiveFromNodes(LoRaRecvData_t *loRaRecvData);
+//void loRaHeaderFrameSend(uint8_t ucNodeId);
+//void receiveFromNodes(LoRaRecvData_t *loRaRecvData);
 
 #endif

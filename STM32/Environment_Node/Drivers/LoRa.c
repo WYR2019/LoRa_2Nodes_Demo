@@ -39,6 +39,7 @@ void vLoRaDataSend(uint8_t ucNodeId, uint8_t ucSensorId,
     pucBuffer[5] = ucExeId1;
     pucBuffer[6] = ucData3;
     pucBuffer[7] = ucExeId2;
+    
     pucBuffer[8] = ucData4;
     pucBuffer[9] = ucExeId3;
     pucBuffer[10] = ucData5;
@@ -49,7 +50,7 @@ void vLoRaDataSend(uint8_t ucNodeId, uint8_t ucSensorId,
     }
     pucBuffer[11] = ucSum;                                                      // 存入校验和
     pucBuffer[12] = 0xAB;
-    vLoRaSendArray(pucBuffer, 12);
+    vLoRaSendArray(pucBuffer, 13);
 }
 
 /**

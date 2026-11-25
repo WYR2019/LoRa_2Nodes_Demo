@@ -14,7 +14,6 @@ TaskHandle_t taskWorkStatusLedHdlr;
 TaskHandle_t taskNetworkInitHdlr;
 TaskHandle_t taskMqttPublishHdlr;
 TaskHandle_t taskMqttSubscribeHdlr;
-TaskHandle_t taskLoRaConfigQueryHdlr;
 TaskHandle_t taskLoRaRecvFromNodesHdlr;
 
 /* 创建队列句柄 */
@@ -22,7 +21,7 @@ QueueHandle_t queueUsart1IrqHdlr;
 QueueHandle_t queueUsart2IrqHdlr;
 QueueHandle_t queueUsart3IrqHdlr;
 
-QueueHandle_t queueLoRaRecvFromNodesHdlr;
+QueueHandle_t queueRecvFromNodesHdlr;
 
 /**
   * @brief  状态指示LED任务
@@ -49,32 +48,36 @@ void taskWorkStatusLed(void *parameters)
   */
 void taskNetworkInit(void *parameters)
 {
+    esp8266Reset();
+    esp8266AtTest();
     while (1)
     {
-        esp8266AtTest();
-        if (esp8266NetModeChoose(STA) == pdTRUE)
+        if (!esp8266NetModeCheck(STA))
         {
-            trace("Set ESP8266 Net Mode Successfully.\r\n");
-        } else
-        {
-            continue;
-        } 
-        if (esp8266JoinAp(ESP8266_APSSID, ESP8266_APPWD) == pdTRUE)
-        {
-            trace("Wifi Join To AP Successfully.\r\n");
-        } else
-        {
+            trace("Failed to set ESP8266 net mode.\r\n");
             continue;
         }
+        trace("ESP8266 net mode has been set successfully.\r\n");
+        if (!esp8266JoinAp(ESP8266_APSSID, ESP8266_APPWD))
+        {
+            trace("Failed to join Wi-Fi AP.\r\n");
+            continue;
+        }
+        else
+        {
+            trace("ESP8266 AP has been connected.\r\n");
+        }
         if (esp8266MqttInit(ESP8266_ALIYUN_MQTT_USERNAME, ESP8266_ALIYUN_MQTT_PASSWORD, ESP8266_ALIYUN_MQTT_CLIENTID, 
-            ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == pdTRUE)
+            ESP8266_ALIYUN_MQTT_IP, ESP8266_ALIYUN_MQTT_PORT, ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC))
         {
             trace("Aliyun MQTT Init Successfully.\r\n");
             /* 通知MQTT发布任务 */
             xTaskNotifyGive(taskMqttPublishHdlr);
             xTaskNotifyGive(taskMqttSubscribeHdlr);
+            xTaskNotifyGive(taskLoRaRecvFromNodesHdlr);
             vTaskDelete(NULL);
-        } else
+        } 
+        else
         {
             continue;
         }
@@ -96,9 +99,17 @@ void taskMqttPublish(void *parameters)
     uint8_t temperature = 0, humidity = 0;
     while (1)
     {
-        getTemperature = xQueueReceive(queueLoRaRecvFromNodesHdlr, &temperature, portMAX_DELAY);
-        getHumidity = xQueueReceive(queueLoRaRecvFromNodesHdlr, &humidity, portMAX_DELAY);
-        trace("MQTT temperature:%d C, humidity:%d%%\r\n", temperature, humidity);
+        getTemperature = xQueueReceive(queueRecvFromNodesHdlr, &temperature, portMAX_DELAY);
+        getHumidity = xQueueReceive(queueRecvFromNodesHdlr, &humidity, portMAX_DELAY);
+        if (getTemperature != NULL && getHumidity != NULL)
+        {
+            trace("MQTT temperature:%d C, humidity:%d%%\r\n", temperature, humidity);
+        }
+        else
+        {
+            trace("MQTT get temperature and humidity error!\r\n");
+            return;
+        }
         vTaskDelay(300);
         snprintf(msg, sizeof(msg), "{\"node1_info\": {\"temperature\":\"%d\" , \"humidity\":\"%d\" },{ \"led\":\"off\" }}", 
                                         temperature, humidity);
@@ -122,27 +133,35 @@ void taskMqttSubscribe(void *parameters)
     {
         if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_ON)
         {
-            trace("Lights on\r\n");
+            trace("Lights on.\r\n");
         }
         else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_LED_OFF)
         {
-            trace("Lights off\r\n");
+            trace("Lights off.\r\n");
         }
         else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_ON)
         {
-            trace("Fan on\r\n");
+            trace("Fan on.\r\n");
         }
         else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_FAN_OFF)
         {
-            trace("Fan off\r\n");
+            trace("Fan off.\r\n");
         }
         else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_ON)
         {
-            trace("Humidifier on\r\n");
+            trace("Humidifier on.\r\n");
         }
         else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_HUMIDIFIER_OFF)
         {
-            trace("Humidifier off\r\n");
+            trace("Humidifier off.\r\n");
+        }
+        else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_AUTOCONTROL_ON)
+        {
+            trace("Auto control on.\r\n");
+        }
+        else if (mqttCmdParse(ESP8266_ALIYUN_MQTT_SUBSCRIBE_TOPIC) == MQTT_CMD_AUTOCONTROL_OFF)
+        {
+            trace("Auto control off.\r\n");
         }
         vTaskDelay(1000);
     }
@@ -150,26 +169,29 @@ void taskMqttSubscribe(void *parameters)
 
 void taskLoRaRecvFromNodes(void *parameters)
 {
-    LoRaRecvData_t loRaRecvData;
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    LoRaRecvData_t loRaRecvData = {0};
     uint8_t temperature = 0, humidity = 0;
     bool getNode1OnlineState = false, getNode2OnlineState = false;
     while (1)
     {
-        receiveFromNodes(&loRaRecvData);
+        // receiveFromNodes(&loRaRecvData);
         vTaskDelay(300);
         getNode1OnlineState = loRaRecvData.NodeOnlineState_t.Node1OnlineState;
         getNode2OnlineState = loRaRecvData.NodeOnlineState_t.Node2OnlineState;
         if (getNode1OnlineState)
         {
             trace("Node1 is online.\r\n");
-        } else
+        } 
+        else
         {
             trace("Node1 is offline.\r\n");
         }
         if (getNode2OnlineState)
         {
             trace("Node2 is online.\r\n");
-        } else
+        } 
+        else
         {
             trace("Node2 is offline.\r\n");
         }
@@ -200,8 +222,8 @@ void taskLoRaRecvFromNodes(void *parameters)
                 trace("fanStatus:unknown\r\n");
                 break;
         }
-        xQueueSend(queueLoRaRecvFromNodesHdlr, &temperature, portMAX_DELAY);
-        xQueueSend(queueLoRaRecvFromNodesHdlr, &humidity, portMAX_DELAY);
+        xQueueSend(queueRecvFromNodesHdlr, &temperature, portMAX_DELAY);
+        xQueueSend(queueRecvFromNodesHdlr, &humidity, portMAX_DELAY);
     }
 }
 
@@ -223,14 +245,14 @@ void createTasksList(void)
     xTaskCreate(
                (TaskFunction_t        ) taskNetworkInit,
                (char *                ) "TaskName_WifiInitMQTTProtocol", 
-               (configSTACK_DEPTH_TYPE) 512,
+               (configSTACK_DEPTH_TYPE) 1024,
                (void *                ) NULL,
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &taskNetworkInitHdlr);
     xTaskCreate(
                (TaskFunction_t        ) taskMqttPublish,
                (char *                ) "TaskName_MqttPublishTest", 
-               (configSTACK_DEPTH_TYPE) 512,
+               (configSTACK_DEPTH_TYPE) 1024,
                (void *                ) NULL,
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &taskMqttPublishHdlr);
@@ -241,13 +263,13 @@ void createTasksList(void)
                (void *                ) NULL,
                (UBaseType_t           ) 2,
                (TaskHandle_t *        ) &taskMqttSubscribeHdlr);
-    xTaskCreate(
-               (TaskFunction_t        ) taskLoRaRecvFromNodes,
-               (char *                ) "TaskName_LoRaReceiveFromNodes", 
-               (configSTACK_DEPTH_TYPE) 512,
-               (void *                ) NULL,
-               (UBaseType_t           ) 2,
-               (TaskHandle_t *        ) &taskLoRaRecvFromNodesHdlr);
+//    xTaskCreate(
+//               (TaskFunction_t        ) taskLoRaRecvFromNodes,
+//               (char *                ) "TaskName_LoRaReceiveFromNodes", 
+//               (configSTACK_DEPTH_TYPE) 1024,
+//               (void *                ) NULL,
+//               (UBaseType_t           ) 2,
+//               (TaskHandle_t *        ) &taskLoRaRecvFromNodesHdlr);
 }
 
 /**
@@ -273,7 +295,7 @@ void createQueuesList(void)
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t *));
 #endif
-    queueLoRaRecvFromNodesHdlr = xQueueCreate(
+    queueRecvFromNodesHdlr = xQueueCreate(
                                       (UBaseType_t) 64,
                                       (UBaseType_t) sizeof(uint8_t));
 }
