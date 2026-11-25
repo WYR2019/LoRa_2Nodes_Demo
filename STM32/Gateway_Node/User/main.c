@@ -319,7 +319,7 @@ void createSemaphoresList(void)
   */
 int main(void)
 {
-    usartInit(USART1, 115200);
+    // usartInit(USART1, 115200);
     usartInit(USART2, 115200);
     usartInit(USART3, 115200);
     delayInit();

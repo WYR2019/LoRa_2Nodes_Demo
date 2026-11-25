@@ -16,11 +16,11 @@ void esp8266IrqHandler(void)
     {
         rx_data = USART_ReceiveData(USART2);
         write_to_buffer(&wifi_receiver, rx_data);
-        traceFromIrq(rx_data);                                                                   // 打印到指定串口调试
+        traceFromIrq(rx_data);                                                                  // 打印到指定串口调试
     }
     if (USART_GetITStatus(USART2, USART_IT_IDLE) == SET)                                        // 数据帧接收完毕
     {
-        rx_data = USART_ReceiveData(USART2);                                                     // 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+        rx_data = USART_ReceiveData(USART2);                                                    // 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
         write_to_buffer(&wifi_receiver, '\0');
     }
 }
@@ -37,10 +37,9 @@ void esp8266IrqHandler(void)
  */
 bool isATCommandExists(char *cmd, char *ack_1, char *ack_2, uint32_t wait_time)
 {
-    uint8_t transmit_string[256] = {0};
-    snprintf((char *)transmit_string, sizeof(transmit_string), "%s\r\n", cmd);
-    trace("AT Command: %s\r\n", transmit_string);
-    esp8266DataTransmit(transmit_string);
+    char transmit_string[256] = {0};
+    snprintf(transmit_string, sizeof(transmit_string), "%s\r\n", cmd);
+    esp8266DataTransmit((uint8_t *)transmit_string);
     if ((ack_1 == 0) && (ack_2 == 0))                                                           // 不需要接收数据
         return true;
     delayMs(wait_time);                                                                         // 延时
@@ -48,7 +47,7 @@ bool isATCommandExists(char *cmd, char *ack_1, char *ack_2, uint32_t wait_time)
     if ((ack_1 != 0) && (ack_2 != 0))
     {
         read_all_string_from_buffer(&wifi_receiver, data);
-        return ((bool)strstr(data, ack_1) && (bool)strstr(data, ack_2));
+        return ((bool)strstr(data, ack_1) || (bool)strstr(data, ack_2));
         // if ((!(bool)strstr(data, ack_1) && (bool)strstr(data, ack_2)))                          // 重试
         // {
         //     char retry[64] = {0};
@@ -66,7 +65,6 @@ bool isATCommandExists(char *cmd, char *ack_1, char *ack_2, uint32_t wait_time)
         read_all_string_from_buffer(&wifi_receiver, data);
         return ((bool)strstr(data, ack_2));
     }
-    return false;
 }
 
 /**
@@ -148,7 +146,7 @@ bool esp8266JoinAp(char *ssid, char *password)
 {
     char cmd[64] = {0};
     sprintf(cmd, "AT+CWJAP=\"%s\",\"%s\"", ssid, password);
-    return isATCommandExists(cmd, "WIFI CONNECTED", NULL, 5000);
+    return isATCommandExists(cmd, "WIFI CONNECTED", "OK", 8000);
 }
 
 /**

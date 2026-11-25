@@ -26,9 +26,8 @@ void loRaIrqHandler(void)
     if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
     {
         rxData = USART_ReceiveData(USART3);
-        usart3RxCount++;
-        // writeToBuffer(&lora_receiver, rxData);
-        // traceFromIrq(rxData);                                                               // 打印到指定串口调试
+        write_to_buffer(&lora_receiver, rxData);
+        traceFromIrq(rxData);                                                               // 打印到指定串口调试
     }
     if (USART_GetITStatus(USART3, USART_IT_IDLE) == SET)                                    // 数据帧接收完毕
     {
@@ -77,8 +76,8 @@ void loRaHeaderFrameSend(uint8_t ucNodeId)
  * 如何根据节点标识符A1找到对应的传感器和执行器数据：根据节点标识符A1，判断是哪个节点的数据，然后根据传感器和执行器的标识符，提取对应的数据。
  * 如何根据校验和验证数据的完整性：将数据帧中除校验和外的所有字节相加并取最后两位，得到的结果与校验和进行比较，如果相等，则数据完整，否则数据有误。
  */
-//void receiveFromNodes(LoRaRecvData_t *loRaRecvData)
-//{
+// void receiveFromNodes(LoRaRecvData_t *loRaRecvData)
+// {
 //    char buffer[15] = {0};
 //    uint16_t updateFrameHeaderIndex = 0, updateFrameTailIndex = 0;
 //    for (uint16_t i = 0; i < lora_receiver.bufferIndex; i++)
@@ -104,12 +103,12 @@ void loRaHeaderFrameSend(uint8_t ucNodeId)
 //        }
 //    }
 //    memcpy(buffer, lora_receiver.buffer + updateFrameHeaderIndex, updateFrameTailIndex - updateFrameHeaderIndex + 1);    // 加上偏移量
-////    trace("Buffer: ");
-////    for (uint8_t i = 0; i < 16; i++)
-////    {
-////        trace("%02X ", buffer[i]);
-////    }
-////    trace("\r\n");
+// //    trace("Buffer: ");
+// //    for (uint8_t i = 0; i < 16; i++)
+// //    {
+// //        trace("%02X ", buffer[i]);
+// //    }
+// //    trace("\r\n");
 
 //    if ((uint8_t)buffer[0] == 0xAA && (uint8_t)buffer[updateFrameTailIndex - updateFrameHeaderIndex] == 0xAB)           // 判断帧头和帧尾是否正确
 //    {
@@ -160,4 +159,4 @@ void loRaHeaderFrameSend(uint8_t ucNodeId)
 //        }
 //    }
 //    memset(buffer, 0, sizeof(buffer));
-//}
+// }

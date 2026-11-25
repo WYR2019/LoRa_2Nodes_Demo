@@ -180,12 +180,12 @@ void usartSendString(USART_TypeDef *usartId, uint8_t *string)                   
   */
 void usartPrintf(USART_TypeDef *usartId, char *format, ...)
 {
-    uint8_t buffer[256] = {0};                                                                      // 定义一个缓冲区，存放格式化后的字符串
+    char buffer[512] = {0};                                                                         // 定义一个缓冲区，存放格式化后的字符串
     va_list arg;                                                                                    // arg是定义一个参数列表变量
     va_start(arg, format);                                                                          // 从format位置开始接收参数表，放在arg里面
-    vsnprintf((char *)buffer, sizeof(buffer), format, arg);                                         // 封装格式要用vsprintf，因为sprintf只能接收直接写的参数；打印字符串格式是format，参数表是arg，
+    vsnprintf(buffer, sizeof(buffer), format, arg);                                                 // 封装格式要用vsprintf，因为sprintf只能接收直接写的参数；打印字符串格式是format，参数表是arg，
     va_end(arg);                                                                                    // 释放参数表
-    uint8_t *p = buffer;
+    char *p = buffer;
     if (usartId == USART1)
     {
         while (*p)

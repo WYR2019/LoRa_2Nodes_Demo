@@ -118,9 +118,13 @@ char *read_all_string_from_buffer(circular_buffer_t *circular_buffer, char *str)
         length = BUFFER_LENGTH - circular_buffer->read_index + circular_buffer->write_index;    // 反之则为缓冲区长度减去读指针加上写指针
     }
     memset(str, 0, length);
+    int valid_length = 0;
     for (int i = 0; i < length; i++)
     {
-        str[i] = read_one_byte_from_buffer(circular_buffer);
+        char ch = read_one_byte_from_buffer(circular_buffer);
+        if (ch != '\0')
+            str[valid_length++] = ch;
     }
+    str[valid_length] = '\0';
     return str;
 }

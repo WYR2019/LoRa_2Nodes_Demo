@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define BUFFER_LENGTH                                                                      1024
+#define BUFFER_LENGTH                                                                       800
 
 /**
  * @brief 循环缓冲区结构体

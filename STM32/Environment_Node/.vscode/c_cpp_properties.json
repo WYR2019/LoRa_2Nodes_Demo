@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "STM32",
+            "includePath": [
+                "${workspaceFolder}/SystemFiles",
+                "${workspaceFolder}/Libraries/inc",
+                "${workspaceFolder}/User",
+                // "${workspaceFolder}/BSP",
+                "${workspaceFolder}/Drivers",
+                "${workspaceFolder}/FreeRTOS/inc",
+                "${workspaceFolder}/FreeRTOS/portable/RVDS/ARM_CM3",
+                "${workspaceFolder}/FreeRTOS/config"
+                // "${workspaceFolder}/Application/**"
+            ],
+            "defines": [
+                "USE_STDPERIPH_DRIVER",
+                "STM32F10X_MD"
+            ],
+            "cStandard": "c99",
+            "cppStandard": "c++11"
+        }
+    ],
+    "version": 4
+}
